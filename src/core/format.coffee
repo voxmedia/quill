@@ -42,7 +42,7 @@ class Format
     strike:
       tag: 'S'
       prepare: 'strikeThrough'
-      aliasTags: ['DEL', 'STRIKE']
+      aliasTags: ['STRIKE']
 
     color:
       style: 'color'
