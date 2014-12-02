@@ -43,7 +43,7 @@ class Normalizer
     lineNode = this._pullBlocks(lineNode)
     lineNode = this.normalizeNode(lineNode)
     this._unwrapText(lineNode)
-    if lineNode? and dom.LIST_TAGS[lineNode.tagName]?
+    if lineNode? and dom.WRAPPER_TAGS[lineNode.tagName]?
       lineNode = lineNode.firstChild
     return lineNode
 
@@ -98,7 +98,7 @@ class Normalizer
           dom(curNode).splitAncestors(lineNode.parentNode)
         if curNode.nextSibling?
           dom(curNode.nextSibling).splitAncestors(lineNode.parentNode)
-        if !dom.LIST_TAGS[curNode.tagName]? or !curNode.firstChild
+        if !dom.WRAPPER_TAGS[curNode.tagName]? or !curNode.firstChild
           dom(curNode).unwrap()
           this._pullBlocks(lineNode)
         else
