@@ -8,11 +8,11 @@ class Toolbar
     container: null
 
   @formats:
-    LINE    : { 'align', 'bullet', 'list', 'firstheader', 'secondheader', 'thirdheader' }
-    SELECT  : { 'align', 'background', 'color', 'font', 'size', }
+    LINE    : { 'align', 'bullet', 'list', 'firstheader', 'secondheader', 'thirdheader', 'blockquote' }
+    SELECT  : { 'align', 'background', 'color', 'font', 'size' }
     TOGGLE  : { 'firstheader', 'secondheader', 'thirdheader', 'bold', 'bullet', 'image', 'italic', 'link', 'list', 'strike', 'underline' }
     TOOLTIP : { 'image', 'link' }
-    EXCLUSIVE : { 'firstheader', 'secondheader', 'thirdheader', 'bullet', 'list' }
+    EXCLUSIVE : { 'firstheader', 'secondheader', 'thirdheader', 'bullet', 'list', 'blockquote' }
 
   constructor: (@quill, @options) ->
     @options = { container: @options } if _.isString(@options) or _.isElement(@options)

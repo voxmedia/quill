@@ -90,6 +90,10 @@ class Format
       parentTag: 'OL'
       tag: 'LI'
 
+    blockquote:
+      type: Format.types.LINE
+      parentTag: 'BLOCKQUOTE'
+
 
   constructor: (, @config) ->
 
@@ -163,17 +167,16 @@ class Format
     if _.isString(@config.class)
       for c in dom(node).classes()
         dom(node).removeClass(c) if c.indexOf(@config.class) == 0
+    if _.isString(@config.parentTag)
+      dom(node).splitAncestors(node.parentNode.parentNode) if node.previousSibling?
+      dom(node.nextSibling).splitAncestors(node.parentNode.parentNode) if node.nextSibling?
+      dom(node.parentNode).unwrap()
     if _.isString(@config.tag)
       if this.isType(Format.types.LINE)
-        if _.isString(@config.parentTag)
-          dom(node).splitAncestors(node.parentNode.parentNode) if node.previousSibling?
-          dom(node.nextSibling).splitAncestors(node.parentNode.parentNode) if node.nextSibling?
         node = dom(node).switchTag(dom.DEFAULT_BLOCK_TAG)
       else
         node = dom(node).switchTag(dom.DEFAULT_INLINE_TAG)
         dom(node).text(dom.EMBED_TEXT) if dom.EMBED_TAGS[@config.tag]?   # TODO is this desireable?
-    if _.isString(@config.parentTag)
-      dom(node.parentNode).unwrap()
     if node.tagName == dom.DEFAULT_INLINE_TAG and !node.hasAttributes()
       node = dom(node).unwrap()
     return node
