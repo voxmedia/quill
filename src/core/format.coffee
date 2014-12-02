@@ -198,7 +198,7 @@ class Format
     else if _.isString(@config.class)
       for c in dom(node).classes()
         return c.slice(@config.class.length) if c.indexOf(@config.class) == 0
-    else if _.isString(@config.tag)
+    else if _.isString(@config.tag) or _.isString(@config.parentTag)
       return true
     return undefined
 
