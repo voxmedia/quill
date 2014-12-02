@@ -101,7 +101,7 @@ class Wrapper
     nextNode = @node.nextSibling
     if !nextNode? and @node.parentNode != root
       nextNode = @node.parentNode.nextSibling
-    if nextNode? and dom.LIST_TAGS[nextNode.tagName]?
+    if nextNode? and dom.WRAPPER_TAGS[nextNode.tagName]?
       nextNode = nextNode.firstChild
     return nextNode
 
@@ -409,9 +409,10 @@ dom = _.extend(dom,
     'LI'
   }
 
-  LIST_TAGS: {
+  WRAPPER_TAGS: {
     'OL'
     'UL'
+    'BLOCKQUOTE'
   }
 
   VOID_TAGS: {

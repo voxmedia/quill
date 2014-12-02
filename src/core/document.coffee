@@ -87,7 +87,7 @@ class Document
   rebuild: ->
     lines = @lines.toArray()
     lineNode = @root.firstChild
-    lineNode = lineNode.firstChild if lineNode? and dom.LIST_TAGS[lineNode.tagName]?
+    lineNode = lineNode.firstChild if lineNode? and dom.WRAPPER_TAGS[lineNode.tagName]?
     _.each(lines, (line, index) =>
       while line.node != lineNode
         if line.node.parentNode == @root or line.node.parentNode?.parentNode == @root
@@ -112,7 +112,7 @@ class Document
 
   removeLine: (line) ->
     if line.node.parentNode?
-      if dom.LIST_TAGS[line.node.parentNode.tagName] and line.node.parentNode.childNodes.length == 1
+      if dom.WRAPPER_TAGS[line.node.parentNode.tagName] and line.node.parentNode.childNodes.length == 1
         dom(line.node.parentNode).remove()
       else
         dom(line.node).remove()
