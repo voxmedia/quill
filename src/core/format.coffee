@@ -92,6 +92,7 @@ class Format
 
     blockquote:
       type: Format.types.LINE
+      exclusive: true
       parentTag: 'BLOCKQUOTE'
 
 
