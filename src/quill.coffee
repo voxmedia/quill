@@ -158,7 +158,7 @@ class Quill extends EventEmitter2
 
   getText: (start = 0, end = null) ->
     return _.map(this.getContents(start, end).ops, (op) ->
-      return if _.isString(op.insert) then op.insert else ''
+      return if _.isString(op.insert) then op.insert else dom.EMBED_TEXT
     ).join('')
 
   insertEmbed: (index, type, url, source) ->
