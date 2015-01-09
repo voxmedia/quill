@@ -16,7 +16,11 @@ class PasteManager
     return unless range?
     @container.focus()
     _.defer( =>
-      doc = new Document(@container, @quill.options)
+      formats = _.reduce(@quill.editor.doc.formats, (memo, format, name) ->
+        memo[name] = format.config
+        memo
+      , {})
+      doc = new Document(@container, { formats })
       delta = doc.toDelta()
       lengthAdded = delta.length() - 1
       # Need to remove trailing newline so paste is inline, losing format is expected and observed in Word
