@@ -11,7 +11,10 @@ class Document
   constructor: (@root, options = {}) ->
     @formats = {}
     @normalizer = new Normalizer()
-    _.each(options.formats, _.bind(this.addFormat, this))
+    if _.isArray(options.formats)
+      _.each(options.formats, (name) => this.addFormat(name))
+    else
+      _.each(options.formats, (config, name) => this.addFormat(name, config))
     this.setHTML(@root.innerHTML)
 
   addFormat: (name, config) ->
