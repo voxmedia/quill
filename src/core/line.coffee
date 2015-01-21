@@ -73,7 +73,7 @@ class Line extends LinkedList.Node
       format = @doc.formats[name]
       # TODO reassigning @node might be dangerous...
       if format.isType(Format.types.LINE)
-        if format.config.exclusive
+        if value and format.config.exclusive
           @node = format.removeConflicting(@node, @doc.formats, @formats)
         @node = format.add(@node, value)
       if value
