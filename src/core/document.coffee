@@ -4,11 +4,12 @@ dom        = require('../lib/dom')
 Format     = require('./format')
 Line       = require('./line')
 LinkedList = require('../lib/linked-list')
-Normalizer = require('../lib/normalizer')
+Normalizer = require('./normalizer')
 
 
 class Document
   constructor: (@root, options = {}) ->
+    @normalizer = new Normalizer()
     @formats = {}
     @normalizer = new Normalizer()
     if _.isArray(options.formats)
@@ -20,8 +21,8 @@ class Document
   addFormat: (name, config) ->
     config = Format.FORMATS[name] unless _.isObject(config)
     console.warn('Overwriting format', name, @formats[name]) if @formats[name]?
-    @normalizer.addFormat(config)
     @formats[name] = new Format(config)
+    @normalizer.addFormat(config)
 
   appendLine: (lineNode) ->
     return this.insertLineBefore(lineNode, null)

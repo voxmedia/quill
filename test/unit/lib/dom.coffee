@@ -205,7 +205,7 @@ describe('DOM', ->
     )
 
     it('get text embed tag', ->
-      expect(dom(@container.querySelector('img')).text()).toEqual(dom.EMBED_TEXT)
+      expect(dom(@container.querySelector('img')).text()).toEqual('!')
     )
 
     it('set text on element', ->
@@ -231,7 +231,7 @@ describe('DOM', ->
 
     describe('child at offset', ->
       beforeEach( ->
-        @container.innerHTML = Quill.Lib.Normalizer.stripWhitespace('
+        @container.innerHTML = Quill.Normalizer.stripWhitespace('
           <span>111</span>
           <b>222</b>
           <br>
@@ -377,9 +377,9 @@ describe('DOM', ->
       )
     )
 
-    describe('splitAncestors()', ->
+    describe('splitBefore()', ->
       beforeEach( ->
-        @container.innerHTML = Quill.Lib.Normalizer.stripWhitespace('
+        @container.innerHTML = Quill.Normalizer.stripWhitespace('
           <div>
             <span>One</span>
             <b>Two</b>
@@ -394,7 +394,7 @@ describe('DOM', ->
 
       it('single split', ->
         node = @container.querySelector('b')
-        retNode = dom(node).splitAncestors(@container).get()
+        retNode = dom(node).splitBefore(@container).get()
         expect(@container).toEqualHTML('
           <div>
             <span>One</span>
@@ -413,7 +413,7 @@ describe('DOM', ->
 
       it('split multiple', ->
         node = @container.querySelector('s')
-        retNode = dom(node).splitAncestors(@container).get()
+        retNode = dom(node).splitBefore(@container).get()
         expect(@container).toEqualHTML('
           <div>
             <span>One</span>
@@ -435,7 +435,7 @@ describe('DOM', ->
       it('split none', ->
         node = @container.querySelector('span')
         html = @container.innerHTML
-        retNode = dom(node).splitAncestors(@container).get()
+        retNode = dom(node).splitBefore(@container).get()
         expect(@container).toEqualHTML(html)
         expect(retNode).toEqual(@container.firstChild)
       )
@@ -443,7 +443,7 @@ describe('DOM', ->
       it('split parent', ->
         node = @container.querySelector('i')
         html = @container.innerHTML
-        retNode = dom(node).splitAncestors(@container).get()
+        retNode = dom(node).splitBefore(@container).get()
         expect(@container).toEqualHTML('
           <div>
             <span>One</span>
@@ -462,7 +462,7 @@ describe('DOM', ->
 
       it('split force', ->
         node = @container.querySelector('span')
-        retNode = dom(node).splitAncestors(@container, true).get()
+        retNode = dom(node).splitBefore(@container, true).get()
         expect(@container).toEqualHTML('
           <div>
           </div>
@@ -542,7 +542,7 @@ describe('DOM', ->
 
       _.each(tests, (test, name) ->
         it(name, ->
-          @container.innerHTML = Quill.Lib.Normalizer.stripWhitespace(test.initial)
+          @container.innerHTML = Quill.Normalizer.stripWhitespace(test.initial)
           [left, right, split] = dom(@container.firstChild).split(test.offset, test.force)
           expect(@container).toEqualHTML(test.expected)
           leftText = if left then dom(left).text() else null
@@ -554,6 +554,70 @@ describe('DOM', ->
       )
     )
 
+    describe('isolate', ->
+      tests =
+        'before':
+          target: 'u', html: '
+            <div>
+              <div>
+                <i>One</i>
+                <s>Two</s>
+              </div>
+            </div>
+            <div>
+              <div>
+                <u>Three</u>
+              </div>
+            </div>'
+        'after':
+          target: 'i', html: '
+          <div>
+            <div>
+              <i>One</i>
+            </div>
+          </div>
+          <div>
+            <div>
+              <s>Two</s>
+              <u>Three</u>
+            </div>
+          </div>'
+        'both':
+          target: 's', html: '
+          <div>
+            <div>
+              <i>One</i>
+            </div>
+          </div>
+          <div>
+            <div>
+              <s>Two</s>
+            </div>
+          </div>
+          <div>
+            <div>
+              <u>Three</u>
+            </div>
+          </div>'
+
+      _.each(tests, (test, name) ->
+        it(name, ->
+          @container.innerHTML = Quill.Normalizer.stripWhitespace('
+            <div>
+              <div>
+                <i>One</i>
+                <s>Two</s>
+                <u>Three</u>
+              </div>
+            </div>
+          ')
+          node = @container.querySelector(test.target)
+          retNode = dom(node).isolate(@container).get()
+          expect(@container).toEqualHTML(test.html)
+          expect(retNode).toEqual(node)
+        )
+      )
+    )
   )
 
   describe('select', ->
@@ -643,7 +707,7 @@ describe('DOM', ->
 
   describe('get next line node', ->
     it('iterate over standard lines', ->
-      container = $('#test-container').html(Quill.Lib.Normalizer.stripWhitespace('
+      container = $('#test-container').html(Quill.Normalizer.stripWhitespace('
         <div id="line-1">Test</div>
         <div id="line-2"><br></div>
         <div id="line-3">Test</div>'
@@ -658,7 +722,7 @@ describe('DOM', ->
     )
 
     it('iterate over lists', ->
-      container = $('#test-container').html(Quill.Lib.Normalizer.stripWhitespace('
+      container = $('#test-container').html(Quill.Normalizer.stripWhitespace('
         <div id="line-1">Test</div>
         <ul>
           <li id="line-2">One</li>

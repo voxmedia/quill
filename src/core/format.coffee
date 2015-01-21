@@ -96,7 +96,7 @@ class Format
       parentTag: 'BLOCKQUOTE'
 
 
-  constructor: (, @config) ->
+  constructor: (@config) ->
 
   add: (node, value) ->
     return this.remove(node) unless value
@@ -169,8 +169,8 @@ class Format
       for c in dom(node).classes()
         dom(node).removeClass(c) if c.indexOf(@config.class) == 0
     if _.isString(@config.parentTag)
-      dom(node).splitAncestors(node.parentNode.parentNode) if node.previousSibling?
-      dom(node.nextSibling).splitAncestors(node.parentNode.parentNode) if node.nextSibling?
+      dom(node).splitBefore(node.parentNode.parentNode) if node.previousSibling?
+      dom(node.nextSibling).splitBefore(node.parentNode.parentNode) if node.nextSibling?
       dom(node.parentNode).unwrap()
     if _.isString(@config.tag)
       if this.isType(Format.types.LINE)

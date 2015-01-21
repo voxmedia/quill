@@ -5,8 +5,8 @@ EventEmitter2 = require('eventemitter2').EventEmitter2
 dom           = require('./lib/dom')
 Editor        = require('./core/editor')
 Format        = require('./core/format')
+Normalizer    = require('./core/normalizer')
 Range         = require('./lib/range')
-Normalizer    = require('./lib/normalizer')
 
 
 class Quill extends EventEmitter2
@@ -46,9 +46,11 @@ class Quill extends EventEmitter2
 
   @require: (name) ->
     switch name
-      when 'lodash' then return _
-      when 'delta' then return Delta
-      when 'dom' then return dom
+      when 'lodash'     then return _
+      when 'delta'      then return Delta
+      when 'normalizer' then return Normalizer
+      when 'dom'        then return dom
+      when 'range'      then return Range
       else return null
 
 
@@ -61,7 +63,6 @@ class Quill extends EventEmitter2
     @options = _.defaults(options, Quill.DEFAULTS)
     @options.modules = moduleOptions
     @options.id = @id = "ql-editor-#{Quill.editors.length + 1}"
-    @options.emitter = this
     @modules = {}
     @root = this.addContainer('ql-editor')
     @editor = new Editor(@root, this, @options)
@@ -141,13 +142,13 @@ class Quill extends EventEmitter2
     if _.isObject(start)
       end = start.end
       start = start.start
-    return @editor.getDelta().slice(start, end)
+    return @editor.delta.slice(start, end)
 
   getHTML: ->
     @editor.doc.getHTML()
 
   getLength: ->
-    return @editor.getDelta().length()
+    return @editor.length
 
   getModule: (name) ->
     return @modules[name]
@@ -176,13 +177,13 @@ class Quill extends EventEmitter2
       callback(module) if moduleName == name
     )
 
-  prepareFormat: (name, value) ->
+  prepareFormat: (name, value, source = Quill.sources.API) ->
     format = @editor.doc.formats[name]
     return unless format?     # TODO warn
     range = this.getSelection()
     return unless range?.isCollapsed()
     if format.isType(Format.types.LINE)
-      this.formatLine(range, name, value, Quill.sources.USER)
+      this.formatLine(range, name, value, source)
     else
       format.prepare(value)
 
