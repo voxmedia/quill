@@ -9,6 +9,5 @@ config
 dist/quill.min.js
 docs
 examples
-src
 test
 Gruntfile.coffee
