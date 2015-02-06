@@ -21,23 +21,13 @@ class Toolbar
     @inputs = {}
     @preventUpdate = false
     @triggering = false
-    _.each(@quill.options.formats, (format) =>
-      return if Toolbar.formats.TOOLTIP[format]?
-      this.initFormat(format, (range, value) =>
-        return if @triggering
-        if range.isCollapsed()
-          @quill.prepareFormat(format, value, 'user')
-        else if Toolbar.formats.LINE[format]?
-          @quill.formatLine(range, format, value, 'user')
-        else
-          @quill.formatText(range, format, value, 'user')
-        _.defer( =>
-          this.updateActive(range, Toolbar.formats.EXCLUSIVE)  # Clear exclusive formats
-          this.setActive(format, value)
-        )
-      )
+    _.each(@quill.options.formats, (name) =>
+      this.initFormat(name)
     )
-    @quill.on(@quill.constructor.events.SELECTION_CHANGE, (range) =>
+    @quill.on(Quill.events.FORMAT_INIT, (name, format) =>
+      this.initFormat(name)
+    )
+    @quill.on(Quill.events.SELECTION_CHANGE, (range) =>
       this.updateActive(range) if range?
     )
     @quill.onModuleLoad('keyboard', (keyboard) =>
@@ -53,7 +43,8 @@ class Toolbar
         return false
       )
 
-  initFormat: (format, callback) ->
+  initFormat: (format) ->
+    return if Toolbar.formats.TOOLTIP[format]?
     selector = ".ql-#{format}"
     if Toolbar.formats.SELECT[format]?
       selector = "select#{selector}"    # Avoid selecting the picker container
@@ -68,7 +59,7 @@ class Toolbar
       @preventUpdate = true
       @quill.focus()
       range = @quill.getSelection()
-      callback(range, value) if range?
+      this._applyFormat(format, range, value) if range?
       @preventUpdate = false
       return true
     )
@@ -99,6 +90,19 @@ class Toolbar
       if !formats || formats[format]
         this.setActive(format, activeFormats[format])
       return true
+    )
+
+  _applyFormat: (format, range, value) ->
+    return if @triggering
+    if range.isCollapsed()
+      @quill.prepareFormat(format, value, 'user')
+    else if Toolbar.formats.LINE[format]?
+      @quill.formatLine(range, format, value, 'user')
+    else
+      @quill.formatText(range, format, value, 'user')
+    _.defer( =>
+      this.updateActive(range, Toolbar.formats.EXCLUSIVE)  # Clear exclusive formats
+      this.setActive(format, value)
     )
 
   _getActive: (range) ->
