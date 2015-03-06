@@ -1,8 +1,8 @@
-Quill   = require('../quill')
-Tooltip = require('./tooltip')
-_       = Quill.require('lodash')
-dom     = Quill.require('dom')
-
+Quill    = require('../quill')
+Tooltip  = require('./tooltip')
+_        = Quill.require('lodash')
+dom      = Quill.require('dom')
+anchorEl = document.createElement('a')
 
 class LinkTooltip extends Tooltip
   @DEFAULTS:
@@ -34,7 +34,7 @@ class LinkTooltip extends Tooltip
       if anchor
         this.setMode(anchor.href, false)
         this.show(anchor)
-      else
+      else if @container.style.left != Tooltip.HIDE_MARGIN
         @range = null   # Prevent restoring selection to last saved
         this.hide()
     )
@@ -56,6 +56,7 @@ class LinkTooltip extends Tooltip
 
   saveLink: ->
     url = this._normalizeURL(@textbox.value)
+    end = @range.end
     if @range?
       if @range.isCollapsed()
         anchor = this._findAnchor(@range)
@@ -63,6 +64,7 @@ class LinkTooltip extends Tooltip
       else
         @quill.formatText(@range, 'link', url, 'user')
     this.setMode(url, false)
+    @quill.setSelection(end, end)
 
   removeLink: (range) ->
     # Expand range to the entire leaf
@@ -77,7 +79,7 @@ class LinkTooltip extends Tooltip
       _.defer( =>
         # Setting value and immediately focusing doesn't work on Chrome
         @textbox.focus()
-        @textbox.setSelectionRange(url.length, url.length)
+        @textbox.setSelectionRange(0, url.length)
       )
     else
       @link.href = url
@@ -117,7 +119,8 @@ class LinkTooltip extends Tooltip
 
   _normalizeURL: (url) ->
     url = 'http://' + url unless /^(https?:\/\/|mailto:)/.test(url)
-    return url
+    anchorEl.href = url
+    return anchorEl.href
 
   _suggestURL: (range) ->
     text = @quill.getText(range)
