@@ -1,8 +1,7 @@
-Quill    = require('../quill')
-Tooltip  = require('./tooltip')
-_        = Quill.require('lodash')
-dom      = Quill.require('dom')
-anchorEl = document.createElement('a')
+Quill   = require('../quill')
+Tooltip = require('./tooltip')
+_       = Quill.require('lodash')
+dom     = Quill.require('dom')
 
 class LinkTooltip extends Tooltip
   @DEFAULTS:
@@ -56,15 +55,15 @@ class LinkTooltip extends Tooltip
 
   saveLink: ->
     url = this._normalizeURL(@textbox.value)
-    end = @range.end
     if @range?
+      end = @range.end
       if @range.isCollapsed()
         anchor = this._findAnchor(@range)
         anchor.href = url if anchor?
       else
         @quill.formatText(@range, 'link', url, 'user')
+      @quill.setSelection(end, end)
     this.setMode(url, false)
-    @quill.setSelection(end, end)
 
   removeLink: (range) ->
     # Expand range to the entire leaf
@@ -72,6 +71,7 @@ class LinkTooltip extends Tooltip
       range = this._expandRange(range)
     @quill.formatText(range, 'link', false, 'user')
     @toolbar.setActive('link', false) if @toolbar?
+    this.hide()
 
   setMode: (url, edit = false) ->
     if edit
@@ -83,6 +83,7 @@ class LinkTooltip extends Tooltip
       )
     else
       @link.href = url
+      url = @link.href # read back the url for further normalization
       text = if url.length > @options.maxLength then url.slice(0, @options.maxLength) + '...' else url
       dom(@link).text(text)
     dom(@container).toggleClass('editing', edit)
@@ -90,7 +91,7 @@ class LinkTooltip extends Tooltip
   _findAnchor: (range) ->
     [leaf, offset] = @quill.editor.doc.findLeafAt(range.start, true)
     node = leaf.node if leaf?
-    while node?
+    while node? and node != @quill.root
       return node if node.tagName == 'A'
       node = node.parentNode
     return null
@@ -106,21 +107,20 @@ class LinkTooltip extends Tooltip
 
   _onKeyboard: ->
     range = @quill.getSelection()
-    this._toggle(range, true)
+    this._toggle(range, !this._findAnchor(range))
 
   _toggle: (range, value) ->
     return unless range
-    if value and !range.isCollapsed()
+    if !value
+      this.removeLink(range)
+    else if !range.isCollapsed()
       this.setMode(this._suggestURL(range), true)
       nativeRange = @quill.editor.selection._getNativeRange()
       this.show(nativeRange)
-    else
-      this.removeLink(range)
 
   _normalizeURL: (url) ->
     url = 'http://' + url unless /^(https?:\/\/|mailto:)/.test(url)
-    anchorEl.href = url
-    return anchorEl.href
+    return url
 
   _suggestURL: (range) ->
     text = @quill.getText(range)
