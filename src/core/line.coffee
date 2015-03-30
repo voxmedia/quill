@@ -114,15 +114,19 @@ class Line extends LinkedList.Node
     return unless text.length > 0
     [leaf, leafOffset] = this.findLeafAt(offset)
     # offset > 0 for multicursor
-    node = _.reduce(formats, (node, value, name) =>
-      format = @doc.formats[name]
-      node = format.add(node, value) if format?
-      return node
-    , document.createTextNode(text))
-    [prevNode, nextNode] = dom(leaf.node).split(leafOffset)
-    nextNode = dom(nextNode).splitBefore(@node).get() if nextNode
-    @node.insertBefore(node, nextNode)
-    this.optimize()
+    if _.isEqual(leaf.formats, formats)
+      leaf.insertText(leafOffset, text)
+      this.resetContent()
+    else
+      node = _.reduce(formats, (node, value, name) =>
+        format = @doc.formats[name]
+        node = format.add(node, value) if format?
+        return node
+      , document.createTextNode(text))
+      [prevNode, nextNode] = dom(leaf.node).split(leafOffset)
+      nextNode = dom(nextNode).splitBefore(@node).get() if nextNode
+      @node.insertBefore(node, nextNode)
+      this.rebuild()
 
   optimize: ->
     Normalizer.optimizeLine(@node)
