@@ -26,14 +26,14 @@ class Format
       prepare: 'thirdheader'
 
     bold:
-      tag: 'B'
+      tag: 'STRONG'
       prepare: 'bold'
-      aliasTags: ['STRONG']
+      aliasTags: ['B']
 
     italic:
-      tag: 'I'
+      tag: 'EM'
       prepare: 'italic'
-      aliasTags: ['EM']
+      aliasTags: ['I']
 
     underline:
       tag: 'U'
