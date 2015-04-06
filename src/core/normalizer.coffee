@@ -11,6 +11,8 @@ camelize = (str) ->
 
 class Normalizer
   @ALIASES: {
+    'I'      : 'EM'
+    'B'      : 'STRONG'
     'STRIKE' : 'S'
   }
 

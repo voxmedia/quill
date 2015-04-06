@@ -28,12 +28,10 @@ class Format
     bold:
       tag: 'STRONG'
       prepare: 'bold'
-      aliasTags: ['B']
 
     italic:
       tag: 'EM'
       prepare: 'italic'
-      aliasTags: ['I']
 
     underline:
       tag: 'U'
@@ -42,7 +40,6 @@ class Format
     strike:
       tag: 'S'
       prepare: 'strikeThrough'
-      aliasTags: ['STRIKE']
 
     color:
       style: 'color'
