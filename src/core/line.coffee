@@ -9,13 +9,10 @@ Normalizer = require('./normalizer')
 
 
 class Line extends LinkedList.Node
-  @CLASS_NAME : 'ql-line'
-  @ID_PREFIX  : 'ql-line-'
+  @DATA_KEY  : 'line'
 
   constructor: (@doc, @node) ->
-    @id = _.uniqueId(Line.ID_PREFIX)
     @formats = {}
-    dom(@node).addClass(Line.CLASS_NAME)
     this.rebuild()
     super(@node)
 
@@ -46,11 +43,7 @@ class Line extends LinkedList.Node
     this.rebuild()
 
   findLeaf: (leafNode) ->
-    curLeaf = @leaves.first
-    while curLeaf?
-      return curLeaf if curLeaf.node == leafNode
-      curLeaf = curLeaf.next
-    return null
+    return if leafNode? then dom(leafNode).data(Leaf.DATA_KEY) else undefined
 
   findLeafAt: (offset, inclusive = false) ->
     # TODO exact same code as findLineAt
@@ -155,7 +148,7 @@ class Line extends LinkedList.Node
     return true
 
   resetContent: ->
-    @node.id = @id unless @node.id == @id
+    dom(@node).data(Line.DATA_KEY, this)
     @outerHTML = @node.outerHTML
     @length = 1
     @delta = new Delta()

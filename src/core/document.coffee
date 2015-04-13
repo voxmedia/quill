@@ -29,37 +29,29 @@ class Document
 
   findLeafAt: (index, inclusive) ->
     [line, offset] = this.findLineAt(index)
-    return if line? then line.findLeafAt(offset, inclusive) else [null, offset]
+    return if line? then line.findLeafAt(offset, inclusive) else [undefined, offset]
 
   findLine: (node) ->
     while node? and !dom.BLOCK_TAGS[node.tagName]?
       node = node.parentNode
-    line = if node? then @lineMap[node.id] else null
-    return if line?.node == node then line else null
+    line = if node? then dom(node).data(Line.DATA_KEY) else undefined
+    return if line?.node == node then line else undefined
 
   findLineAt: (index) ->
-    return [null, index] unless @lines.length > 0
+    return [undefined, index] unless @lines.length > 0
     length = this.toDelta().length()     # TODO optimize
     return [@lines.last, @lines.last.length] if index == length
-    return [null, index - length] if index > length
+    return [undefined, index - length] if index > length
     curLine = @lines.first
     while curLine?
       return [curLine, index] if index < curLine.length
       index -= curLine.length
       curLine = curLine.next
-    return [null, index]    # Should never occur unless length calculation is off
+    return [undefined, index]    # Should never occur unless length calculation is off
 
   getHTML: ->
-    html = @root.innerHTML
     # Preserve spaces between tags
-    html = html.replace(/\>\s+\</g, '>&nbsp;<')
-    container = document.createElement('div')
-    container.innerHTML = html
-    _.each(container.querySelectorAll(".#{Line.CLASS_NAME}"), (node) ->
-      dom(node).removeClass(Line.CLASS_NAME)
-      node.removeAttribute('id')
-    )
-    return container.innerHTML
+    return @root.innerHTML.replace(/\>\s+\</g, '>&nbsp;<')
 
   insertLineBefore: (newLineNode, refLine) ->
     line = new Line(this, newLineNode)
@@ -69,7 +61,6 @@ class Document
     else
       @root.appendChild(newLineNode) unless dom(newLineNode.parentNode).isElement()
       @lines.append(line)
-    @lineMap[line.id] = line
     return line
 
   mergeLines: (line, lineToMerge) ->
@@ -120,7 +111,6 @@ class Document
         dom(line.node.parentNode).remove()
       else
         dom(line.node).remove()
-    delete @lineMap[line.id]
     @lines.remove(line)
 
   setHTML: (html) ->
@@ -128,7 +118,6 @@ class Document
     html = Normalizer.stripWhitespace(html)
     @root.innerHTML = html
     @lines = new LinkedList()
-    @lineMap = {}
     this.rebuild()
 
   splitLine: (line, offset) ->
