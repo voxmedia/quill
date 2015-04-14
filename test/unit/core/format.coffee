@@ -27,17 +27,17 @@ describe('Format', ->
       missing: 'Text'
       value: 'http://quilljs.com'
     firstheader:
-      format: new Quill.Format(document, Quill.Format.FORMATS.firstheader)
+      format: new Quill.Format(Quill.Format.FORMATS.firstheader)
       existing: '<h1>Text</h1>'
       missing: '<div>Text</div>'
       value: true
     secondheader:
-      format: new Quill.Format(document, Quill.Format.FORMATS.secondheader)
+      format: new Quill.Format(Quill.Format.FORMATS.secondheader)
       existing: '<h2>Text</h2>'
       missing: '<div>Text</div>'
       value: true
     thirdheader:
-      format: new Quill.Format(document, Quill.Format.FORMATS.thirdheader)
+      format: new Quill.Format(Quill.Format.FORMATS.thirdheader)
       existing: '<h3>Text</h3>'
       missing: '<div>Text</div>'
       value: true
@@ -223,8 +223,8 @@ describe('Format', ->
 
   describe('removeConflicting()', ->
     it('removes conflicting formats', ->
-      firstheader = new Quill.Format(document, Quill.Format.FORMATS.firstheader)
-      secondheader = new Quill.Format(document, Quill.Format.FORMATS.secondheader)
+      firstheader = new Quill.Format(Quill.Format.FORMATS.firstheader)
+      secondheader = new Quill.Format(Quill.Format.FORMATS.secondheader)
       @container.innerHTML = '<h2>Hello</h2>'
       formats = { firstheader, secondheader }
       currentFormats = { secondheader: true }
@@ -236,7 +236,7 @@ describe('Format', ->
 
   it('bullets', ->
     @container.innerHTML = '<ul><li>One</li><li>Two</li><li>Three</li></ul>'
-    format = new Quill.Format(document, Quill.Format.FORMATS.bullet)
+    format = new Quill.Format(Quill.Format.FORMATS.bullet)
     li = @container.firstChild.childNodes[1]
     format.remove(li)
     expect(@container).toEqualHTML('<ul><li>One</li></ul><div>Two</div><ul><li>Three</li></ul>')
