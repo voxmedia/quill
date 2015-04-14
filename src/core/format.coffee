@@ -26,11 +26,11 @@ class Format
       prepare: 'thirdheader'
 
     bold:
-      tag: 'STRONG'
+      tag: 'B'
       prepare: 'bold'
 
     italic:
-      tag: 'EM'
+      tag: 'I'
       prepare: 'italic'
 
     underline:
