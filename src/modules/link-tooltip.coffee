@@ -12,7 +12,7 @@ class LinkTooltip extends Tooltip
       <input class="input" type="text">
       <span>&nbsp;</span>
       <a href="javascript:;" class="change">Change</a>
-      <a href="javascript:;" class="remove"><svg viewBox="0 0 20 20" class="p-icon " title="Versions"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-x"></use></svg></a>
+      <a href="javascript:;" class="remove">Remove</a>
       <a href="javascript:;" class="done">Done</a>'
 
   @hotkeys:
