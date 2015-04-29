@@ -16,7 +16,9 @@ class Keyboard
     @hotkeys = {}
     this._initListeners()
     this._initHotkeys()
-    this._initDeletes()
+    @quill.onModuleLoad('toolbar', (toolbar) =>
+      @toolbar = toolbar
+    )
 
   addHotkey: (hotkeys, callback) ->
     hotkeys = [hotkeys] unless Array.isArray(hotkeys)
@@ -40,8 +42,25 @@ class Keyboard
       @quill.prepareFormat(format, value, Quill.sources.USER)
     else
       @quill.formatText(range, format, value, Quill.sources.USER)
-    toolbar = @quill.getModule('toolbar')
-    toolbar.setActive(format, value) if toolbar?
+    @toolbar.setActive(format, value) if @toolbar?
+
+  _initEnter: ->
+    keys = [
+      { key: dom.KEYS.ENTER }
+      { key: dom.KEYS.ENTER, shiftKey: true }
+    ]
+    this.addHotkey(keys, (range, hotkey) =>
+      return true unless range?
+      [line, offset] = @quill.editor.doc.findLineAt(range.start)
+      [leaf, offset] = line.findLeafAt(offset)
+      delta = new Delta().retain(range.start).insert('\n', line.formats).delete(range.end - range.start)
+      @quill.updateContents(delta, Quill.sources.USER)
+      _.each(leaf.formats, (value, format) =>
+        @quill.prepareFormat(format, value)
+        @toolbar.setActive(format, value)
+      )
+      return false
+    )
 
   _initDeletes: ->
     this.addHotkey([dom.KEYS.DELETE, dom.KEYS.BACKSPACE], (range, hotkey) =>
@@ -63,7 +82,7 @@ class Keyboard
               @quill.formatLine(start, start, format, false)
             else if start > 0
               @quill.deleteText(start - 1, start, Quill.sources.USER)
-          else if start < @quill.getLength()
+          else if start < @quill.getLength() - 1
             @quill.deleteText(start, start + 1, Quill.sources.USER)
       return false
     )
@@ -83,6 +102,8 @@ class Keyboard
         return false
       )
     )
+    this._initDeletes()
+    this._initEnter()
 
   _initListeners: ->
     dom(@quill.root).on('keydown', (event) =>
