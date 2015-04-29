@@ -5,6 +5,7 @@ dom = require('../lib/dom')
 class Format
   @types:
     LINE: 'line'
+    EMBED: 'embed'
 
   @FORMATS:
     bold:
@@ -46,9 +47,17 @@ class Format
 
     link:
       tag: 'A'
-      attribute: 'href'
+      add: (node, value) ->
+        node.setAttribute('href', value)
+        return node
+      remove: (node) ->
+        node.removeAttribute('href')
+        return node
+      value: (node) ->
+        return node.getAttribute('href')
 
     image:
+      type: Format.types.EMBED
       tag: 'IMG'
       attribute: 'src'
 
@@ -75,7 +84,6 @@ class Format
   add: (node, value) ->
     return this.remove(node) unless value
     return node if _.isEqual(this.value(node), value)
-    return @config.add.call(this, node, value) if _.isFunction(@config.add)
     if _.isString(@config.parentTag)
       parentNode = document.createElement(@config.parentTag)
       dom(node).wrap(parentNode)
@@ -106,14 +114,17 @@ class Format
         node.setAttribute(@config.attribute, value)
       if _.isString(@config.class)
         dom(node).addClass(@config.class + value)
+    if _.isFunction(@config.add)
+      node = @config.add(node, value)
     return node
 
   isType: (type) ->
     return type == @config.type
 
   match: (node) ->
-    return @config.match.call(this, node) if _.isFunction(@config.match)
     return false unless dom(node).isElement()
+    if _.isFunction(@config.match)
+      return @config.match(node)
     if _.isString(@config.parentTag) and node.parentNode?.tagName != @config.parentTag
       return false
     if _.isString(@config.tag) and node.tagName != @config.tag
@@ -132,11 +143,10 @@ class Format
     if _.isString(@config.prepare)
       document.execCommand(@config.prepare, false, value)
     else if _.isFunction(@config.prepare)
-      @config.prepare.call(this, value)
+      @config.prepare(value)
 
   remove: (node) ->
     return node unless this.match(node)
-    return @config.remove.call(this, node) if _.isFunction(@config.remove)
     if _.isString(@config.style)
       node.style[@config.style] = ''    # IE10 requires setting to '', other browsers can take null
       node.removeAttribute('style') unless node.getAttribute('style')  # Some browsers leave empty style attribute
@@ -151,18 +161,23 @@ class Format
           dom(node).splitBefore(node.parentNode.parentNode) if node.previousSibling?
           dom(node.nextSibling).splitBefore(node.parentNode.parentNode) if node.nextSibling?
         node = dom(node).switchTag(dom.DEFAULT_BLOCK_TAG)
+      else if this.isType(Format.types.EMBED)
+        dom(node).remove()
+        return undefined
       else
         node = dom(node).switchTag(dom.DEFAULT_INLINE_TAG)
-        dom(node).text(dom.EMBED_TEXT) if dom.EMBED_TAGS[@config.tag]?   # TODO is this desireable?
     if _.isString(@config.parentTag)
       dom(node.parentNode).unwrap()
+    if _.isFunction(@config.remove)
+      node = @config.remove(node)
     if node.tagName == dom.DEFAULT_INLINE_TAG and !node.hasAttributes()
       node = dom(node).unwrap()
     return node
 
   value: (node) ->
     return undefined unless this.match(node)
-    return @config.value.call(this, node) if _.isFunction(@config.value)
+    if @config.value
+      return @config.value(node)
     if _.isString(@config.attribute)
       return node.getAttribute(@config.attribute) or undefined    # So "" does not get returned
     else if _.isString(@config.style)

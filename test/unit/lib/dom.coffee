@@ -2,7 +2,7 @@ dom = Quill.Lib.DOM
 
 describe('DOM', ->
   beforeEach( ->
-    @container = $('#test-container').html('<div></div>').get(0).firstChild
+    @container = jasmine.clearContainer()
   )
 
   describe('classes', ->
@@ -116,6 +116,37 @@ describe('DOM', ->
     )
   )
 
+  describe('data', ->
+    beforeEach( ->
+      @container.id = 'test-data'
+    )
+
+    it('get nonexistent value', ->
+      data = dom(@container).data('nonexistent')
+      expect(data).toBeUndefined()
+    )
+
+    it('get/set value', ->
+      dom(@container).data('a', 1).data('b', 2)
+      elem = document.getElementById('test-data')
+      expect(dom(elem).data('a')).toEqual(1)
+      expect(dom(elem).data('b')).toEqual(2)
+    )
+
+    it('overwrite value', ->
+      dom(@container).data('a', 1).data('a', 2)
+      elem = document.getElementById('test-data')
+      expect(dom(elem).data('a')).toEqual(2)
+    )
+
+    it('removed node', ->
+      dom(@container).data('a', 1)
+      elem = document.getElementById('test-data')
+      dom(@container).remove()
+      expect(dom(elem).data('a')).toEqual(1)
+    )
+  )
+
   describe('events', ->
     describe('on()', ->
       beforeEach( ->
@@ -225,10 +256,6 @@ describe('DOM', ->
   )
 
   describe('access', ->
-    beforeEach( ->
-      @container = $('#test-container').html('').get(0)
-    )
-
     describe('child at offset', ->
       beforeEach( ->
         @container.innerHTML = Quill.Normalizer.stripWhitespace('
@@ -265,11 +292,11 @@ describe('DOM', ->
 
     describe('get node length', ->
       tests =
-        'element':
-          html: '<b>One</b>'
-          length: 3
         'text':
           html: 'One'
+          length: 3
+        'element':
+          html: '<b>One</b>'
           length: 3
         'many nodes':
           html: '<i><b><i>A</i>B<u>C<s>D</s></u></i>'
@@ -343,38 +370,34 @@ describe('DOM', ->
     )
   )
 
-  describe('split + merge', ->
-    beforeEach( ->
-      @container = $('#test-container').html('').get(0)
+  describe('merge', ->
+    it('nodes', ->
+      @container.innerHTML = '<ul><li>One</li></ul><ul><li>Two</li></ul>'
+      dom(@container.firstChild).merge(@container.lastChild)
+      expect(@container).toEqualHTML('<ul><li>One</li><li>Two</li></ul>')
     )
 
-    describe('merge', ->
-      it('merge nodes', ->
-        @container.innerHTML = '<ul><li>One</li></ul><ul><li>Two</li></ul>'
-        dom(@container.firstChild).merge(@container.lastChild)
-        expect(@container).toEqualHTML('<ul><li>One</li><li>Two</li></ul>')
-      )
-
-      it('merge and normalize', ->
-        @container.innerHTML = '<span>One</span><span>Two</span>'
-        expect(@container.childNodes.length).toEqual(2)
-        dom(@container.firstChild).merge(@container.lastChild)
-        expect(@container).toEqualHTML('<span>OneTwo</span>')
-        expect(@container.childNodes.length).toEqual(1)
-        expect(@container.firstChild.childNodes.length).toEqual(1)
-      )
-
-      it('merge text nodes', ->
-        @container.innerHTML = ''
-        @container.appendChild(document.createTextNode('One'))
-        @container.appendChild(document.createTextNode('Two'))
-        expect(@container.childNodes.length).toEqual(2)
-        dom(@container.firstChild).merge(@container.lastChild)
-        expect(@container).toEqualHTML('OneTwo')
-        expect(@container.childNodes.length).toEqual(1)
-      )
+    it('normalize', ->
+      @container.innerHTML = '<span>One</span><span>Two</span>'
+      expect(@container.childNodes.length).toEqual(2)
+      dom(@container.firstChild).merge(@container.lastChild)
+      expect(@container).toEqualHTML('<span>OneTwo</span>')
+      expect(@container.childNodes.length).toEqual(1)
+      expect(@container.firstChild.childNodes.length).toEqual(1)
     )
 
+    it('text nodes', ->
+      @container.innerHTML = ''
+      @container.appendChild(document.createTextNode('One'))
+      @container.appendChild(document.createTextNode('Two'))
+      expect(@container.childNodes.length).toEqual(2)
+      dom(@container.firstChild).merge(@container.lastChild)
+      expect(@container).toEqualHTML('OneTwo')
+      expect(@container.childNodes.length).toEqual(1)
+    )
+  )
+
+  describe('split', ->
     describe('splitBefore()', ->
       beforeEach( ->
         @container.innerHTML = Quill.Normalizer.stripWhitespace('

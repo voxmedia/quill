@@ -28,6 +28,7 @@ class Quill extends EventEmitter2
     theme: 'base'
 
   @events:
+    FORMAT_INIT      : 'format-init'
     MODULE_INIT      : 'module-init'
     POST_EVENT       : 'post-event'
     PRE_EVENT        : 'pre-event'
@@ -48,6 +49,7 @@ class Quill extends EventEmitter2
     switch name
       when 'lodash'     then return _
       when 'delta'      then return Delta
+      when 'format'     then return Format
       when 'normalizer' then return Normalizer
       when 'dom'        then return dom
       when 'range'      then return Range
@@ -55,7 +57,7 @@ class Quill extends EventEmitter2
 
 
   constructor: (@container, options = {}) ->
-    @container = document.querySelector(container) if _.isString(@container)
+    @container = document.querySelector(@container) if _.isString(@container)
     throw new Error('Invalid Quill container') unless @container?
     moduleOptions = _.defaults(options.modules or {}, Quill.DEFAULTS.modules)
     html = @container.innerHTML
@@ -92,8 +94,9 @@ class Quill extends EventEmitter2
     @container.insertBefore(container, refNode)
     return container
 
-  addFormat: (name, format) ->
-    @editor.doc.addFormat(name, format)
+  addFormat: (name, config) ->
+    @editor.doc.addFormat(name, config)
+    this.emit(Quill.events.FORMAT_INIT, name)
 
   addModule: (name, options) ->
     moduleClass = Quill.modules[name]
@@ -163,7 +166,9 @@ class Quill extends EventEmitter2
     ).join('')
 
   insertEmbed: (index, type, url, source) ->
-    this.insertText(index, dom.EMBED_TEXT, type, url, source)
+    [index, end, formats, source] = this._buildParams(index, 0, type, url, source)
+    delta = new Delta().retain(index).insert(1, formats)
+    @editor.applyDelta(delta, source)
 
   insertText: (index, text, name, value, source) ->
     [index, end, formats, source] = this._buildParams(index, 0, name, value, source)
@@ -192,7 +197,7 @@ class Quill extends EventEmitter2
       delta = { ops: delta.slice() }
     else
       delta = { ops: delta.ops.slice() }
-    delta.ops.push({ delete: this.getLength() })
+    delta.ops.push({ delete: this.getLength() - 1 })
     this.updateContents(delta, source)
 
   setHTML: (html, source = Quill.sources.API) ->

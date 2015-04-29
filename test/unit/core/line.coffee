@@ -2,8 +2,7 @@ dom = Quill.Lib.DOM
 
 describe('Line', ->
   beforeEach( ->
-    resetContainer()
-    @container = $('#test-container').html('<div></div>').get(0).firstChild
+    @container = jasmine.clearContainer()
     @doc = new Quill.Document(@container, { formats: Quill.DEFAULTS.formats })
   )
 
@@ -93,7 +92,7 @@ describe('Line', ->
         if test.match
           expect(leaf.node).toEqual(queryNode)
         else
-          expect(leaf).toBe(null)
+          expect(leaf).toBe(undefined)
       )
     )
 
@@ -276,9 +275,13 @@ describe('Line', ->
         initial: '<b><i>01</i><s>23</s></b><i><s>45</s><b>67</b></i>'
         expected: '<b><i>01</i></b><b><s>2</s></b><s>3</s><i><s>45</s></i><i>6<b>7</b></i>'
         args: [3, 4, 'bold', false]
+      'split boundaries with parents remove at beginning':
+        initial: '<b><i>01</i><s>23</s></b>'
+        expected: '<i>01</i><s>23</s>'
+        args: [0, 4, 'bold', false]
       'remove image':
         initial: '<b>01</b><img src="http://quilljs.com/images/cloud.png"><s>34</s>'
-        expected: "<b>01</b>#{dom.EMBED_TEXT}<s>34</s>"
+        expected: "<b>01</b><s>34</s>"
         args: [2, 1, 'image', false]
       'change format':
         initial: '<b style="color: red;">012</b>'

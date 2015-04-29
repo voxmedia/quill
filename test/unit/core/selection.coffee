@@ -1,7 +1,6 @@
 describe('Selection', ->
   beforeEach( ->
-    resetContainer()
-    @container = $('#editor-container').get(0)
+    @container = jasmine.resetEditor()
   )
 
   describe('helpers', ->
@@ -195,6 +194,14 @@ describe('Selection', ->
         expect(range.start).toEqual(0)
         expect(range.end).toEqual(0)
       )
+
+      it('empty line', ->
+        @container.innerHTML = '<div><br></div>'
+        quill = new Quill(@container.firstChild)
+        quill.editor.selection.setRange(new Quill.Lib.Range(0, 0))
+        range = quill.editor.selection.getRange()
+        expect(range.start).toEqual(0)
+      )
     )
   )
 
@@ -208,7 +215,7 @@ describe('Selection', ->
           </div>'
         quill = new Quill(@container.firstChild)
         quill.editor.selection.setRange(new Quill.Lib.Range(0, 3))
-        quill.editor._insertAt(0, Quill.Lib.DOM.EMBED_TEXT, { image: 'http://quilljs.com/images/cloud.png' })
+        quill.editor._insertEmbed(0, { image: 'http://quilljs.com/images/cloud.png' })
         quill.editor._formatAt(2, 4, 'bold', true)
         expect(quill.root).toEqualHTML('
           <div><img src="http://quilljs.com/images/cloud.png"><br></div>

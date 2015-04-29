@@ -122,6 +122,7 @@ class Selection
     return this._decodePosition(leaf.node, offset)
 
   _positionToIndex: (node, offset) ->
+    offset = 0 if dom.isIE(10) and node.tagName == 'BR' and offset == 1
     [leafNode, offset] = this._encodePosition(node, offset)
     line = @doc.findLine(leafNode)
     # TODO move to linked list
@@ -157,6 +158,8 @@ class Selection
     else
       selection.removeAllRanges()
       @doc.root.blur()
+      # setRange(null) will fail to blur in IE10/11 on Travis+SauceLabs (but not local VMs)
+      document.body.focus() if dom.isIE(11) and !dom.isIE(9)
 
 
 module.exports = Selection

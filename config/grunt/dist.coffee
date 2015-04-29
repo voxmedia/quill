@@ -75,13 +75,13 @@ module.exports = (grunt) ->
       modifier: 'modern'
       include: [
         'difference', 'intersection', 'last'
-        'all', 'each', 'invoke', 'map', 'reduce'
+        'all', 'each', 'find', 'invoke', 'map', 'reduce'
         'bind', 'defer', 'partial'
         'clone', 'extend', 'defaults', 'omit', 'values'
-        'isElement', 'isEqual', 'isNumber', 'isObject', 'isString'
+        'isElement', 'isEqual', 'isFunction', 'isNumber', 'isObject', 'isString'
         'uniqueId'
       ]
-      flags: ['debug']
+      flags: ['development']
     target:
       dest: '.build/lodash.js'
   )

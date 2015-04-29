@@ -1,4 +1,4 @@
-# [Quill Rich Text Editor](http://quilljs.com/) [![Build Status](https://travis-ci.org/quilljs/quill.svg?branch=master)](http://travis-ci.org/quilljs/quill) [![Dependency Status](https://gemnasium.com/quilljs/quill.png)](https://gemnasium.com/quilljs/quill)
+# [Quill Rich Text Editor](http://quilljs.com/) [![Build Status](https://travis-ci.org/quilljs/quill.svg?branch=master)](http://travis-ci.org/quilljs/quill)
 
 [![Webdriver Test Status](https://saucelabs.com/browser-matrix/quill-master.svg)](https://saucelabs.com/u/quill)
 
@@ -23,7 +23,7 @@ Instantiate a new Quill object with a css selector for the div that should becom
 </div>
 
 <!-- Include the Quill library -->
-<script src="http://quilljs.com/js/quill.js"></script>
+<script src="http://cdn.quilljs.com/latest/quill.js"></script>
 
 <!-- Initialize Quill editor -->
 <script>
@@ -44,8 +44,8 @@ There are a number of ways to the latest or versioned copy of Quill.
 ### CDN
 
 ```html
-<link rel="stylesheet" href="//cdn.quilljs.com/0.16.0/quill.snow.css" />
-<script src="//cdn.quilljs.com/0.16.0/quill.min.js"></script>
+<link rel="stylesheet" href="//cdn.quilljs.com/0.19.10/quill.snow.css" />
+<script src="//cdn.quilljs.com/0.19.10/quill.min.js"></script>
 ```
 
 
@@ -63,17 +63,22 @@ Quill's source is in [Coffeescript](http://coffeescript.org/) and utilizes [Brow
     grunt dist - compile and browserify
     grunt server - starts a local server that will build and serve assets on the fly
 
+### Examples
+
+With the local server (`grunt server`) running you can try out some minimal examples on:
+
+- [localhost:9000/examples/index.html](http://localhost:9000/examples/index.html)
+- [localhost:9000/examples/advanced.html](http://localhost:9000/examples/advanced.html) 
+
+Quill [releases](https://github.com/quilljs/quill/releases) also contain these examples as built static files you can try without needing to run the local development server.
+
 ### Testing
 
-All tests assume the local server is running.
-
-    grunt test - run tests with phantomjs
-    grunt test:unit - runs javascript test suite with phantomjs
+    grunt test:unit - runs javascript test suite with chrome
     grunt test:e2e - runs end to end tests with Webdriver + Chrome
     grunt test:coverage - run coverage tests using phantomjs
-    grunt test:karma - runs karma on port 9876
 
-Check out Gruntfile.coffee and config/grunt for more testing options.
+Tests are run by [Karma](http://karma-runner.github.io/) and [Protractor](https://github.com/angular/protractor) using [Jasmine](http://jasmine.github.io/). Check out `Gruntfile.coffee` and `config/grunt/` for more testing options.
 
 
 ## Community
@@ -81,7 +86,7 @@ Check out Gruntfile.coffee and config/grunt for more testing options.
 Get help or stay up to date.
 
 - Follow [@quilljs](https://twitter.com/quilljs) on Twitter
-- Ask questions on [Stack Overflow](http://stackoverflow.com/) (tag with quill)
+- Ask questions on [Stack Overflow](http://stackoverflow.com/questions/tagged/quill) (tag with quill)
 - Visit the [discussion group](http://discuss.quilljs.com)
 - If a private channel is required, you may also email support@quilljs.com
 

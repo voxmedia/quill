@@ -42,8 +42,7 @@ class Editor
             this._insertAt(index, op.insert, op.attributes)
             index += op.insert.length;
           else if _.isNumber(op.insert)
-            # TODO embed needs native insert
-            this._insertAt(index, dom.EMBED_TEXT, op.attributes)
+            this._insertEmbed(index, op.attributes)
             index += 1;
           else if _.isNumber(op.delete)
             this._deleteAt(index, op.delete)
@@ -84,8 +83,11 @@ class Editor
     throw new Error('Invalid index') unless leaf?
     containerBounds = @root.parentNode.getBoundingClientRect()
     side = 'left'
-    if leaf.length == 0
+    if leaf.length == 0   # BR case
       bounds = leaf.node.parentNode.getBoundingClientRect()
+    else if dom.VOID_TAGS[leaf.node.tagName]
+      bounds = leaf.node.getBoundingClientRect()
+      side = 'right' if offset == 1
     else
       range = document.createRange()
       if offset < leaf.length
@@ -98,7 +100,7 @@ class Editor
       bounds = range.getBoundingClientRect()
     return {
       height: bounds.height
-      left: bounds[side] - containerBounds.left,
+      left: bounds[side] - containerBounds.left
       top: bounds.top - containerBounds.top
     }
 
@@ -132,6 +134,12 @@ class Editor
         length -= 1
         offset = 0
         line = line.next
+    )
+
+  _insertEmbed: (index, attributes) ->
+    @selection.shiftAfter(index, 1, =>
+      [line, offset] = @doc.findLineAt(index)
+      line.insertEmbed(offset, attributes)
     )
 
   _insertAt: (index, text, formatting = {}) ->
