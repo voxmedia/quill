@@ -13,18 +13,19 @@ class Leaf extends LinkedList.Node
   constructor: (@node, formats) ->
     @formats = _.clone(formats)
     @text = dom(@node).text()
-    this.rebuild()
+    @length = @text.length
+    dom(@node).data(Leaf.DATA_KEY, this)
 
   deleteText: (offset, length) ->
     return unless length > 0
     @text = @text.slice(0, offset) + @text.slice(offset + length)
+    @length = @text.length
     if dom.EMBED_TAGS[@node.tagName]?
       textNode = document.createTextNode(@text)
       dom(textNode).data(Leaf.DATA_KEY, this)
       @node = dom(@node).replace(textNode)
     else
       dom(@node).text(@text)
-    this.rebuild()
 
   insertText: (offset, text) ->
     @text = @text.slice(0, offset) + text + @text.slice(offset)
@@ -38,11 +39,7 @@ class Leaf extends LinkedList.Node
       else
         @node.appendChild(textNode)
         @node = textNode
-    this.rebuild()
-
-  rebuild: ->
     @length = @text.length
-    dom(@node).data(Leaf.DATA_KEY, this)
-    return true
+
 
 module.exports = Leaf
