@@ -182,9 +182,6 @@ class Format
         dom(node).removeClass(c) if c.indexOf(@config.class) == 0
     if _.isString(@config.tag)
       if this.isType(Format.types.LINE)
-        if _.isString(@config.parentTag)
-          dom(node).splitBefore(node.parentNode.parentNode) if node.previousSibling?
-          dom(node.nextSibling).splitBefore(node.parentNode.parentNode) if node.nextSibling?
         node = dom(node).switchTag(dom.DEFAULT_BLOCK_TAG)
       else if this.isType(Format.types.EMBED)
         dom(node).remove()
@@ -192,6 +189,8 @@ class Format
       else
         node = dom(node).switchTag(dom.DEFAULT_INLINE_TAG)
     if _.isString(@config.parentTag)
+      dom(node).splitBefore(node.parentNode.parentNode) if node.previousSibling?
+      dom(node.nextSibling).splitBefore(node.parentNode.parentNode) if node.nextSibling?
       dom(node.parentNode).unwrap()
     if _.isFunction(@config.remove)
       node = @config.remove(node)
