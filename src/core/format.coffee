@@ -8,24 +8,6 @@ class Format
     EMBED: 'embed'
 
   @FORMATS:
-    firstheader:
-      type: Format.types.LINE
-      exclusive: true
-      tag: 'H1'
-      prepare: 'firstheader'
-
-    secondheader:
-      type: Format.types.LINE
-      exclusive: true
-      tag: 'H2'
-      prepare: 'secondheader'
-
-    thirdheader:
-      type: Format.types.LINE
-      exclusive: true
-      tag: 'H3'
-      prepare: 'thirdheader'
-
     bold:
       tag: 'B'
       prepare: 'bold'
@@ -97,11 +79,6 @@ class Format
       inherit: true
       parentTag: 'OL'
       tag: 'LI'
-
-    blockquote:
-      type: Format.types.LINE
-      exclusive: true
-      parentTag: 'BLOCKQUOTE'
 
 
   constructor: (@config) ->
