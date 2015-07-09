@@ -81,7 +81,8 @@ class Keyboard
       @quill.updateContents(delta, Quill.sources.USER)
       _.each(leaf.formats, (value, format) =>
         @quill.prepareFormat(format, value)
-        @toolbar.setActive(format, value)
+        @toolbar.setActive(format, value) if @toolbar?
+        return
       )
       return false
     )
