@@ -424,6 +424,11 @@ dom = _.extend(dom,
     'LI'
   }
 
+  LIST_TAGS: {
+    'OL'
+    'UL'
+  }
+
   WRAPPER_TAGS: {
     'OL'
     'UL'

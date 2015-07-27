@@ -343,7 +343,7 @@ describe('DOM', ->
 
     it('switchTag() to same', ->
       html = @container.innerHTML
-      node = dom(@container.firstChild).switchTag('div')
+      node = dom(@container.firstChild).switchTag('div').get()
       expect(@container).toEqualHTML(html)
       expect(node).toEqual(@container.firstChild)
     )
