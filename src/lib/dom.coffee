@@ -164,7 +164,7 @@ class Wrapper
   replace: (newNode) ->
     @node.parentNode.replaceChild(newNode, @node)
     @node = newNode
-    return newNode
+    return this
 
   splitBefore: (root, force = false) ->
     return this if @node == root or @node.parentNode == root
@@ -225,12 +225,13 @@ class Wrapper
 
   switchTag: (newTag) ->
     newTag = newTag.toUpperCase()
-    return @node if @node.tagName == newTag
+    return this if @node.tagName == newTag
     newNode = document.createElement(newTag)
     attributes = this.attributes()
     this.moveChildren(newNode) unless dom.VOID_TAGS[newTag]?
     this.replace(newNode)
-    return this.attributes(attributes).get()
+    @node = newNode
+    return this.attributes(attributes)
 
   text: (text) ->
     if text?

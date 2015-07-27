@@ -39,6 +39,8 @@ class Normalizer
   normalizeLine: (lineNode) ->
     lineNode = Normalizer.wrapInline(lineNode)
     lineNode = Normalizer.handleBreaks(lineNode)
+    if lineNode.tagName == 'LI'
+      Normalizer.flattenList(lineNode)
     lineNode = Normalizer.pullBlocks(lineNode)
     lineNode = this.normalizeNode(lineNode)
     Normalizer.unwrapText(lineNode)
@@ -54,6 +56,10 @@ class Normalizer
         node.style[style] = value
         node.removeAttribute(attribute)
     )
+    # Chrome turns <b> into style in some cases
+    if (node.style.fontWeight == 'bold')
+      node.style.fontWeight = ''
+      dom(node).wrap(document.createElement('b'))
     this.whitelistStyles(node)
     return this.whitelistTags(node)
 
@@ -71,15 +77,27 @@ class Normalizer
   whitelistTags: (node) ->
     return node unless dom(node).isElement()
     if Normalizer.ALIASES[node.tagName]?
-      node = dom(node).switchTag(Normalizer.ALIASES[node.tagName])
+      node = dom(node).switchTag(Normalizer.ALIASES[node.tagName]).get()
     else if !@whitelist.tags[node.tagName]?
       if dom.BLOCK_TAGS[node.tagName]?
-        node = dom(node).switchTag(dom.DEFAULT_BLOCK_TAG)
+        node = dom(node).switchTag(dom.DEFAULT_BLOCK_TAG).get()
       else if !node.hasAttributes() and node.firstChild?
         node = dom(node).unwrap()
       else
-        node = dom(node).switchTag(dom.DEFAULT_INLINE_TAG)
+        node = dom(node).switchTag(dom.DEFAULT_INLINE_TAG).get()
     return node
+
+  @flattenList: (listNode) ->
+    ref = listNode.nextSibling
+    innerItems = _.map(listNode.querySelectorAll('li'))
+    innerItems.forEach((item) ->
+      listNode.parentNode.insertBefore(item, ref)
+      ref = item.nextSibling
+    )
+    innerLists = _.map(listNode.querySelectorAll(Object.keys(dom.LIST_TAGS).join(',')))
+    innerLists.forEach((list) ->
+      dom(list).remove()
+    )
 
   # Make sure descendant break tags are not causing multiple lines to be rendered
   @handleBreaks: (lineNode) ->
