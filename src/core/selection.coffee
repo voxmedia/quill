@@ -43,6 +43,7 @@ class Selection
       fn()
 
   scrollIntoView: () ->
+    return
     return unless @range
     editor = @emitter.editor
     startBounds = editor.getBounds(@range.start)
