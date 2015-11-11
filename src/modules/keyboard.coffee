@@ -118,7 +118,7 @@ class Keyboard
             [line, offset] = @quill.editor.doc.findLineAt(start)
             if offset == 0 and (line.formats.bullet or line.formats.list)
               format = if line.formats.bullet then 'bullet' else 'list'
-              @quill.formatLine(start, start, format, false)
+              @quill.formatLine(start, start, format, false, Quill.sources.USER)
             else if start > 0
               @quill.deleteText(start - 1, start, Quill.sources.USER)
           else if start < @quill.getLength() - 1

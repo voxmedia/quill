@@ -57,8 +57,9 @@ class Toolbar
       @quill.focus()
       range = @quill.getSelection()
       callback(range, value) if range?
+      @quill.editor.selection.scrollIntoView() if dom.isIE(11)
       @preventUpdate = false
-      return true
+      return false
     )
 
   setActive: (format, value) ->
