@@ -40,7 +40,6 @@ class LinkTooltip extends Tooltip
     dom(@container.querySelector('.done')).on('click', _.bind(this.saveLink, this))
     dom(@container.querySelector('.remove')).on('click', =>
       this.removeLink(@range)
-      dom(@container).removeClass('open')
     )
     dom(@container.querySelector('.change')).on('click', =>
       this.setMode(@link.href, true)
