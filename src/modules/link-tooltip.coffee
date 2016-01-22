@@ -43,6 +43,7 @@ class LinkTooltip extends Tooltip
     )
     dom(@container.querySelector('.change')).on('click', =>
       this.setMode(@link.href, true)
+      dom(@container).removeClass('open')
     )
     this.initTextbox(@textbox, this.saveLink, this.hide)
     @quill.onModuleLoad('toolbar', (toolbar) =>
@@ -82,6 +83,7 @@ class LinkTooltip extends Tooltip
         @textbox.setSelectionRange(0, url.length)
       )
     else
+      dom(@container).addClass('open')
       @link.href = url
       url = @link.href # read back the url for further normalization
       text = if url.length > @options.maxLength then url.slice(0, @options.maxLength) + '...' else url

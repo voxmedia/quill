@@ -37,6 +37,7 @@ class Tooltip
     @container.style.left = Tooltip.HIDE_MARGIN
     @quill.setSelection(@range) if @range
     @range = null
+    dom(@container).removeClass('open')
 
   position: (reference) ->
     if reference?
