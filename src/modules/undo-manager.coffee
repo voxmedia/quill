@@ -77,21 +77,6 @@ class UndoManager
   undo: ->
     this._change('undo', 'redo')
 
-  _getLastChangeIndex: (delta) ->
-    lastIndex = 0
-    index = 0
-    _.each(delta.ops, (op) ->
-      if op.insert?
-        lastIndex = Math.max(index + (op.insert.length or 1), lastIndex)
-      else if op.delete?
-        lastIndex = Math.max(index, lastIndex)
-      else if op.retain?
-        if op.attributes?
-          lastIndex = Math.max(index + op.retain, lastIndex)
-        index += op.retain
-    )
-    return lastIndex
-
   _change: (source, dest) ->
     if @stack[source].length > 0
       change = @stack[source].pop()
@@ -99,8 +84,6 @@ class UndoManager
       @ignoreChange = true
       @quill.updateContents(change[source], Quill.sources.USER)
       @ignoreChange = false
-      index = this._getLastChangeIndex(change[source])
-      @quill.setSelection(index, index)
       @oldDelta = @quill.getContents()
       @stack[dest].push(change)
 
