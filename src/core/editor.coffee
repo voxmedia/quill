@@ -123,8 +123,15 @@ class Editor
         length -= deleteLength
         curLine = nextLine
         offset = 0
-      @doc.mergeLines(firstLine, firstLine.next) if mergeFirstLine and firstLine.next
+      this._mergeLines(firstLine) if mergeFirstLine and firstLine.next
     )
+
+  _mergeLines: (line) ->
+    reverseMerge = false
+    for key of line.formats
+      if @doc.formats[key] and @doc.formats[key].config.reverseMerge
+        reverseMerge = true
+    if reverseMerge then @doc.reverseMergeLines(line, line.next) else @doc.mergeLines(line, line.next)
 
   _formatAt: (index, length, name, value) ->
     @selection.shiftAfter(index, 0, =>

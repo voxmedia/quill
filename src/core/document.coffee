@@ -72,6 +72,17 @@ class Document
     this.removeLine(lineToMerge)
     line.rebuild()
 
+  reverseMergeLines: (sourceLine, targetLine) ->
+    if targetLine.length > 1
+      dom(sourceLine.leaves.last.node).remove() if sourceLine.length == 1
+      dom(targetLine.leaves.last.node).remove() if targetLine.length == 1
+      # append target to source
+      dom(targetLine.node).moveChildren(sourceLine.node)
+      # move source to target
+      dom(sourceLine.node).moveChildren(targetLine.node)
+    this.removeLine(sourceLine)
+    targetLine.rebuild()
+
   optimizeLines: ->
     # TODO optimize algorithm (track which lines get dirty and only Normalize.optimizeLine those)
     _.each(@lines.toArray(), (line, i) ->
