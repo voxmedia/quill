@@ -73,7 +73,7 @@ class Document
     line.rebuild()
 
   reverseMergeLines: (sourceLine, targetLine) ->
-    if targetLine.length > 1
+    if sourceLine.length > 1
       dom(sourceLine.leaves.last.node).remove() if sourceLine.length == 1
       dom(targetLine.leaves.last.node).remove() if targetLine.length == 1
       # append target to source
