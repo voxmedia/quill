@@ -9,7 +9,6 @@ Normalizer = require('./normalizer')
 
 class Document
   constructor: (@root, options = {}) ->
-    @normalizer = new Normalizer()
     @formats = {}
     @normalizer = new Normalizer()
     if _.isArray(options.formats)
@@ -115,7 +114,6 @@ class Document
 
   setHTML: (html) ->
     html = Normalizer.stripComments(html)
-    html = Normalizer.stripWhitespace(html)
     @root.innerHTML = html
     @lines = new LinkedList()
     this.rebuild()
