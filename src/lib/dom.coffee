@@ -58,6 +58,13 @@ class Wrapper
   descendants: ->
     return _.map(@node.getElementsByTagName('*'))
 
+  firstChild: (ignoreWhitespace) ->
+    firstChild = @node.firstChild
+    if ignoreWhitespace
+      while dom(firstChild).isTextNode() and !/\S/.test(firstChild.data)
+        firstChild = firstChild.nextSibling
+    return child
+
   get: ->
     return @node
 
@@ -110,12 +117,19 @@ class Wrapper
     )
     return this
 
-  nextLineNode: (root) ->
+  nextSibling: (ignoreWhitespace) ->
     nextNode = @node.nextSibling
+    if ignoreWhitespace
+      while dom(nextNode).isTextNode() and !/\S/.test(nextNode.data)
+        nextNode = nextNode.nextSibling
+    return nextNode
+
+  nextLineNode: (root) ->
+    nextNode = this.nextSibling(true)
     if !nextNode? and @node.parentNode != root
-      nextNode = @node.parentNode.nextSibling
+      nextNode = dom(@node.parentNode).nextSibling(true)
     if nextNode? and dom.WRAPPER_TAGS[nextNode.tagName]?
-      nextNode = nextNode.firstChild
+      nextNode = dom(nextNode).firstChild(true)
     return nextNode
 
   # IE normalize is broken

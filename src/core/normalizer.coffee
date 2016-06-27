@@ -153,8 +153,8 @@ class Normalizer
     html = html.trim()
     # Replace all newline characters
     html = html.replace(/(\r?\n|\r)+/g, ' ')
-    # Remove whitespace between tags, requires &nbsp; for legitmate spaces
-    html = html.replace(/\>\s+\</g, '><')
+    # Collapse whitespace between tags, requires &nbsp; for legitmate spaces
+    html = html.replace(/\>\s+\</g, '> <')
     return html
 
   # Wrap inline nodes with block tags
