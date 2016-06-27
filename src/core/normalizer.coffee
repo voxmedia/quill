@@ -56,11 +56,27 @@ class Normalizer
         node.style[style] = value
         node.removeAttribute(attribute)
     )
-    # Turn inline fontWeight styling into <b> tags
-    if dom.BLOCK_TAGS[node.tagName] == null and (node.style.fontWeight == 'bold' or node.style.fontWeight > 500)
-      node.style.fontWeight = ''
-      dom(node).wrap(document.createElement('b'))
-      node = node.parentNode
+    if !dom.BLOCK_TAGS[node.tagName]
+      # Turn inline fontWeight styling into <b> tags
+      if node.style.fontWeight == 'bold' or node.style.fontWeight > 500
+        node.style.fontWeight = null
+        dom(node).wrap(document.createElement('b'))
+        node = node.parentNode
+      # Turn inline fontStyle styling into <i> tags
+      if node.style.fontStyle == 'italic'
+        node.style.fontStyle = null
+        dom(node).wrap(document.createElement('i'))
+        node = node.parentNode
+      # Turn inline textDecoration styling into <s> tags
+      if node.style.textDecoration == 'line-through'
+        node.style.textDecoration = null
+        dom(node).wrap(document.createElement('s'))
+        node = node.parentNode
+      # Turn inline textDecoration styling into <u> tags
+      if node.style.textDecoration == 'underline'
+        node.style.textDecoration = null
+        dom(node).wrap(document.createElement('u'))
+        node = node.parentNode
     this.whitelistStyles(node)
     return this.whitelistTags(node)
 

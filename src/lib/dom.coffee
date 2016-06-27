@@ -63,7 +63,7 @@ class Wrapper
     if ignoreWhitespace
       while dom(firstChild).isTextNode() and !/\S/.test(firstChild.data)
         firstChild = firstChild.nextSibling
-    return child
+    return firstChild
 
   get: ->
     return @node
