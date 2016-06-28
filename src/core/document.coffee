@@ -125,6 +125,7 @@ class Document
 
   setHTML: (html) ->
     html = Normalizer.stripComments(html)
+    html = Normalizer.stripWhitespace(html)
     @root.innerHTML = html
     @lines = new LinkedList()
     this.rebuild()
