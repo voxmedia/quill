@@ -12,23 +12,14 @@ class Toolbar
     SELECT  : { 'align', 'background', 'color', 'font', 'size' }
     TOGGLE  : { 'firstheader', 'secondheader', 'thirdheader', 'fourthheader', 'fifthheader', 'bold', 'bullet', 'image', 'italic', 'link', 'list', 'strike', 'underline' }
     TOOLTIP : { 'image', 'link' }
-    EXCLUSIVE : { 'firstheader', 'secondheader', 'thirdheader', 'fourthheader', 'fifthheader', 'bullet', 'list', 'blockquote' }
 
   constructor: (@quill, @options) ->
     @options = { container: @options } if _.isString(@options) or _.isElement(@options)
     throw new Error('container required for toolbar', @options) unless @options.container?
     @container = if _.isString(@options.container) then document.querySelector(@options.container) else @options.container
-    @inputs = {}
+    @formatHandlers = {}
     @preventUpdate = false
     @triggering = false
-    _.each(@quill.options.formats, (name) =>
-      return if Toolbar.formats.TOOLTIP[name]?
-      this.initFormat(name, _.bind(this._applyFormat, this, name))
-    )
-    @quill.on(Quill.events.FORMAT_INIT, (name) =>
-      return if Toolbar.formats.TOOLTIP[name]?
-      this.initFormat(name, _.bind(this._applyFormat, this, name))
-    )
     @quill.on(Quill.events.SELECTION_CHANGE, (range) =>
       this.updateActive(range) if range?
     )
@@ -38,33 +29,16 @@ class Toolbar
         _.defer(_.bind(this.updateActive, this))
       )
     )
+    dom(@container).on('click', this._onClick)
     dom(@container).addClass('ql-toolbar')
     dom(@container).addClass('ios') if dom.isIOS()  # Fix for iOS not losing hover state after click
 
   initFormat: (format, callback) ->
-    selector = ".ql-#{format}"
-    if Toolbar.formats.SELECT[format]?
-      selector = "select#{selector}"    # Avoid selecting the picker container
-      eventName = 'change'
-    else
-      eventName = 'click'
-    input = @container.querySelector(selector)
-    return unless input?
-    @inputs[format] = input
-    dom(input).on(eventName, =>
-      value = if eventName == 'change' then dom(input).value() else !dom(input).hasClass('ql-active')
-      @preventUpdate = true
-      @quill.focus()
-      range = @quill.getSelection()
-      callback(range, value) if range?
-      @quill.editor.selection.scrollIntoView() if dom.isIE(11)
-      @preventUpdate = false
-      return false
-    )
+    @formatHandlers[format] = callback
 
   setActive: (format, value) ->
     value = false if format == 'image'  # TODO generalize to all embeds
-    input = @inputs[format]
+    input = @container.querySelector(".ql-#{format}")
     return unless input?
     $input = dom(input)
     if input.tagName == 'SELECT'
@@ -81,15 +55,34 @@ class Toolbar
     else
       $input.toggleClass('ql-active', value or false)
 
-  updateActive: (range, formats = null) ->
+  updateActive: (range) ->
     range or= @quill.getSelection()
     return unless range? and !@preventUpdate
     activeFormats = this._getActive(range)
-    _.each(@inputs, (input, format) =>
-      if !formats || formats[format]
-        this.setActive(format, activeFormats[format])
+    _.each(@quill.editor.doc.formats, (format, name) =>
+      this.setActive(name, activeFormats[name])
       return true
     )
+
+  _onClick: (event) =>
+    _.each(@quill.editor.doc.formats, (format, name) =>
+      target = event.target
+      until dom(target).hasClass("ql-#{name}") or target == @container
+        target = target.parentNode
+      return unless target? and target != @container
+
+      value = !dom(target).hasClass('ql-active')
+      @preventUpdate = true
+      @quill.focus()
+      range = @quill.getSelection()
+      if range?
+        handler = @formatHandlers[name] || this._applyFormat.bind(this, name)
+        handler(range, value)
+      @quill.editor.selection.scrollIntoView() if dom.isIE(11)
+      @preventUpdate = false
+      return false
+    )
+    return false
 
   _applyFormat: (format, range, value) ->
     return if @triggering
@@ -100,7 +93,7 @@ class Toolbar
     else
       @quill.formatText(range, format, value, 'user')
     _.defer( =>
-      this.updateActive(range, Toolbar.formats.EXCLUSIVE)  # Clear exclusive formats
+      this.updateActive(range)
       this.setActive(format, value)
     )
 
