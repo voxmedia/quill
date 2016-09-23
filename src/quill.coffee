@@ -1,5 +1,4 @@
 _             = require('lodash')
-pkg           = require('../package.json')
 Delta         = require('rich-text/lib/delta')
 EventEmitter2 = require('eventemitter2').EventEmitter2
 dom           = require('./lib/dom')
@@ -11,7 +10,7 @@ Range         = require('./lib/range')
 
 
 class Quill extends EventEmitter2
-  @version: pkg.version
+  @version: '0.20.1'
   @editors: []
 
   @modules: []
