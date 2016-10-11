@@ -88,8 +88,6 @@ class Toolbar
     return if @triggering
     if range.isCollapsed()
       @quill.prepareFormat(format, value, 'user')
-    else if Toolbar.formats.LINE[format]?
-      @quill.formatLine(range, format, value, 'user')
     else
       @quill.formatText(range, format, value, 'user')
     _.defer( =>
