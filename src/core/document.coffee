@@ -26,7 +26,7 @@ class Document
   appendLine: (lineNode) ->
     return this.insertLineBefore(lineNode, null)
 
-  findLeafAt: (index, inclusive) ->
+  findLeafAt: (index, inclusive = false) ->
     [line, offset] = this.findLineAt(index)
     return if line? then line.findLeafAt(offset, inclusive) else [undefined, offset]
 
@@ -36,14 +36,15 @@ class Document
     line = if node? then dom(node).data(Line.DATA_KEY) else undefined
     return if line?.node == node then line else undefined
 
-  findLineAt: (index) ->
+  findLineAt: (index, inclusive = false) ->
     return [undefined, index] unless @lines.length > 0
     length = this.toDelta().length()     # TODO optimize
     return [@lines.last, @lines.last.length] if index == length
     return [undefined, index - length] if index > length
     curLine = @lines.first
     while curLine?
-      return [curLine, index] if index < curLine.length
+      if index < curLine.length or (index == curLine.length and inclusive)
+        return [curLine, index]
       index -= curLine.length
       curLine = curLine.next
     return [undefined, index]    # Should never occur unless length calculation is off
