@@ -124,7 +124,8 @@ class Quill extends EventEmitter2
 
   formatLine: (start, end, name, value, source) ->
     [start, end, formats, source] = this._buildParams(start, end, name, value, source)
-    [line, offset] = @editor.doc.findLineAt(end, true)
+    # use the inclusive option only when a range is selected
+    [line, offset] = @editor.doc.findLineAt(end, start != end)
     end += (line.length - offset) if line?
     this.formatText(start, end, formats, source)
 
