@@ -15,8 +15,8 @@ class Toolbar
 
   constructor: (@quill, @options) ->
     @options = { container: @options } if _.isString(@options) or _.isElement(@options)
-    throw new Error('container required for toolbar', @options) unless @options.container?
     @container = if _.isString(@options.container) then document.querySelector(@options.container) else @options.container
+    throw new Error("container required for toolbar, #{@options.container} not found") unless @container?
     @formatHandlers = {}
     @preventUpdate = false
     @triggering = false
