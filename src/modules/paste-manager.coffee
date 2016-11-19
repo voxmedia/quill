@@ -3,14 +3,6 @@ Document = require('../core/document')
 _        = Quill.require('lodash')
 dom      = Quill.require('dom')
 Delta    = Quill.require('delta')
-cachedCanUpdateClipboard = null
-
-canUpdateClipboard = (dataTransfer) ->
-  if (cachedCanUpdateClipboard != null)
-    return cachedCanUpdateClipboard
-  dataTransfer.setData("text/html", "<hr>")
-  cachedCanUpdateClipboard = (dataTransfer.getData("text/html") == "<hr>")
-  return cachedCanUpdateClipboard
 
 class PasteManager
   @DEFAULTS:
