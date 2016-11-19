@@ -56,7 +56,7 @@ class PasteManager
     range = @quill.getSelection()
     if range
       delta = @quill.getContents(range)
-      event.clipboardData.setData('application/rich-text+json', JSON.stringify(delta))
+      event.clipboardData.setData('application/json', JSON.stringify(delta))
 
       text = @quill.getText(range)
       event.clipboardData.setData('text/plain', text)
@@ -73,12 +73,15 @@ class PasteManager
     range = @quill.getSelection()
     return unless range?
 
-    if event.clipboardData?.types.indexOf('application/rich-text+json') > -1
-      delta = JSON.parse event.clipboardData.getData('application/rich-text+json')
-      delta = new Delta().retain(range.start).delete(range.end - range.start).concat(delta)
-      @quill.updateContents(delta, 'user')
-      event.preventDefault()
-      return
+    if _.includes(event.clipboardData?.types, 'application/json')
+      try
+        removal = new Delta().retain(range.start).delete(range.end - range.start)
+        insertion = new Delta(JSON.parse(event.clipboardData.getData('application/json')))
+        @quill.updateContents(removal.concat(insertion), 'user')
+        event.preventDefault()
+        return
+      finally
+        # fall back to native behavior
 
     oldDocLength = @quill.getLength()
     @container.focus()
