@@ -70,8 +70,8 @@ class Keyboard
 
       removeInheritedFormats = {}
       removeNonInheritedFormats = {}
-      removeFromNewLine = {}
-      removeFromOriginalLine = {}
+      removeFromRightLine = {}
+      removeFromLeftLine = {}
       for name, value of line.formats
         format = @quill.editor.doc.formats[name]
         if format and format.isType('line')
@@ -79,16 +79,16 @@ class Keyboard
             removeInheritedFormats[name] = false
           if !format.config.inherit
             removeNonInheritedFormats[name] = false
-          if format.config.lineAffinity == 'before'
-            removeFromOriginalLine[name] = null
-          if format.config.lineAffinity == 'after'
-            removeFromNewLine[name] = null
+          if format.config.splitAffinity == 'left'
+            removeFromLeftLine[name] = null
+          if format.config.splitAffinity == 'right'
+            removeFromRightLine[name] = null
 
       # if on an empty line, remove the inheritable formats
       if range.isCollapsed() and line.length == 1 and Object.keys(removeInheritedFormats).length > 0
         delta.retain(1, removeInheritedFormats)
       else
-        delta.insert('\n', Object.assign({}, line.formats, removeFromNewLine)).delete(range.end - range.start)
+        delta.insert('\n', Object.assign({}, line.formats, removeFromRightLine)).delete(range.end - range.start)
 
       # if creating a new empty line (was at the end of the old line),
       # remove line formats from the new line that should not be inherited
@@ -96,7 +96,7 @@ class Keyboard
         delta.retain(1, removeNonInheritedFormats)
       else
         delta.retain(leaf.length - offset)
-        delta.retain(1, Object.assign({}, line.formats, removeFromOriginalLine))
+        delta.retain(1, Object.assign({}, line.formats, removeFromLeftLine))
 
       @quill.updateContents(delta, Quill.sources.USER)
       _.each(leaf.formats, (value, format) =>
