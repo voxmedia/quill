@@ -67,29 +67,36 @@ class Keyboard
       [line, offset] = @quill.editor.doc.findLineAt(range.start)
       [leaf, offset] = line.findLeafAt(offset)
       delta = new Delta().retain(range.start)
-      removeInheritedFormats = _.reduce(line.formats, (formats, value, name) =>
+
+      removeInheritedFormats = {}
+      removeNonInheritedFormats = {}
+      removeFromRightLine = {}
+      removeFromLeftLine = {}
+      for name, value of line.formats
         format = @quill.editor.doc.formats[name]
-        if format and format.isType('line') and format.config.inherit
-          formats[name] = false
-        return formats
-      , {})
-      removeNonInheritedFormats = _.reduce(line.formats, (formats, value, name) =>
-        format = @quill.editor.doc.formats[name]
-        if format and format.isType('line') and !format.config.inherit
-          formats[name] = false
-        return formats
-      , {})
+        if format and format.isType('line')
+          if format.config.inherit
+            removeInheritedFormats[name] = false
+          if !format.config.inherit
+            removeNonInheritedFormats[name] = false
+          if format.config.splitAffinity == 'left'
+            removeFromRightLine[name] = null
+          if format.config.splitAffinity == 'right'
+            removeFromLeftLine[name] = null
 
       # if on an empty line, remove the inheritable formats
       if range.isCollapsed() and line.length == 1 and Object.keys(removeInheritedFormats).length > 0
         delta.retain(1, removeInheritedFormats)
       else
-        delta.insert('\n', line.formats).delete(range.end - range.start)
+        delta.insert('\n', Object.assign({}, line.formats, removeFromLeftLine)).delete(range.end - range.start)
 
       # if creating a new empty line (was at the end of the old line),
       # remove line formats from the new line that should not be inherited
       if !leaf.next and offset == leaf.length
         delta.retain(1, removeNonInheritedFormats)
+      else
+        delta.retain(leaf.length - offset)
+        delta.retain(1, Object.assign({}, line.formats, removeFromRightLine))
 
       @quill.updateContents(delta, Quill.sources.USER)
       _.each(leaf.formats, (value, format) =>
