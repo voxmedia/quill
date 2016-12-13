@@ -116,6 +116,10 @@ class Normalizer
       dom(list).remove()
     )
 
+  @mergeAdjacentLists: (listNode) ->
+    if listNode.nextSibling?.tagName == listNode.tagName
+      dom(listNode).merge(listNode.nextSibling)
+
   # Make sure descendant break tags are not causing multiple lines to be rendered
   @handleBreaks: (lineNode) ->
     breaks = _.map(lineNode.querySelectorAll(dom.DEFAULT_BREAK_TAG))
@@ -129,6 +133,8 @@ class Normalizer
   @optimizeLine: (lineNode) ->
     lineNode.normalize()
     lineNodeLength = dom(lineNode).length()
+    if lineNode.tagName == 'LI'
+      Normalizer.mergeAdjacentLists(lineNode.parentNode)
     nodes = dom(lineNode).descendants()
     while nodes.length > 0
       node = nodes.pop()
