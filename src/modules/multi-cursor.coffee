@@ -66,7 +66,7 @@ class MultiCursor extends EventEmitter2
       shift = Math.max(length, index - cursor.index)
       if cursor.userId == authorId
         this.moveCursor(authorId, cursor.index + shift)
-      else if cursor.index > index
+      else if cursor.index >= index
         cursor.index += shift
     )
 
