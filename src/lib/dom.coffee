@@ -321,7 +321,7 @@ class Wrapper
     @node.parentNode.insertBefore(wrapper, @node) if @node.parentNode?
     parent = wrapper
     while parent.firstChild?
-      parent = wrapper.firstChild
+      parent = parent.firstChild
     parent.appendChild(@node)
     return this
 
