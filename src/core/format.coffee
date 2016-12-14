@@ -119,7 +119,7 @@ class Format
       if _.isString(@config.class)
         dom(node).addClass(@config.class + value)
     if _.isFunction(@config.add)
-      node = @config.add(node, value)
+      node = @config.add(node, value, dom)
     return node
 
   isType: (type) ->
@@ -128,7 +128,7 @@ class Format
   match: (node) ->
     return false unless dom(node).isElement()
     if _.isFunction(@config.match)
-      return @config.match(node)
+      return @config.match(node, dom)
     if _.isString(@config.parentTag) and node.parentNode?.tagName != @config.parentTag
       return false
     if _.isString(@config.tag) and node.tagName != @config.tag
@@ -172,7 +172,7 @@ class Format
       dom(node.nextSibling).splitBefore(node.parentNode.parentNode) if node.nextSibling?
       dom(node.parentNode).unwrap()
     if _.isFunction(@config.remove)
-      node = @config.remove(node)
+      node = @config.remove(node, dom)
     if node.tagName == dom.DEFAULT_INLINE_TAG and !node.hasAttributes()
       node = dom(node).unwrap()
     return node
