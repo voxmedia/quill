@@ -179,6 +179,9 @@ class Normalizer
     html = html.replace(/\>\s+\</g, '> <')
     return html
 
+  @stripStyleTags: (html) ->
+    return html.replace(/<style.*?<\/style>/g, '')
+
   # Wrap inline nodes with block tags
   @wrapInline: (lineNode) ->
     return lineNode if dom.BLOCK_TAGS[lineNode.tagName]?
