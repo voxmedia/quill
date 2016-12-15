@@ -15,7 +15,6 @@ advancedEditor = new Quill('.advanced-wrapper .editor-container',
     'image-tooltip': true
     'multi-cursor': true
   styles: false
-  theme: 'snow'
 )
 
 authorship = advancedEditor.getModule('authorship')

@@ -310,7 +310,6 @@ describe('Editor', ->
 
     beforeEach( ->
       @editor.root.style.fontFamily = 'monospace'
-      # Normally handled by theme
       if dom.isIE(10)
         version = if dom.isIE(9) then '9' else '10'
         dom(@editor.root).addClass('ql-ie-' + version).addClass('ql-editor')

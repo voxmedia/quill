@@ -37,18 +37,6 @@ serve = (connect, req, res, next) ->
     when '/test/quill.js'
       res.setHeader('Content-Type', 'application/javascript')
       bundle(watchers['test']).pipe(res)
-    when '/quill.snow.css', '/quill.base.css'
-      theme = url.slice(7, 11)
-      res.setHeader('Content-Type', 'text/css')
-      fs.readFile("./src/themes/#{theme}/#{theme}.styl", (err, data) ->
-        s = stylus(data.toString())
-        s.include("./src/themes/#{theme}")
-        s.define('url', stylus.url())
-        s.render((err, css) ->
-          console.error(err.name, err.message) if err?
-          res.end(css)
-        )
-      )
     when '/favicon.ico'
       res.setHeader('Content-Type', 'image/png')
       res.end(FAVICON)

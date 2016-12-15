@@ -78,22 +78,6 @@ module.exports = (grunt) ->
       dest: '.build/lodash.js'
   )
 
-  grunt.config('stylus',
-    options:
-      compress: false
-    themes:
-      options:
-        urlfunc: 'url'
-      files: [{
-        expand: true
-        ext: '.css'
-        flatten: true
-        src: 'src/themes/*/*.styl'
-        rename: (dest, src) ->
-          return "dist/quill.#{src}"
-      }]
-  )
-
   grunt.config('uglify',
     quill:
       files: { 'dist/quill.min.js': ['dist/quill.js'] }

@@ -35,7 +35,6 @@ module.exports = (grunt) ->
         'test/unit/lib/*.coffee'
         'test/unit/core/*.coffee'
         'test/unit/modules/*.coffee'
-        'test/unit/themes/*.coffee'
       ]
       port: grunt.config('karmaPort')
     coverage:

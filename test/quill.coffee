@@ -29,10 +29,6 @@ Quill.Module =
   Tooltip       : require('../src/modules/tooltip')
   UndoManager   : require('../src/modules/undo-manager')
 
-Quill.Theme =
-  Base          : require('../src/themes/base')
-  Snow          : require('../src/themes/snow')
-
 
 Quill.DEFAULTS.pollInterval = 10000000
 Quill.DEFAULTS.style = false
