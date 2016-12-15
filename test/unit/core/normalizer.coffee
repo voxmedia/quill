@@ -83,7 +83,7 @@ describe('Normalizer', ->
         expected: 'Test'
       'preserve span with attributes':
         initial:  '<span class="custom"><span id="span-1234">Test</span></span>'
-        expected: '<span class="custom"><span id="span-1234">Test</span></span>'
+        expected: '<span class="custom" id="span-1234">Test</span>'
       'unwrap zero length nodes':
         initial:  '<b></b>'
         expected: ''
@@ -110,7 +110,7 @@ describe('Normalizer', ->
         expected: '<b style="color: red;">AB</b>'
       'merge recursive':
         initial:  '<s><b>A</b></s><s><b>B</b></s>'
-        expected: '<s><b>AB</b></s>'
+        expected: '<b><s>AB</s></b>'
       'preserve close but not same nodes':
         initial:  '<b style="color: red;">A</b><b style="color: blue;">B</b>'
         expected: '<b style="color: red;">A</b><b style="color: blue;">B</b>'
@@ -119,10 +119,14 @@ describe('Normalizer', ->
         expected: '<img src="http://quilljs.com/images/cloud.png"><img src="http://quilljs.com/images/cloud.png">'
       'wrap orphaned text node':
         initial:  '<s><b>0</b></s><s><span>1</span></s>'
-        expected: '<s><b>0</b><span>1</span></s>'
+        expected: '<s><b>0</b>1</s>'
       'merge text nodes':
         initial:  'A <b></b> B.'
         expected:  'A  B.'
+      'reorder nodes':
+        initial:  '<strong><em class="author-1">A</em>'
+        expected: '<em class="author-1"><strong>A</strong></em>'
+
 
     _.each(tests, (test, name) ->
       it(name, ->

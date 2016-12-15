@@ -102,7 +102,7 @@ describe('Editor', ->
           expected: '<div>Test</div>'
           text: 'Test'
         'formatted text':
-          expected: '<div><i><b>Test</b></i></div>'
+          expected: '<div><b><i>Test</i></b></div>'
           text: 'Test', formats: { bold: true, italic: true }
         'newline':
           expected: '<div><br></div>'

@@ -140,14 +140,40 @@ class Normalizer
       node = nodes.pop()
       continue unless node?.parentNode?
       continue if dom.EMBED_TAGS[node.tagName]?
+
       if node.tagName == dom.DEFAULT_BREAK_TAG
         # Remove unneeded BRs
         dom(node).remove() unless lineNodeLength == 0
-      else if dom(node).length() == 0
+        continue
+
+      if dom(node).length() == 0
         nodes.push(node.nextSibling)
         dom(node).unwrap()
-      else if node.previousSibling? and node.tagName == node.previousSibling.tagName
-        # Merge similar nodes
+        continue
+
+      # If node is an only child
+      if node.parentNode != lineNode && !node.previousSibling? && !node.nextSibling?
+        if node.parentNode.tagName > node.tagName
+          # Order tag nesting alphabetically (parent->child : A->Z)
+          dom(node).moveChildren(node.parentNode)
+          dom(node.parentNode).wrap(node)
+          if node.parentNode.nextSibling?
+            # check next sibling again in case it is similar enough to merge
+            nodes.push(node.parentNode.nextSibling)
+        else
+          # Move attributes to parent
+          for name, value of dom(node).attributes()
+            node.parentNode.setAttribute(name, value)
+            node.removeAttribute(name)
+          if node.parentNode.nextSibling?
+            # check next sibling again in case it is similar enough to merge
+            nodes.push(node.parentNode.nextSibling)
+          if node.tagName == dom.DEFAULT_INLINE_TAG
+            # remove spans without attributes
+            dom(node).unwrap()
+
+      # Merge similar nodes
+      if node.previousSibling? and node.tagName == node.previousSibling.tagName
         if _.isEqual(dom(node).attributes(), dom(node.previousSibling).attributes())
           nodes.push(node.firstChild)
           dom(node.previousSibling).merge(node)
