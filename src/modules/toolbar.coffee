@@ -30,6 +30,7 @@ class Toolbar
       )
     )
     dom(@container).on('click', this._onClick)
+    dom(@container).on('change', this._onClick)
     dom(@container).addClass('ql-toolbar')
     dom(@container).addClass('ios') if dom.isIOS()  # Fix for iOS not losing hover state after click
 
@@ -65,18 +66,25 @@ class Toolbar
     )
 
   _onClick: (event) =>
+    return if @triggering
     _.each(@quill.editor.doc.formats, (format, name) =>
       target = event.target
       until dom(target).hasClass("ql-#{name}") or target == @container
         target = target.parentNode
       return unless target? and target != @container
 
-      value = !dom(target).hasClass('ql-active')
+      value =
+        if target.tagName == 'SELECT'
+          target.value
+        else
+          !dom(target).hasClass('ql-active')
+
       @preventUpdate = true
       @quill.focus()
       range = @quill.getSelection()
       if range?
-        handler = @formatHandlers[name] || this._applyFormat.bind(this, name)
+        handler = @formatHandlers[name] ||
+          (range, value) => this._applyFormat(name, range, value)
         handler(range, value)
       @quill.editor.selection.scrollIntoView() if dom.isIE(11)
       @preventUpdate = false
@@ -84,17 +92,16 @@ class Toolbar
     )
     return false
 
-  _applyFormat: (format, range, value) ->
-    return if @triggering
+  _applyFormat: (name, range, value) ->
     if range.isCollapsed()
-      @quill.prepareFormat(format, value, 'user')
-    else if Toolbar.formats.LINE[format]?
-      @quill.formatLine(range, format, value, 'user')
+      @quill.prepareFormat(name, value, 'user')
+    else if Toolbar.formats.LINE[name]?
+      @quill.formatLine(range, name, value, 'user')
     else
-      @quill.formatText(range, format, value, 'user')
+      @quill.formatText(range, name, value, 'user')
     _.defer( =>
       this.updateActive(range)
-      this.setActive(format, value)
+      this.setActive(name, value)
     )
 
   _getActive: (range) ->

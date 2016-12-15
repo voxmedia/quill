@@ -340,7 +340,7 @@ class SelectWrapper extends Wrapper
           break
     else
       @node.selectedIndex = -1  # PhantomJS
-    this.trigger('change') if trigger
+    this.trigger('change', { bubbles: true }) if trigger
     return this
 
   reset: (trigger = true) ->
@@ -349,7 +349,7 @@ class SelectWrapper extends Wrapper
       option.selected = true
     else
       @node.selectedIndex = 0
-    this.trigger('change') if trigger
+    this.trigger('change', { bubbles: true }) if trigger
     return this
 
   value: ->
