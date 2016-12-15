@@ -17,7 +17,7 @@ class ImageTooltip extends Tooltip
       <a href="javascript:;" class="insert">Insert</a>'
 
   constructor: (@quill, @options) ->
-    @options = _.defaults(@options, Tooltip.DEFAULTS)
+    @options = _.defaults(@options, ImageTooltip.DEFAULTS)
     super(@quill, @options)
     @preview = @container.querySelector('.preview')
     @textbox = @container.querySelector('.input')

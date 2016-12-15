@@ -19,7 +19,7 @@ class LinkTooltip extends Tooltip
     LINK: { key: 'K', metaKey: true }
 
   constructor: (@quill, @options) ->
-    @options = _.defaults(@options, Tooltip.DEFAULTS)
+    @options = _.defaults(@options, LinkTooltip.DEFAULTS)
     super(@quill, @options)
     dom(@container).addClass('ql-link-tooltip')
     @textbox = @container.querySelector('.input')
