@@ -5,7 +5,6 @@ fs = require('fs')
 harp = require('harp')
 proxy = require('http-proxy')
 stylify = require('stylify')
-stylus = require('stylus')
 watchify = require('watchify')
 
 
