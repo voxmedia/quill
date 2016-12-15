@@ -251,12 +251,11 @@ describe('Editor', ->
         initial: '
           <div>0123</div>
           <div>5678</div>
-          <div>abcd</div>'
+          <div>abcd</div>'.replace(/\s+/g, ' ')
         delta: new Quill.Delta().retain(4).delete(1).retain(2).insert('|\n|').retain(7).retain(1, { align: 'right' })
         expected: '
-          <div>012356|</div>
-          <div>|78</div>
-          <div style="text-align: right;">abcd</div>'
+          <div>012356|</div><div>|78</div>
+          <div style="text-align: right;">abcd</div>'.replace(/\s+/g, ' ')
 
     _.each(tests, (test, name) ->
       it(name, ->

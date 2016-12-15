@@ -202,7 +202,7 @@ describe('Normalizer', ->
           <div>
             <br>
           </div>'
-        expected: '<div>Test</div><div><br></div>'
+        expected: '<div>Test</div> <div> <br> </div>'
       'newlines in text':
         initial: "<div>A\nB\r\nC\rD</div>"
         expected: "<div>A B C D</div>"
@@ -213,8 +213,8 @@ describe('Normalizer', ->
         initial:  '  <div></div>  '
         expected: '<div></div>'
       'inner spaces':
-        initial:  '<div> <span> </span> <span>&nbsp; </span> </div>'
-        expected: '<div><span></span><span>&nbsp; </span></div>'
+        initial:  '<div>   <span>  </span>   <span>&nbsp;  </span>   </div>'
+        expected: '<div> <span> </span> <span>&nbsp;  </span> </div>'
 
     _.each(tests, (test, name) ->
       it(name, ->

@@ -258,7 +258,7 @@ describe('DOM', ->
   describe('access', ->
     describe('child at offset', ->
       beforeEach( ->
-        @container.innerHTML = Quill.Normalizer.stripWhitespace('
+        html = '
           <span>111</span>
           <b>222</b>
           <br>
@@ -268,7 +268,7 @@ describe('DOM', ->
             <span>3</span>
           </div>
           <i>444</i>'
-        )
+        @container.innerHTML = html.replace(/\s+/g, '')
       )
 
       length = 12
@@ -402,7 +402,7 @@ describe('DOM', ->
   describe('split', ->
     describe('splitBefore()', ->
       beforeEach( ->
-        @container.innerHTML = Quill.Normalizer.stripWhitespace('
+        @container.innerHTML = '
           <div>
             <span>One</span>
             <b>Two</b>
@@ -412,7 +412,7 @@ describe('DOM', ->
               <u>Five</u>
             </div>
           </div>
-        ')
+        '.replace(/\s+/g, '')
       )
 
       it('single split', ->
@@ -430,7 +430,7 @@ describe('DOM', ->
               <u>Five</u>
             </div>
           </div>
-        ')
+        '.replace(/\s+/g, ''))
         expect(retNode).toEqual(@container.lastChild)
       )
 
@@ -451,7 +451,7 @@ describe('DOM', ->
               <u>Five</u>
             </div>
           </div>
-        ')
+        '.replace(/\s+/g, ''))
         expect(retNode).toEqual(@container.lastChild)
       )
 
@@ -479,7 +479,7 @@ describe('DOM', ->
               <u>Five</u>
             </div>
           </div>
-        ')
+        '.replace(/\s+/g, ''))
         expect(retNode).toEqual(@container.lastChild)
       )
 
@@ -498,7 +498,7 @@ describe('DOM', ->
               <u>Five</u>
             </div>
           </div>
-        ')
+        '.replace(/\s+/g, ''))
         expect(retNode).toEqual(node.parentNode)
       )
     )
@@ -535,7 +535,7 @@ describe('DOM', ->
                 </s>
                 <s>Three</s>
               </i>
-            </b>'
+            </b>'.replace(/\s+/g, '')
           expected: '
             <b>
               <i>
@@ -552,7 +552,7 @@ describe('DOM', ->
                 </s>
                 <s>Three</s>
               </i>
-            </b>'
+            </b>'.replace(/\s+/g, '')
           offset: 2, left: 'On', right: 'eTwoThree', split: true
         'force split':
           initial:  '<b>Bold</b>'
@@ -580,7 +580,8 @@ describe('DOM', ->
     describe('isolate', ->
       tests =
         'before':
-          target: 'u', html: '
+          target: 'u'
+          html: '
             <div>
               <div>
                 <i>One</i>
@@ -593,39 +594,41 @@ describe('DOM', ->
               </div>
             </div>'
         'after':
-          target: 'i', html: '
-          <div>
+          target: 'i'
+          html: '
             <div>
-              <i>One</i>
+              <div>
+                <i>One</i>
+              </div>
             </div>
-          </div>
-          <div>
             <div>
-              <s>Two</s>
-              <u>Three</u>
-            </div>
-          </div>'
+              <div>
+                <s>Two</s>
+                <u>Three</u>
+              </div>
+            </div>'
         'both':
-          target: 's', html: '
-          <div>
+          target: 's'
+          html: '
             <div>
-              <i>One</i>
+              <div>
+                <i>One</i>
+              </div>
             </div>
-          </div>
-          <div>
             <div>
-              <s>Two</s>
+              <div>
+                <s>Two</s>
+              </div>
             </div>
-          </div>
-          <div>
             <div>
-              <u>Three</u>
-            </div>
-          </div>'
+              <div>
+                <u>Three</u>
+              </div>
+            </div>'
 
       _.each(tests, (test, name) ->
         it(name, ->
-          @container.innerHTML = Quill.Normalizer.stripWhitespace('
+          @container.innerHTML = '
             <div>
               <div>
                 <i>One</i>
@@ -633,10 +636,10 @@ describe('DOM', ->
                 <u>Three</u>
               </div>
             </div>
-          ')
+          '.replace(/\s+/g, '')
           node = @container.querySelector(test.target)
           retNode = dom(node).isolate(@container).get()
-          expect(@container).toEqualHTML(test.html)
+          expect(@container).toEqualHTML(test.html.replace(/\s+/g, ''))
           expect(retNode).toEqual(node)
         )
       )

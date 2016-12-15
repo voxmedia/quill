@@ -12,13 +12,13 @@ describe('PasteManager', ->
     pasteManager.container.innerHTML = '
       <b>Pasted</b>
       <div style="text-align: right;">Text</div>
-    '
+    '.replace(/\s+/g, '')
     quill.on(Quill.events.TEXT_CHANGE, (delta) ->
-      expect(delta).toEqualDelta(new Quill.Delta().retain(2).insert('Pasted', { bold: true }).insert('\nText'))
+      expect(delta).toEqualDelta(new Quill.Delta().retain(2).insert('Pasted', { bold: true }).insert('Text'))
       _.defer( ->
         range = quill.getSelection()
-        expect(range.start).toEqual(13)
-        expect(range.end).toEqual(13)
+        expect(range.start).toEqual(12)
+        expect(range.end).toEqual(12)
         done()
       )
     )

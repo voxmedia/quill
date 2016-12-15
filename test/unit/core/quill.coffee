@@ -55,7 +55,7 @@ describe('Quill', ->
   describe('manipulation', ->
     it('deleteText()', ->
       @quill.deleteText(2, 3)
-      expect(@quill.root).toEqualHTML('<div>013</div><div>5678</div>', true)
+      expect(@quill.root).toEqualHTML('<div>013</div> <div>5678</div>', true)
     )
 
     it('formatLine()', ->
@@ -68,9 +68,9 @@ describe('Quill', ->
 
     it('formatText()', ->
       @quill.formatText(2, 4, 'bold', true)
-      expect(@quill.root).toEqualHTML('<div>01<b>23</b></div><div>5678</div>', true)
+      expect(@quill.root).toEqualHTML('<div>01<b>23</b></div> <div>5678</div>', true)
       @quill.formatText(2, 4, 'bold', false)
-      expect(@quill.root).toEqualHTML('<div>0123</div><div>5678</div>', true)
+      expect(@quill.root).toEqualHTML('<div>0123</div> <div>5678</div>', true)
       expect(@quill.getContents(0, 4)).toEqualDelta(new Quill.Delta().insert('0123'))
     )
 
@@ -82,12 +82,12 @@ describe('Quill', ->
 
     it('insertEmbed()', ->
       @quill.insertEmbed(2, 'image', 'http://quilljs.com/images/cloud.png')
-      expect(@quill.root).toEqualHTML('<div>01<img src="http://quilljs.com/images/cloud.png">23</div><div>5678</div>', true)
+      expect(@quill.root).toEqualHTML('<div>01<img src="http://quilljs.com/images/cloud.png">23</div> <div>5678</div>', true)
     )
 
     it('insertText()', ->
       @quill.insertText(2, 'A')
-      expect(@quill.root).toEqualHTML('<div>01A23</div><div>5678</div>', true)
+      expect(@quill.root).toEqualHTML('<div>01A23</div> <div>5678</div>', true)
     )
 
     it('setContents() with delta', ->
@@ -126,7 +126,7 @@ describe('Quill', ->
 
     it('updateContents()', ->
       @quill.updateContents(new Quill.Delta().retain(2).insert('A'))
-      expect(@quill.root).toEqualHTML('<div>01A23</div><div>5678</div>', true)
+      expect(@quill.root).toEqualHTML('<div>01A23</div> <div>5678</div>', true)
     )
   )
 
@@ -140,7 +140,7 @@ describe('Quill', ->
     )
 
     it('getHTML()', ->
-      expect(@quill.getHTML()).toEqualHTML('<div>0123</div><div>5678</div>', true)
+      expect(@quill.getHTML()).toEqualHTML('<div>0123</div>&nbsp;<div>5678</div>', true)
     )
 
     it('getLength()', ->

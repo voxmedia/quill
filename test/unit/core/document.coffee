@@ -132,7 +132,7 @@ describe('Document', ->
 
   describe('manipulation', ->
     beforeEach( ->
-      @container.innerHTML = Quill.Normalizer.stripWhitespace('
+      @container.innerHTML = '
         <div>
           <div>Test</div>
           <div><i>Test</i></div>
@@ -140,7 +140,7 @@ describe('Document', ->
           <div><br></div>
           <div><b>Test</b></div>
         </div>
-      ')
+      '.replace(/\s+/g, '')
       @doc = new Quill.Document(@container.firstChild, { formats: Quill.DEFAULTS.formats })
       @lines = @doc.lines.toArray()
     )
@@ -152,7 +152,7 @@ describe('Document', ->
         <div><br></div>
         <div><br></div>
         <div><b>Test</b></div>
-      ', true)
+      '.replace(/\s+/g, ''), true)
       expect(@doc.lines.length).toEqual(@lines.length - 1)
     )
 
@@ -163,7 +163,7 @@ describe('Document', ->
         <div><i>Test</i></div>
         <div><br></div>
         <div><b>Test</b></div>
-      ', true)
+      '.replace(/\s+/g, ''), true)
       expect(@doc.lines.length).toEqual(@lines.length - 1)
     )
 
@@ -174,7 +174,7 @@ describe('Document', ->
         <div><i>Test</i></div>
         <div><br></div>
         <div><b>Test</b></div>
-      ', true)
+      '.replace(/\s+/g, ''), true)
       expect(@doc.lines.length).toEqual(@lines.length - 1)
     )
 
@@ -185,7 +185,7 @@ describe('Document', ->
         <div><i>Test</i></div>
         <div><br></div>
         <div><b>Test</b></div>
-      ', true)
+      '.replace(/\s+/g, ''), true)
       expect(@doc.lines.length).toEqual(@lines.length - 1)
     )
 
@@ -196,7 +196,7 @@ describe('Document', ->
         <div><br></div>
         <div><br></div>
         <div><b>Test</b></div>
-      ', true)
+      '.replace(/\s+/g, ''), true)
       expect(@doc.lines.length).toEqual(@lines.length - 1)
     )
 
@@ -208,7 +208,7 @@ describe('Document', ->
         <div><br></div>
         <div><br></div>
         <div><b>Test</b></div>
-      ', true)
+      '.replace(/\s+/g, ''), true)
       expect(@doc.lines.length).toEqual(@lines.length - 1)
     )
 
@@ -221,7 +221,7 @@ describe('Document', ->
         <div><br></div>
         <div><br></div>
         <div><b>Test</b></div>
-      ', true)
+      '.replace(/\s+/g, ''), true)
       expect(@doc.lines.length).toEqual(@lines.length + 1)
     )
 
@@ -234,7 +234,7 @@ describe('Document', ->
         <div><br></div>
         <div><br></div>
         <div><b>Test</b></div>
-      ', true)
+      '.replace(/\s+/g, ''), true)
       expect(@doc.lines.length).toEqual(@lines.length + 1)
     )
 
@@ -247,7 +247,7 @@ describe('Document', ->
         <div><br></div>
         <div><br></div>
         <div><b>Test</b></div>
-      ', true)
+      '.replace(/\s+/g, ''), true)
       expect(@doc.lines.length).toEqual(@lines.length + 1)
     )
 
@@ -260,7 +260,7 @@ describe('Document', ->
         <div><br></div>
         <div><br></div>
         <div><b>Test</b></div>
-      ', true)
+      '.replace(/\s+/g, ''), true)
       expect(@doc.lines.length).toEqual(@lines.length + 1)
     )
 
@@ -273,7 +273,7 @@ describe('Document', ->
         <div><br></div>
         <div><br></div>
         <div><b>Test</b></div>
-      ', true)
+      '.replace(/\s+/g, ''), true)
       expect(@doc.lines.length).toEqual(@lines.length + 1)
     )
 
@@ -293,13 +293,13 @@ describe('Document', ->
         <div>
           <b></b>
         </div>
-      ')
+      '.replace(/\s+/g, ''))
       expect(@doc.root).toEqualHTML('
         <div>A</div>
         <div>B<br></div>
         <div>C</div>
         <div><b></b><br></div>
-      ', true)
+      '.replace(/\s+/g, ''), true)
     )
 
     it('setHTML() with comment', ->
@@ -368,7 +368,7 @@ describe('Document', ->
         <div>
           <div>0123</div>
           <div>5678</div>
-        </div>'
+        </div>'.replace(/\s+/g, '')
       @doc = new Quill.Document(@container)
     )
 
