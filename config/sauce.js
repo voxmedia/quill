@@ -2,8 +2,8 @@ var _ = require('lodash');
 var os = require('os');
 
 var options = {
-  username: process.env.SAUCE_USER || 'quill',
-  accessKey: process.env.SAUCE_KEY || 'adc0c0cf-221b-46f1-81b9-a4429b722c2e'
+  username: process.env.SAUCE_USER || 'voxmedia-quill',
+  accessKey: process.env.SAUCE_KEY || 'd920e137-42a9-4b6a-8bc8-252c6808598f'
 };
 
 if (process.env.TRAVIS) {

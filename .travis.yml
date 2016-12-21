@@ -1,5 +1,5 @@
 language: node_js
-node_js: '0.12'
+node_js: 'node'
 script:
   - grunt travis:$TEST
 sudo: false
@@ -14,8 +14,6 @@ env:
     - TEST=unit-windows-firefox
     - TEST=unit-windows-chrome
     - TEST=unit-windows-ie-11
-    - TEST=unit-windows-ie-10
-    - TEST=unit-windows-ie-9
     - TEST=unit-linux-chrome
     - TEST=unit-linux-firefox
     - TEST=unit-ipad
