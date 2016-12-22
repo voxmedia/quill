@@ -4,7 +4,6 @@ coffeeify = require('coffeeify')
 fs = require('fs')
 harp = require('harp')
 proxy = require('http-proxy')
-stylify = require('stylify')
 watchify = require('watchify')
 
 
@@ -52,7 +51,6 @@ module.exports = (grunt) ->
           b = browserify(file, browserifyOps)
           watchers[type] = watchify(b)
           watchers[type].transform(coffeeify)
-          watchers[type].transform(stylify)
           watchers[type].on('update', _.bind(bundle, watchers[type], watchers[type]))
           bundle(watchers[type])
           return watchers

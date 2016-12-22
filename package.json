@@ -50,7 +50,6 @@
     "lodash-cli": "~3.9.3",
     "protractor": "~2.1.0",
     "rich-text": "~2.1.0",
-    "stylify": "~1.0.0",
     "through": "~2.3.7",
     "watchify": "~3.2.1"
   },

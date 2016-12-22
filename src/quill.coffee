@@ -23,7 +23,6 @@ class Quill extends EventEmitter2
       'undo-manager': true
     pollInterval: 100
     readOnly: false
-    styles: {}
 
   @events:
     FORMAT_INIT      : 'format-init'

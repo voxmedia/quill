@@ -24,7 +24,7 @@ module.exports = (grunt) ->
         browserifyOptions:
           extensions: ['.js', '.coffee']
           standalone: 'Quill'
-        transform: ['coffeeify', 'stylify', versionify]
+        transform: ['coffeeify', versionify]
         plugin: [derequire]
       files:
         'dist/quill.js': ['src/index.coffee']
@@ -58,8 +58,6 @@ module.exports = (grunt) ->
       files:
         'dist/quill.js': ['dist/quill.js']
         'dist/quill.min.js': ['dist/quill.min.js']
-        'dist/quill.base.css': ['dist/quill.base.css']
-        'dist/quill.snow.css': ['dist/quill.snow.css']
   )
 
   grunt.config('lodash',
