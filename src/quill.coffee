@@ -12,7 +12,6 @@ Range         = require('./lib/range')
 class Quill extends EventEmitter2
   @version: '0.20.1'
   @editors: []
-
   @modules: []
 
   @DEFAULTS:
