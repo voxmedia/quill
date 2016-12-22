@@ -42,24 +42,28 @@ class Editor
       delta = this._trackDelta( =>
         consumeNextNewline = false
         index = 0
+        length = @length
         _.each(delta.ops, (op) =>
           if _.isString(op.insert)
             text = op.insert
             if _.last(op.insert) == '\n' and consumeNextNewline
               consumeNextNewline = false
               text = text.slice(0, -1)
-            if index >= delta.length() && _.last(op.insert) != '\n'
+            if index >= length && _.last(op.insert) != '\n'
               consumeNextNewline = true
             this._insertText(index, text)
             _.each(op.attributes, (value, name) =>
               this._formatAt(index, op.insert.length, name, value)
             )
-            index += op.insert.length;
+            index += op.insert.length
+            length += op.insert.length
           else if _.isNumber(op.insert)
             this._insertEmbed(index, op.attributes)
-            index += 1;
+            index += 1
+            length += 1
           else if _.isNumber(op.delete)
             this._deleteAt(index, op.delete)
+            length -= op.delete
           else if _.isNumber(op.retain)
             _.each(op.attributes, (value, name) =>
               this._formatAt(index, op.retain, name, value)
