@@ -48,7 +48,7 @@ class Editor
             if _.last(op.insert) == '\n' and consumeNextNewline
               consumeNextNewline = false
               text = text.slice(0, -1)
-            if index >= @length && _.last(op.insert) != '\n'
+            if index >= delta.length() && _.last(op.insert) != '\n'
               consumeNextNewline = true
             this._insertText(index, text)
             _.each(op.attributes, (value, name) =>
