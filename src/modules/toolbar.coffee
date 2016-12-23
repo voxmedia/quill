@@ -86,7 +86,6 @@ class Toolbar
         handler = @formatHandlers[name] ||
           (range, value) => this._applyFormat(name, range, value)
         handler(range, value)
-      @quill.editor.selection.scrollIntoView() if dom.isIE(11)
       @preventUpdate = false
       return false
     )

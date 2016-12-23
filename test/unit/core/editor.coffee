@@ -309,9 +309,6 @@ describe('Editor', ->
 
     beforeEach( ->
       @editor.root.style.fontFamily = 'monospace'
-      if dom.isIE(10)
-        version = if dom.isIE(9) then '9' else '10'
-        dom(@editor.root).addClass('ql-ie-' + version).addClass('ql-editor')
       unless reference?
         @editor.root.innerHTML = '<div><span>0</span></div>'
         reference =
@@ -364,11 +361,7 @@ describe('Editor', ->
     it('end of plain text start of formatted text', ->
       bounds = @editor.getBounds(5)
       expect(bounds.left).toBeApproximately(2*reference.normal.width, 2)
-      # IE takes height of line
-      if Quill.Lib.DOM.isIE(11)
-        expect(bounds.height).toBeApproximately(reference.large.height, 1)
-      else
-        expect(bounds.height).toBeApproximately(reference.normal.height, 1)
+      expect(bounds.height).toBeApproximately(reference.normal.height, 1)
     )
 
     it('end of formatted text start of plain text', ->

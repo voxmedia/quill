@@ -293,17 +293,9 @@ class Wrapper
         lastKeyEvent.which = options.key.toUpperCase().charCodeAt(0)
       else
         lastKeyEvent.which = 0
-      if dom.isIE(10)
-        modifiers = []
-        modifiers.push('Alt') if options.altKey
-        modifiers.push('Control') if options.ctrlKey
-        modifiers.push('Meta') if options.metaKey
-        modifiers.push('Shift') if options.shiftKey
-        event.initKeyboardEvent(eventName, options.bubbles, options.cancelable, window, 0, 0, modifiers.join(' '), null, null)
-      else
-        # FF uses initKeyEvent, Webkit uses initKeyboardEvent
-        initFn = if _.isFunction(event.initKeyboardEvent) then 'initKeyboardEvent' else 'initKeyEvent'
-        event[initFn](eventName, options.bubbles, options.cancelable, window, options.ctrlKey, options.altKey, options.shiftKey, options.metaKey, 0, 0)
+      # FF uses initKeyEvent, Webkit uses initKeyboardEvent
+      initFn = if _.isFunction(event.initKeyboardEvent) then 'initKeyboardEvent' else 'initKeyEvent'
+      event[initFn](eventName, options.bubbles, options.cancelable, window, options.ctrlKey, options.altKey, options.shiftKey, options.metaKey, 0, 0)
     @node.dispatchEvent(event)
     lastKeyEvent = null
     return this
@@ -479,10 +471,6 @@ dom = _.extend(dom,
     for i,s of sources
       return targets[i] if parseInt(size) <= parseInt(s)
     return _.last(targets)
-
-  isIE: (maxVersion) ->
-    version = document.documentMode
-    return version and maxVersion >= version
 
   isIOS: ->
     return /iPhone|iPad/i.test(navigator.userAgent)

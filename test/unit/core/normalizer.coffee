@@ -17,7 +17,6 @@ describe('Normalizer', ->
         expected: '<div><b>One<br></b></div>'
 
     _.each(tests, (test, name) ->
-      return if test.ieOmit and Quill.Lib.DOM.isIE(10)
       it(name, ->
         @container.innerHTML = test.initial
         lineNode = Quill.Normalizer.handleBreaks(@container.firstChild)

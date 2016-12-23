@@ -124,7 +124,7 @@ class Normalizer
   @handleBreaks: (lineNode) ->
     breaks = _.map(lineNode.querySelectorAll(dom.DEFAULT_BREAK_TAG))
     _.each(breaks, (br) =>
-      if br.nextSibling? and (!dom.isIE(10) or br.previousSibling?)
+      if br.nextSibling?
         dom(br.nextSibling).splitBefore(lineNode.parentNode)
     )
     return lineNode
