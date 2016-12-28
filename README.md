@@ -44,7 +44,6 @@ There are a number of ways to download the latest or versioned copy of Quill.
 ### CDN
 
 ```html
-<link rel="stylesheet" href="//cdn.quilljs.com/0.19.10/quill.snow.css" />
 <script src="//cdn.quilljs.com/0.19.10/quill.min.js"></script>
 ```
 

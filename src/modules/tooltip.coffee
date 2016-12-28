@@ -11,6 +11,7 @@ class Tooltip
   @HIDE_MARGIN = '-10000px'
 
   constructor: (@quill, @options) ->
+    @options = _.defaults(@options, Tooltip.DEFAULTS)
     @container = @quill.addContainer('ql-tooltip')
     @container.innerHTML = @options.template
     this.hide()

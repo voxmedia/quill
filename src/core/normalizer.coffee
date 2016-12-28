@@ -116,11 +116,15 @@ class Normalizer
       dom(list).remove()
     )
 
+  @mergeAdjacentLists: (listNode) ->
+    if listNode.nextSibling?.tagName == listNode.tagName
+      dom(listNode).merge(listNode.nextSibling)
+
   # Make sure descendant break tags are not causing multiple lines to be rendered
   @handleBreaks: (lineNode) ->
     breaks = _.map(lineNode.querySelectorAll(dom.DEFAULT_BREAK_TAG))
     _.each(breaks, (br) =>
-      if br.nextSibling? and (!dom.isIE(10) or br.previousSibling?)
+      if br.nextSibling?
         dom(br.nextSibling).splitBefore(lineNode.parentNode)
     )
     return lineNode
@@ -129,19 +133,47 @@ class Normalizer
   @optimizeLine: (lineNode) ->
     lineNode.normalize()
     lineNodeLength = dom(lineNode).length()
+    if lineNode.tagName == 'LI'
+      Normalizer.mergeAdjacentLists(lineNode.parentNode)
     nodes = dom(lineNode).descendants()
     while nodes.length > 0
       node = nodes.pop()
       continue unless node?.parentNode?
       continue if dom.EMBED_TAGS[node.tagName]?
+
       if node.tagName == dom.DEFAULT_BREAK_TAG
         # Remove unneeded BRs
         dom(node).remove() unless lineNodeLength == 0
-      else if dom(node).length() == 0
+        continue
+
+      if dom(node).length() == 0
         nodes.push(node.nextSibling)
         dom(node).unwrap()
-      else if node.previousSibling? and node.tagName == node.previousSibling.tagName
-        # Merge similar nodes
+        continue
+
+      # If node is an only child
+      if node.parentNode != lineNode && !node.previousSibling? && !node.nextSibling?
+        if node.parentNode.tagName > node.tagName
+          # Order tag nesting alphabetically (parent->child : A->Z)
+          dom(node).moveChildren(node.parentNode)
+          dom(node.parentNode).wrap(node)
+          if node.parentNode.nextSibling?
+            # check next sibling again in case it is similar enough to merge
+            nodes.push(node.parentNode.nextSibling)
+        else
+          # Move attributes to parent
+          for name, value of dom(node).attributes()
+            node.parentNode.setAttribute(name, value)
+            node.removeAttribute(name)
+          if node.parentNode.nextSibling?
+            # check next sibling again in case it is similar enough to merge
+            nodes.push(node.parentNode.nextSibling)
+          if node.tagName == dom.DEFAULT_INLINE_TAG
+            # remove spans without attributes
+            dom(node).unwrap()
+
+      # Merge similar nodes
+      if node.previousSibling? and node.tagName == node.previousSibling.tagName
         if _.isEqual(dom(node).attributes(), dom(node.previousSibling).attributes())
           nodes.push(node.firstChild)
           dom(node.previousSibling).merge(node)
@@ -172,6 +204,9 @@ class Normalizer
     # Collapse whitespace between tags, requires &nbsp; for legitmate spaces
     html = html.replace(/\>\s+\</g, '> <')
     return html
+
+  @stripStyleTags: (html) ->
+    return html.replace(/<style.*?<\/style>/g, '')
 
   # Wrap inline nodes with block tags
   @wrapInline: (lineNode) ->

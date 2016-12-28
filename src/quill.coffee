@@ -12,9 +12,7 @@ Range         = require('./lib/range')
 class Quill extends EventEmitter2
   @version: '0.20.1'
   @editors: []
-
   @modules: []
-  @themes: []
 
   @DEFAULTS:
     formats: Object.keys(Format.FORMATS)
@@ -24,8 +22,6 @@ class Quill extends EventEmitter2
       'undo-manager': true
     pollInterval: 100
     readOnly: false
-    styles: {}
-    theme: 'base'
 
   @events:
     FORMAT_INIT      : 'format-init'
@@ -40,10 +36,6 @@ class Quill extends EventEmitter2
   @registerModule: (name, module) ->
     console.warn("Overwriting #{name} module") if Quill.modules[name]?
     Quill.modules[name] = module
-
-  @registerTheme: (name, theme) ->
-    console.warn("Overwriting #{name} theme") if Quill.themes[name]?
-    Quill.themes[name] = theme
 
   @require: (name) ->
     switch name
@@ -71,9 +63,6 @@ class Quill extends EventEmitter2
     @editor = new Editor(@root, this, @options)
     Quill.editors.push(this)
     this.setHTML(html, Quill.sources.SILENT)
-    themeClass = Quill.themes[@options.theme]
-    throw new Error("Cannot load #{@options.theme} theme. Are you sure you registered it?") unless themeClass?
-    @theme = new themeClass(this, @options)
     _.each(@options.modules, (option, name) =>
       this.addModule(name, option)
     )
@@ -103,10 +92,15 @@ class Quill extends EventEmitter2
     moduleClass = Quill.modules[name]
     throw new Error("Cannot load #{name} module. Are you sure you registered it?") unless moduleClass?
     options = {} if options == true   # Allow for addModule('module', true)
-    options = _.defaults(options, @theme.constructor.OPTIONS[name] or {}, moduleClass.DEFAULTS or {})
     @modules[name] = new moduleClass(this, options)
     this.emit(Quill.events.MODULE_INIT, name, @modules[name])
     return @modules[name]
+
+  addStyles: (css) ->
+    style = document.createElement('style')
+    style.type = 'text/css'
+    style.appendChild(document.createTextNode(css))
+    document.head.appendChild(style)
 
   deleteText: (start, end, source = Quill.sources.API) ->
     [start, end, formats, source] = this._buildParams(start, end, {}, source)
@@ -240,10 +234,5 @@ class Quill extends EventEmitter2
       params.splice(2, 2, formats)
     params[3] ?= Quill.sources.API
     return params
-
-
-Quill.registerTheme('base', require('./themes/base'))
-Quill.registerTheme('snow', require('./themes/snow'))
-
 
 module.exports = Quill

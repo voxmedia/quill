@@ -19,25 +19,12 @@ describe('UndoManager', ->
   tests =
     'insert':
       delta: new Quill.Delta().retain(9).insert('hairy ')
-      index: 15
     'delete':
       delta: new Quill.Delta().retain(4).delete(5)
-      index: 4
     'format':
       delta: new Quill.Delta().retain(4).retain(5, { bold: true })
-      index: 9
     'multiple':
       delta: new Quill.Delta().retain(4, { bold: true }).insert('hairy').delete(4)
-      index: 9
-
-  describe('_getLastChangeIndex', ->
-    _.each(tests, (test, name) ->
-      it(name, ->
-        index = @undoManager._getLastChangeIndex(test.delta)
-        expect(index).toEqual(test.index)
-      )
-    )
-  )
 
   describe('undo/redo', ->
     _.each(tests, (test, name) ->

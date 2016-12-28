@@ -65,7 +65,7 @@ class PasteManager
     range = @quill.getSelection()
     return unless range?
 
-    if _.includes(event.clipboardData?.types, 'application/json')
+    if _.includes(event?.clipboardData?.types, 'application/json')
       try
         removal = new Delta().retain(range.start).delete(range.end - range.start)
         insertion = new Delta(JSON.parse(event.clipboardData.getData('application/json')))

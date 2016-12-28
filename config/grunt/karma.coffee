@@ -22,20 +22,16 @@ module.exports = (grunt) ->
         'node_modules/jquery/dist/jquery.js'
         'node_modules/lodash/index.js'
 
-        grunt.config('baseUrl') + 'quill.base.css'
         grunt.config('baseUrl') + 'test/quill.js'
 
         'test/fixtures/unit.html'
         'test/helpers/inject.coffee'
         'test/helpers/matchers.coffee'
 
-        { pattern: 'test/fixtures/*.css', included: false }
-
         # We dont do **/*.coffee to control order of tests
         'test/unit/lib/*.coffee'
         'test/unit/core/*.coffee'
         'test/unit/modules/*.coffee'
-        'test/unit/themes/*.coffee'
       ]
       port: grunt.config('karmaPort')
     coverage:

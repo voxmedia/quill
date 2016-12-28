@@ -3,13 +3,7 @@ dom = Quill.Lib.DOM
 describe('Toolbar', ->
   beforeEach( ->
     jasmine.resetEditor()
-    @editorContainer = $('#editor-container').html('
-      <div>
-        <div>
-          <b>01</b>23<i>45</i><span style="font-size: 18px;">67</span><span style="font-size: 32px;">89</span>
-        </div>
-      </div>
-    ').get(0)
+    @editorContainer = $('#editor-container').html('<div><div><b>01</b>23<i>45</i><span style="font-size: 18px;">67</span><span style="font-size: 32px;">89</span></div></div>').get(0)
     @toolbarContainer = $('#toolbar-container').get(0)
     @toolbarContainer.innerHTML = @toolbarContainer.innerHTML   # Remove child listeners
     @quill = new Quill(@editorContainer.firstChild)
@@ -27,14 +21,14 @@ describe('Toolbar', ->
     it('button add', ->
       range = new Quill.Lib.Range(2, 4)
       @quill.setSelection(range)
-      dom(@button).trigger('click')
+      dom(@button).trigger('click', { bubbles: true })
       expect(@quill.getContents(range)).toEqualDelta(new Quill.Delta().insert('23', { bold: true }))
     )
 
     it('button remove', ->
       range = new Quill.Lib.Range(0, 2)
       @quill.setSelection(range)
-      dom(@button).trigger('click')
+      dom(@button).trigger('click', { bubbles: true })
       expect(@quill.getContents(range)).toEqualDelta(new Quill.Delta().insert('01'))
     )
 

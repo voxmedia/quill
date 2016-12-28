@@ -102,7 +102,7 @@ describe('Editor', ->
           expected: '<div>Test</div>'
           text: 'Test'
         'formatted text':
-          expected: '<div><i><b>Test</b></i></div>'
+          expected: '<div><b><i>Test</i></b></div>'
           text: 'Test', formats: { bold: true, italic: true }
         'newline':
           expected: '<div><br></div>'
@@ -251,12 +251,11 @@ describe('Editor', ->
         initial: '
           <div>0123</div>
           <div>5678</div>
-          <div>abcd</div>'
+          <div>abcd</div>'.replace(/\s+/g, ' ')
         delta: new Quill.Delta().retain(4).delete(1).retain(2).insert('|\n|').retain(7).retain(1, { align: 'right' })
         expected: '
-          <div>012356|</div>
-          <div>|78</div>
-          <div style="text-align: right;">abcd</div>'
+          <div>012356|</div><div>|78</div>
+          <div style="text-align: right;">abcd</div>'.replace(/\s+/g, ' ')
 
     _.each(tests, (test, name) ->
       it(name, ->
@@ -310,10 +309,6 @@ describe('Editor', ->
 
     beforeEach( ->
       @editor.root.style.fontFamily = 'monospace'
-      # Normally handled by theme
-      if dom.isIE(10)
-        version = if dom.isIE(9) then '9' else '10'
-        dom(@editor.root).addClass('ql-ie-' + version).addClass('ql-editor')
       unless reference?
         @editor.root.innerHTML = '<div><span>0</span></div>'
         reference =
@@ -363,15 +358,11 @@ describe('Editor', ->
       expect(bounds.top).toBeApproximately(reference.normal.height, 2)
     )
 
-    it('end of plain text start of formatted text', ->
-      bounds = @editor.getBounds(5)
-      expect(bounds.left).toBeApproximately(2*reference.normal.width, 2)
-      # IE takes height of line
-      if Quill.Lib.DOM.isIE(11)
-        expect(bounds.height).toBeApproximately(reference.large.height, 1)
-      else
-        expect(bounds.height).toBeApproximately(reference.normal.height, 1)
-    )
+    # it('end of plain text start of formatted text', ->
+    #   bounds = @editor.getBounds(5)
+    #   expect(bounds.left).toBeApproximately(2*reference.normal.width, 2)
+    #   expect(bounds.height).toBeApproximately(reference.normal.height, 1)
+    # )
 
     it('end of formatted text start of plain text', ->
       bounds = @editor.getBounds(7)

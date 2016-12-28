@@ -1,8 +1,9 @@
+dist: trusty
+sudo: false
 language: node_js
-node_js: '0.12'
+node_js: '4'
 script:
   - grunt travis:$TEST
-sudo: false
 cache:
   directories:
     - node_modules
@@ -11,13 +12,11 @@ env:
     - TEST=unit-mac-chrome
     - TEST=unit-mac-firefox
     - TEST=unit-mac-safari
-    - TEST=unit-windows-firefox
     - TEST=unit-windows-chrome
-    - TEST=unit-windows-ie-11
-    - TEST=unit-windows-ie-10
-    - TEST=unit-windows-ie-9
+    - TEST=unit-windows-firefox
+    - TEST=unit-windows-edge
     - TEST=unit-linux-chrome
     - TEST=unit-linux-firefox
-    - TEST=unit-ipad
     - TEST=unit-iphone
+    - TEST=unit-ipad
     - TEST=unit-android

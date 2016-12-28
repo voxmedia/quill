@@ -142,7 +142,7 @@ class Line extends LinkedList.Node
 
   rebuild: (force = false) ->
     if !force and @outerHTML? and @outerHTML == @node.outerHTML
-      if _.all(@leaves.toArray(), (leaf) =>
+      if _.every(@leaves.toArray(), (leaf) =>
         return dom(leaf.node).isAncestor(@node)
       )
         return false

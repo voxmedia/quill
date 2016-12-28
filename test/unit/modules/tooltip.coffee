@@ -40,16 +40,16 @@ describe('Tooltip', ->
       reference = @quill.addContainer('ql-reference')
       $(reference).css({ position: 'absolute', top: '100px', left: '200px', width: '100px', height: '50px' })
       [left, top] = @tooltip.position(reference)
-      expect(left).toEqual(150)
-      expect(top).toEqual(170)    # ref top + ref height + offset
+      expect(left).toEqual(142)
+      expect(top).toEqual(162)    # ref top + ref height + offset
     )
 
     it('place above', ->
       reference = @quill.addContainer('ql-reference')
       $(reference).css({ position: 'absolute', top: '350px', left: '200px', width: '100px', height: '50px' })
       [left, top] = @tooltip.position(reference)
-      expect(left).toEqual(150)
-      expect(top).toEqual(230)    # ref top - tooltip height - offset
+      expect(left).toEqual(142)
+      expect(top).toEqual(222)    # ref top - tooltip height - offset
     )
   )
 )

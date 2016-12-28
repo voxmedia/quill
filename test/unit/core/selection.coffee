@@ -5,18 +5,7 @@ describe('Selection', ->
 
   describe('helpers', ->
     beforeEach( ->
-      @container.innerHTML = '
-        <div>
-          <div>0123</div>
-          <div><br></div>
-          <div><img src="http://quilljs.com/images/cloud.png"></div>
-          <ul>
-            <li>One</li>
-            <li>Two</li>
-          </ul>
-          <div><b><s>89</s></b><i>ab</i></div>
-        </div>
-      '
+      @container.innerHTML = '<div><div>0123</div><div><br></div><div><img src="http://quilljs.com/images/cloud.png"></div><ul><li>One</li><li>Two</li></ul><div><b><s>89</s></b><i>ab</i></div></div> '
       @quill = new Quill(@container.firstChild)   # Need Quill to create iframe for focus logic
       @selection = @quill.editor.selection
     )
