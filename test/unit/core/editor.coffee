@@ -207,7 +207,7 @@ describe('Editor', ->
     )
   )
 
-  describe('insertEmbed()', ->
+  describe('_insertEmbed()', ->
     it('insert image', ->
       @editor.doc.setHTML('<div>A</div>')
       @editor._insertEmbed(1, { image: "http://quilljs.com/images/cloud.png" })
@@ -256,6 +256,22 @@ describe('Editor', ->
         expected: '
           <div>012356|</div><div>|78</div>
           <div style="text-align: right;">abcd</div>'.replace(/\s+/g, ' ')
+      'trailing newline':
+        initial: '<div>0123</div>'
+        delta: new Quill.Delta().retain(5).insert('|\n')
+        expected: '<div>0123</div><div>|</div>'
+      'formatted trailing newline':
+        initial: '<div>0123</div>'
+        delta: new Quill.Delta().retain(5).insert('|').insert('\n', { align: 'right' })
+        expected: '<div>0123</div><div style="text-align: right;">|</div>'
+      'delete with trailing newline':
+        initial: '<div>0123</div>'
+        delta: new Quill.Delta().delete(1).retain(4).insert('|').insert('\n', { align: 'right' })
+        expected: '<div>123</div><div style="text-align: right;">|</div>'
+      'multiple trailing newlines':
+        initial: '<div>0123</div>'
+        delta: new Quill.Delta().retain(5).insert('45').insert('\n').insert('67').insert('\n')
+        expected: '<div>0123</div><div>45</div><div>67</div>'
 
     _.each(tests, (test, name) ->
       it(name, ->

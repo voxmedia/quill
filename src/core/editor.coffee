@@ -40,16 +40,30 @@ class Editor
       delta = localDelta.transform(delta, true)
     if delta.ops.length > 0
       delta = this._trackDelta( =>
+        consumeNextNewline = false
         index = 0
+        length = @length
         _.each(delta.ops, (op) =>
           if _.isString(op.insert)
-            this._insertAt(index, op.insert, op.attributes)
-            index += op.insert.length;
+            text = op.insert
+            if _.last(op.insert) == '\n' and consumeNextNewline
+              consumeNextNewline = false
+              text = text.slice(0, -1)
+            if index >= length && _.last(op.insert) != '\n'
+              consumeNextNewline = true
+            this._insertText(index, text)
+            _.each(op.attributes, (value, name) =>
+              this._formatAt(index, op.insert.length, name, value)
+            )
+            index += op.insert.length
+            length += op.insert.length
           else if _.isNumber(op.insert)
             this._insertEmbed(index, op.attributes)
-            index += 1;
+            index += 1
+            length += 1
           else if _.isNumber(op.delete)
             this._deleteAt(index, op.delete)
+            length -= op.delete
           else if _.isNumber(op.retain)
             _.each(op.attributes, (value, name) =>
               this._formatAt(index, op.retain, name, value)
@@ -152,7 +166,7 @@ class Editor
       line.insertEmbed(offset, attributes)
     )
 
-  _insertAt: (index, text, formatting = {}) ->
+  _insertText: (index, text) ->
     @selection.shiftAfter(index, text.length, =>
       text = text.replace(/\r\n?/g, '\n')
       lineTexts = text.split('\n')
@@ -162,16 +176,12 @@ class Editor
           if i < lineTexts.length - 1 or lineText.length > 0
             line = @doc.appendLine(document.createElement(dom.DEFAULT_BLOCK_TAG))
             offset = 0
-            line.insertText(offset, lineText, formatting)
-            line.format(formatting)
+            line.insertText(offset, lineText)
             nextLine = null
         else
-          line.insertText(offset, lineText, formatting)
+          line.insertText(offset, lineText)
           if i < lineTexts.length - 1       # Are there more lines to insert?
             nextLine = @doc.splitLine(line, offset + lineText.length)
-            _.each(_.defaults({}, formatting, line.formats), (value, format) ->
-              line.format(format, formatting[format])
-            )
             offset = 0
         line = nextLine
       )
