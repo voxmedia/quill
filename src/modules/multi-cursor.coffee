@@ -20,6 +20,7 @@ class MultiCursor extends EventEmitter2
 
   constructor: (@quill, options) ->
     @options = Object.assign({}, MultiCursor.DEFAULTS, options)
+    @cursors = {}
     @container = @quill.addContainer('ql-multi-cursor', true)
     @quill.on(@quill.constructor.events.TEXT_CHANGE, _.bind(this._applyDelta, this))
 
