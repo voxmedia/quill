@@ -95,15 +95,12 @@ describe('Editor', ->
     )
   )
 
-  describe('_insertAt()', ->
+  describe('_insertText()', ->
     describe('empty', ->
       tests =
         'text':
           expected: '<div>Test</div>'
           text: 'Test'
-        'formatted text':
-          expected: '<div><b><i>Test</i></b></div>'
-          text: 'Test', formats: { bold: true, italic: true }
         'newline':
           expected: '<div><br></div>'
           text: '\n'
@@ -116,25 +113,10 @@ describe('Editor', ->
 
       _.each(tests, (test, name) ->
         it(name, ->
-          @editor._insertAt(0, test.text, test.formats)
+          @editor._insertText(0, test.text)
           @editor.doc.optimizeLines()
           expect(@editor.root).toEqualHTML(test.expected, true)
         )
-      )
-
-      it('formatted newline', ->
-        @editor._insertAt(0, 'A\n', { bold: true })
-        @editor.doc.optimizeLines()
-        expect(@editor.root).toEqualHTML('<div><b>A</b></div>', true)
-
-        expect(@editor.doc.toDelta()).toEqualDelta(new Quill.Delta().insert('A\n', { bold: true }))
-      )
-
-      it('multiple formatted newlines', ->
-        @editor._insertAt(0, 'A\nB\n', { bold: true })
-        @editor.doc.optimizeLines()
-        expect(@editor.root).toEqualHTML('<div><b>A</b></div><div><b>B</b></div>', true)
-        expect(@editor.doc.toDelta()).toEqualDelta(new Quill.Delta().insert('A\nB\n', { bold: true }))
       )
     )
 
@@ -146,9 +128,6 @@ describe('Editor', ->
         'insert in middle of formatted text':
           expected: ['<div>0123<b><i>45</i></b>A<b><i>67</i></b></div>']
           index: 6, text: 'A'
-        'insert formatted text with match':
-          expected: ['<div>0123<b><i>45A67</i></b></div>']
-          index: 6, text: 'A', formats: { bold: true, italic: true }
         'prepend newline':
           expected: ['<div><br></div>', '<div>0123<b><i>4567</i></b></div>']
           index: 0, text: '\n'
@@ -177,32 +156,24 @@ describe('Editor', ->
       _.each(tests, (test, name) ->
         it(name, ->
           @editor.doc.setHTML('<div>0123<b><i>4567</i></b></div>')
-          @editor._insertAt(test.index, test.text, test.formats)
+          @editor._insertText(test.index, test.text)
           @editor.doc.optimizeLines()
           expect(@editor.root).toEqualHTML(test.expected.join(''), true)
         )
       )
 
-      it('append formatted newline', ->
-        @editor.doc.setHTML('<div>A</div>')
-        @editor._insertAt(2, '\n', { bold: true })
-        @editor.doc.optimizeLines()
-        expect(@editor.root).toEqualHTML('<div>A</div><div><br></div>', true)
-        expect(@editor.doc.toDelta()).toEqualDelta(new Quill.Delta().insert('A\n').insert('\n', { bold: true }))
-      )
-
       it('insert after image', ->
         @editor.doc.setHTML('<div><img src="http://quilljs.com/images/cloud.png"></div>')
-        @editor._insertAt(1, 'A', { bold: true })
+        @editor._insertText(1, 'A')
         @editor.doc.optimizeLines()
-        expect(@editor.root).toEqualHTML('<div><img src="http://quilljs.com/images/cloud.png"><b>A</b></div>', true)
+        expect(@editor.root).toEqualHTML('<div><img src="http://quilljs.com/images/cloud.png">A</div>', true)
       )
 
       it('insert newline after bullet', ->
         @editor.doc.setHTML('<ul><li>One</li></ul>')
-        @editor._insertAt(1, '\n')
+        @editor._insertText(1, '\n')
         @editor.doc.optimizeLines()
-        expect(@editor.root).toEqualHTML('<div>O</div><ul><li>ne</li></ul>', true)
+        expect(@editor.root).toEqualHTML('<ul><li>O</li><li>ne</li></ul>', true)
       )
     )
   )
