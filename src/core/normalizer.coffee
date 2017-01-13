@@ -151,32 +151,46 @@ class Normalizer
         dom(node).unwrap()
         continue
 
-      # If node is an only child
-      if node.parentNode != lineNode && !node.previousSibling? && !node.nextSibling?
-        if node.parentNode.tagName > node.tagName
-          # Order tag nesting alphabetically (parent->child : A->Z)
-          dom(node).moveChildren(node.parentNode)
-          dom(node.parentNode).wrap(node)
-          if node.nextSibling?
-            # check next sibling again in case it is similar enough to merge
-            nodes.push(node.nextSibling)
-        else
-          # Move attributes to parent
-          for name, value of dom(node).attributes()
-            node.parentNode.setAttribute(name, value)
-            node.removeAttribute(name)
-          if node.parentNode.nextSibling?
-            # check next sibling again in case it is similar enough to merge
-            nodes.push(node.parentNode.nextSibling)
-          if node.tagName == dom.DEFAULT_INLINE_TAG
-            # remove spans without attributes
-            dom(node).unwrap()
+      # If node is an only child, and parent is not the lineNode,
+      # normalize nesting order
+      if node.parentNode != lineNode and !node.previousSibling? and !node.nextSibling?
+        node = @optimizeNesting(node, lineNode)
+        # check next sibling again in case it is similar enough to merge
+        if node.nextSibling?
+          nodes.push(node.nextSibling)
 
       # Merge similar nodes
       if node.previousSibling? and node.tagName == node.previousSibling.tagName
         if _.isEqual(dom(node).attributes(), dom(node.previousSibling).attributes())
           nodes.push(node.firstChild)
           dom(node.previousSibling).merge(node)
+
+  # If a <span>, move attributes as high in the tree as possible and unwrap,
+  # otherwise, alphabetize nesting order of tag names (prefer <a> to be outer-most)
+  @optimizeNesting: (node, root) ->
+    if node.tagName == dom.DEFAULT_INLINE_TAG
+      # find all parents with only one child, up to the root
+      parents = []
+      next = node.parentNode
+      while next != root and next.firstChild == next.lastChild
+        parents.push(next)
+        next = next.parentNode
+      # choose the parent with the earliest tag name, alphabetically
+      target = _.sortBy(parents, 'tagName')[0]
+      # Move attributes to the target, and unwrap
+      for name, value of dom(node).attributes()
+        if name == 'class' && target.hasAttribute('class')
+          value = [target.getAttribute('class'), value].join(' ')
+        target.setAttribute(name, value)
+      dom(node).unwrap()
+      return target
+    else if node.parentNode.tagName > node.tagName
+      # Order tag nesting alphabetically (parent->child : A->Z)
+      dom(node).moveChildren(node.parentNode)
+      dom(node.parentNode).wrap(node)
+      return node
+    else
+      return node
 
   # Make sure descendants are all inline elements
   @pullBlocks: (lineNode) ->

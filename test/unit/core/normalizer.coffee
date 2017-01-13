@@ -125,10 +125,17 @@ describe('Normalizer', ->
       'reorder nodes':
         initial:  '<strong><em class="author-1">A</em>'
         expected: '<em class="author-1"><strong>A</strong></em>'
+      'reorder nodes plus merge':
+        initial:  '<strong><em>A</em></strong><em>B</em>'
+        expected: '<em><strong>A</strong>B</em>'
+      'unwrap span':
+        initial:  '<strong><em><span class="author-1">A</span></em></strong>'
+        expected: '<em class="author-1"><strong>A</strong></em>'
 
 
     _.each(tests, (test, name) ->
       it(name, ->
+        # debugger if name == 'unwrap span'
         @container.innerHTML = "<div>#{test.initial}</div>"
         Quill.Normalizer.optimizeLine(@container.firstChild)
         expect(@container.firstChild).toEqualHTML(test.expected)
