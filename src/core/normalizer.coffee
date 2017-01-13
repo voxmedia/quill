@@ -157,9 +157,9 @@ class Normalizer
           # Order tag nesting alphabetically (parent->child : A->Z)
           dom(node).moveChildren(node.parentNode)
           dom(node.parentNode).wrap(node)
-          if node.parentNode.nextSibling?
+          if node.nextSibling?
             # check next sibling again in case it is similar enough to merge
-            nodes.push(node.parentNode.nextSibling)
+            nodes.push(node.nextSibling)
         else
           # Move attributes to parent
           for name, value of dom(node).attributes()
