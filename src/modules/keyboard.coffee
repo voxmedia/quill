@@ -62,7 +62,7 @@ class Keyboard
       { key: dom.KEYS.ENTER }
       { key: dom.KEYS.ENTER, shiftKey: true }
     ]
-    this.addHotkey(keys, (range, hotkey) =>
+    this.addHotkey(keys, (range, hotkey, event) =>
       return true unless range?
       [line, offset] = @quill.editor.doc.findLineAt(range.start)
       [leaf, offset] = line.findLeafAt(offset)
@@ -92,7 +92,7 @@ class Keyboard
 
       # if creating a new empty line (was at the end of the old line),
       # remove line formats from the new line that should not be inherited
-      if !leaf.next and offset == leaf.length
+      if !leaf.next and offset == leaf.length and !event.shiftKey
         delta.retain(1, removeNonInheritedFormats)
       else
         delta.retain(leaf.length - offset)
