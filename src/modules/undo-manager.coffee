@@ -13,7 +13,8 @@ class UndoManager
     UNDO: { key: 'Z', metaKey: true }
     REDO: { key: 'Z', metaKey: true, shiftKey: true }
 
-  constructor: (@quill, @options = {}) ->
+  constructor: (@quill, options = {}) ->
+    @options = _.defaults(options, UndoManager.DEFAULTS)
     @lastRecorded = 0
     @ignoreChange = false
     this.clear()

@@ -18,8 +18,8 @@ class MultiCursor extends EventEmitter2
     CURSOR_MOVED: 'cursor-moved'
     CURSOR_REMOVED: 'cursor-removed'
 
-  constructor: (@quill, options) ->
-    @options = Object.assign({}, MultiCursor.DEFAULTS, options)
+  constructor: (@quill, options = {}) ->
+    @options = _.defaults(options, MultiCursor.DEFAULTS)
     @cursors = {}
     @container = @quill.addContainer('ql-multi-cursor', true)
     @quill.on(@quill.constructor.events.TEXT_CHANGE, _.bind(this._applyDelta, this))
