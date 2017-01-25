@@ -49,7 +49,8 @@ class Keyboard
     else
       delta = @quill.getContents(range)
     value = delta.ops.length == 0 or !_.every(delta.ops, (op) ->
-      return op.attributes?[format]
+      # it's ok to have newline-only inserts without the format
+      return op.attributes?[format] or /^\n+$/.test(op.insert)
     )
     if range.isCollapsed()
       @quill.prepareFormat(format, value, Quill.sources.USER)
