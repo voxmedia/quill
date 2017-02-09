@@ -104,15 +104,14 @@ class MultiCursor extends EventEmitter2
     @container.appendChild(cursor)
     return cursor
 
-  _buildHighlight: (start, end, color) =>
-    startBounds = @quill.getBounds(start)
-    endBounds = @quill.getBounds(end)
+  _buildHighlight: (bounds, color) =>
+    containerBounds = @quill.container.getBoundingClientRect()
     span = document.createElement('span')
     span.classList.add('cursor-highlight')
-    span.style.left = startBounds.left + 'px'
-    span.style.top = @quill.container.scrollTop + Math.min(startBounds.top, endBounds.top) + 'px'
-    span.style.width = (endBounds.left - startBounds.left) + 'px'
-    span.style.height = Math.max(endBounds.height, startBounds.height) + 'px'
+    span.style.left = (bounds.left - containerBounds.left) + 'px'
+    span.style.top = (bounds.top - containerBounds.top) + 'px'
+    span.style.width = bounds.width + 'px'
+    span.style.height = bounds.height + 'px'
     span.style.backgroundColor = color
     return span
 
@@ -142,15 +141,27 @@ class MultiCursor extends EventEmitter2
     highlights = elem.querySelector('.cursor-highlights')
     highlights.innerHTML = ''
     if cursor.range.start != cursor.range.end
-      offset = cursor.range.start
-      @quill.getText(cursor.range).split('\n').forEach (line) =>
-        box = this._buildHighlight(offset, offset + line.length, cursor.color)
-        highlights.appendChild(box)
-        offset = offset + line.length + 1
+      eachClientRect(@quill, cursor.range, (bounds) =>
+        highlights.appendChild this._buildHighlight(bounds, cursor.color)
+      )
 
     # emit move event
     this.emit(MultiCursor.events.CURSOR_MOVED, cursor)
 
+# For each line in the range, create a native range on which to call getClientRects()
+# Creating a single range doesn't seem to highlight embeds correctly
+eachClientRect = (quill, range, callback) ->
+  sel = quill.editor.selection
+  index = range.start
+  quill.getText(range).split('\n').forEach((line) ->
+    [startNode, startOffset] = sel._indexToPosition(index)
+    [endNode, endOffset] = sel._indexToPosition(index + line.length)
+    nativeRange = document.createRange()
+    nativeRange.setStart(startNode, startOffset)
+    nativeRange.setEnd(endNode, endOffset)
+    _.each(nativeRange.getClientRects(), callback)
+    index += line.length + 1
+  )
 
 Quill.registerModule('multi-cursor', MultiCursor)
 module.exports = MultiCursor
