@@ -2,15 +2,15 @@ Quill         = require('../quill')
 EventEmitter2 = require('eventemitter2').EventEmitter2
 _             = Quill.require('lodash')
 dom           = Quill.require('dom')
+Range         = Quill.require('range')
 
 
 class MultiCursor extends EventEmitter2
   @DEFAULTS:
     template:
-     '<span class="cursor-flag">
-        <span class="cursor-name"></span>
-      </span>
-      <span class="cursor-caret"></span>'
+     '<span class="cursor-flag"></span>
+      <span class="cursor-caret"></span>
+      <div class="cursor-highlights"></div>'
     timeout: 2500
 
   @events:
@@ -23,15 +23,16 @@ class MultiCursor extends EventEmitter2
     @cursors = {}
     @container = @quill.addContainer('ql-multi-cursor', true)
     @quill.on(@quill.constructor.events.TEXT_CHANGE, _.bind(this._applyDelta, this))
+    window.addEventListener('resize', _.throttle(_.bind(this.update, this), 200))
 
   clearCursors: ->
     _.each(Object.keys(@cursors), _.bind(this.removeCursor, this))
     @cursors = {}
 
-  moveCursor: (userId, index) ->
+  moveCursor: (userId, range) ->
     cursor = @cursors[userId]
     return unless cursor?
-    cursor.index = index
+    cursor.range = new Range(range.start, range.end)
     dom(cursor.elem).removeClass('hidden')
     clearTimeout(cursor.timer)
     cursor.timer = setTimeout( =>
@@ -47,28 +48,26 @@ class MultiCursor extends EventEmitter2
     cursor.elem.parentNode.removeChild(cursor.elem) if cursor?
     delete @cursors[userId]
 
-  setCursor: (userId, index, name, color) ->
+  setCursor: (userId, range, name, color) ->
     unless @cursors[userId]?
       @cursors[userId] = cursor = {
         userId: userId
-        index: index
+        range: new Range(range.start, range.end)
         color: color
         elem: this._buildCursor(name, color)
       }
       this.emit(MultiCursor.events.CURSOR_ADDED, cursor)
     _.defer( =>
-      this.moveCursor(userId, index)
+      this.moveCursor(userId, range)
     )
     return @cursors[userId]
 
   shiftCursors: (index, length, authorId = null) ->
     _.each(@cursors, (cursor, id) =>
       return unless cursor
-      shift = Math.max(length, index - cursor.index)
+      cursor.range.shift(index, length)
       if cursor.userId == authorId
-        this.moveCursor(authorId, cursor.index + shift)
-      else if cursor.index >= index
-        cursor.index += shift
+        this.moveCursor(authorId, cursor.range)
     )
 
   update: ->
@@ -95,27 +94,61 @@ class MultiCursor extends EventEmitter2
     this.update()
 
   _buildCursor: (name, color) ->
-    cursor = document.createElement('span')
+    cursor = document.createElement('div')
     dom(cursor).addClass('cursor')
     cursor.innerHTML = @options.template
-    cursorFlag = cursor.querySelector('.cursor-flag')
-    cursorName = cursor.querySelector('.cursor-name')
-    dom(cursorName).text(name)
-    cursorCaret = cursor.querySelector('.cursor-caret')
-    cursorCaret.style.backgroundColor = cursorName.style.backgroundColor = color
+    flag = cursor.querySelector('.cursor-flag')
+    dom(flag).text(name)
+    caret = cursor.querySelector('.cursor-caret')
+    caret.style.backgroundColor = flag.style.backgroundColor = color
     @container.appendChild(cursor)
     return cursor
 
+  _buildHighlight: (start, end, color) =>
+    startBounds = @quill.getBounds(start)
+    endBounds = @quill.getBounds(end)
+    span = document.createElement('span')
+    span.classList.add('cursor-highlight')
+    span.style.left = startBounds.left + 'px'
+    span.style.top = @quill.container.scrollTop + Math.min(startBounds.top, endBounds.top) + 'px'
+    span.style.width = (endBounds.left - startBounds.left) + 'px'
+    span.style.height = Math.max(endBounds.height, startBounds.height) + 'px'
+    span.style.backgroundColor = color
+    return span
+
   _updateCursor: (cursor) ->
-    bounds = @quill.getBounds(cursor.index)
-    return this.removeCursor(cursor.userId) unless bounds?
-    cursor.elem.style.top = (bounds.top + @quill.container.scrollTop) + 'px'
-    cursor.elem.style.left = bounds.left + 'px'
-    cursor.elem.style.height = bounds.height + 'px'
-    flag = cursor.elem.querySelector('.cursor-flag')
-    dom(cursor.elem).toggleClass('top', parseInt(cursor.elem.style.top) <= flag.offsetHeight)
-                    .toggleClass('left', parseInt(cursor.elem.style.left) <= flag.offsetWidth)
-                    .toggleClass('right', @quill.root.offsetWidth - parseInt(cursor.elem.style.left) <= flag.offsetWidth)
+    endBounds = @quill.getBounds(cursor.range.end)
+    return this.removeCursor(cursor.userId) unless endBounds?
+
+    elem = cursor.elem
+
+    # position the caret at the end
+    caret = elem.querySelector('.cursor-caret')
+    caret.style.top = (endBounds.top + @quill.container.scrollTop) + 'px'
+    caret.style.left = endBounds.left + 'px'
+    caret.style.height = endBounds.height + 'px'
+
+    # position the flag at the end
+    flag = elem.querySelector('.cursor-flag')
+    flag.style.top = (endBounds.top + @quill.container.scrollTop - flag.offsetHeight) + 'px'
+    flag.style.left = endBounds.left + 'px'
+
+    # flip flag to left side of caret if not enough space
+    if endBounds.left > flag.offsetWidth - caret.offsetWidth and flag.offsetWidth > @quill.root.offsetWidth - endBounds.left
+      flag.classList.add('left')
+      flag.style.left = (endBounds.left - flag.offsetWidth + caret.offsetWidth) + 'px'
+
+    # build the highlight boxes for each selected line
+    highlights = elem.querySelector('.cursor-highlights')
+    highlights.innerHTML = ''
+    if cursor.range.start != cursor.range.end
+      offset = cursor.range.start
+      @quill.getText(cursor.range).split('\n').forEach (line) =>
+        box = this._buildHighlight(offset, offset + line.length, cursor.color)
+        highlights.appendChild(box)
+        offset = offset + line.length + 1
+
+    # emit move event
     this.emit(MultiCursor.events.CURSOR_MOVED, cursor)
 
 
