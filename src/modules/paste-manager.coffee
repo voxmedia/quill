@@ -45,7 +45,7 @@ class PasteManager
     @quill.deleteText(start, end, 'user')
 
   _copy: (event) ->
-    range = @quill.getSelection()
+    range = @quill.getSelection({ overrideFocus: true })
     if range
       delta = @quill.getContents(range)
       event.clipboardData.setData('application/json', JSON.stringify(delta))

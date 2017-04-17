@@ -6,6 +6,9 @@ Range      = require('../lib/range')
 
 
 class Selection
+  @DEFAULTS:
+    rangeOpts: { ignoreFocus: false, overrideFocus: false }
+
   constructor: (@doc, @emitter) ->
     @focus = false
     @range = new Range(0, 0)
@@ -15,8 +18,9 @@ class Selection
   checkFocus: ->
     return document.activeElement == @doc.root
 
-  getRange: (ignoreFocus = false) ->
-    if this.checkFocus()
+  getRange: (opts = {}) ->
+    { ignoreFocus, overrideFocus } = _.defaults(opts, Selection.DEFAULTS.rangeOpts)
+    if this.checkFocus() || overrideFocus
       nativeRange = this._getNativeRange()
       return null unless nativeRange?
       start = this._positionToIndex(nativeRange.startContainer, nativeRange.startOffset)
@@ -77,7 +81,7 @@ class Selection
 
   update: (source) ->
     focus = this.checkFocus()
-    range = this.getRange(true)
+    range = this.getRange({ ignoreFocus: true })
     emit = source != 'silent' and (!Range.compare(range, @range) or focus != @focus)
     toEmit = if focus then range else null
     # If range changes to null, require two update cycles to update and emit
