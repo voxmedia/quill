@@ -300,7 +300,7 @@ describe('Selection', ->
       _.defer( =>
         expect(@quill.editor.selection.checkFocus()).not.toBeTruthy()
         expect(@quill.getSelection()).not.toBeTruthy()
-        savedRange = @quill.editor.selection.getRange(true)
+        savedRange = @quill.editor.selection.getRange({ ignoreFocus: true })
         expect(savedRange).toBeTruthy()
         expect(savedRange.start).toEqual(2)
         expect(savedRange.end).toEqual(3)
