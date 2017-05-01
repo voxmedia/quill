@@ -108,7 +108,7 @@ class Format
     if _.isString(@config.style) or _.isString(@config.attribute) or _.isString(@config.class)
       if _.isString(@config.class)
         node = this.remove(node)
-      if !this.isType(Format.types.LINE) and node.tagName != dom.DEFAULT_INLINE_TAG
+      if !this.isType(Format.types.LINE) and !this.isType(Format.types.EMBED) and node.tagName != dom.DEFAULT_INLINE_TAG
         inline = document.createElement(dom.DEFAULT_INLINE_TAG)
         dom(node).wrap(inline)
         node = inline
