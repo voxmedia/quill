@@ -130,7 +130,7 @@ describe('Normalizer', ->
         expected: '<em><strong>A</strong>B</em>'
       'unwrap span':
         initial:  '<strong><em><span class="author-1">A</span></em></strong>'
-        expected: '<em class="author-1"><strong>A</strong></em>'
+        expected: '<em><strong><span class="author-1">A</span></strong></em>'
 
 
     _.each(tests, (test, name) ->
