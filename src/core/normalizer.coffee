@@ -159,6 +159,7 @@ class Normalizer
         if node.nextSibling?
           nodes.push(node.nextSibling)
 
+      # If an inline tag has no attributes after optimization, unwrap it
       if node.tagName == dom.DEFAULT_INLINE_TAG and !node.hasAttributes()
         dom(node).unwrap()
 
@@ -168,7 +169,7 @@ class Normalizer
           nodes.push(node.firstChild)
           dom(node.previousSibling).merge(node)
 
-  # If a <span>, merge with the parent span if possible,
+  # If the node is an inline tag, merge with the parent inline tag if possible,
   # otherwise, alphabetize nesting order of tag names (prefer <a> to be outer-most)
   @optimizeNesting: (node, root) ->
     if node.tagName == dom.DEFAULT_INLINE_TAG and node.parentNode.tagName == dom.DEFAULT_INLINE_TAG
