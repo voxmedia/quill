@@ -159,15 +159,28 @@ class Normalizer
         if node.nextSibling?
           nodes.push(node.nextSibling)
 
+      if node.tagName == dom.DEFAULT_INLINE_TAG and !node.hasAttributes()
+        dom(node).unwrap()
+
       # Merge similar nodes
       if node.previousSibling? and node.tagName == node.previousSibling.tagName
         if _.isEqual(dom(node).attributes(), dom(node.previousSibling).attributes())
           nodes.push(node.firstChild)
           dom(node.previousSibling).merge(node)
 
-  # Alphabetize nesting order of tag names (prefer <a> to be outer-most)
+  # If a <span>, merge with the parent span if possible,
+  # otherwise, alphabetize nesting order of tag names (prefer <a> to be outer-most)
   @optimizeNesting: (node, root) ->
-    if node.parentNode.tagName > node.tagName
+    if node.tagName == dom.DEFAULT_INLINE_TAG and node.parentNode.tagName == dom.DEFAULT_INLINE_TAG
+      target = node.parentNode
+      # Move attributes to the target, and unwrap
+      for name, value of dom(node).attributes()
+        if name == 'class' && target.hasAttribute('class')
+          value = [target.getAttribute('class'), value].join(' ')
+        target.setAttribute(name, value)
+      dom(node).unwrap()
+      return target
+    else if node.parentNode.tagName > node.tagName
       # Order tag nesting alphabetically (parent->child : A->Z)
       dom(node).moveChildren(node.parentNode)
       dom(node.parentNode).wrap(node)
