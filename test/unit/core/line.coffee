@@ -284,8 +284,8 @@ describe('Line', ->
         expected: "<b>01</b><s>34</s>"
         args: [2, 1, 'image', false]
       'change format':
-        initial: '<b style="color: red;">012</b>'
-        expected: '<b style="color: red;">0</b><b style="color: blue;">1</b><b style="color: red;">2</b>'
+        initial: '<b><span style="color: red;">012</span></b>'
+        expected: '<b><span style="color: red;">0</span><span style="color: blue;">1</span><span style="color: red;">2</span></b>'
         args: [1, 1, 'color', 'blue']
 
     _.each(tests, (test, name) ->

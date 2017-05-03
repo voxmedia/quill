@@ -159,31 +159,28 @@ class Normalizer
         if node.nextSibling?
           nodes.push(node.nextSibling)
 
+      # If an inline tag has no attributes after optimization, unwrap it
+      if node.tagName == dom.DEFAULT_INLINE_TAG and !node.hasAttributes()
+        dom(node).unwrap()
+
       # Merge similar nodes
       if node.previousSibling? and node.tagName == node.previousSibling.tagName
         if _.isEqual(dom(node).attributes(), dom(node.previousSibling).attributes())
           nodes.push(node.firstChild)
           dom(node.previousSibling).merge(node)
 
-  # If a <span>, move attributes as high in the tree as possible and unwrap,
+  # Merge the node with its parent if their tags are the same,
   # otherwise, alphabetize nesting order of tag names (prefer <a> to be outer-most)
   @optimizeNesting: (node, root) ->
-    if node.tagName == dom.DEFAULT_INLINE_TAG
-      # find all parents with only one child, up to the root
-      parents = []
-      next = node.parentNode
-      while next != root and next.firstChild == next.lastChild
-        parents.push(next)
-        next = next.parentNode
-      # choose the parent with the earliest tag name, alphabetically
-      target = _.sortBy(parents, 'tagName')[0]
-      # Move attributes to the target, and unwrap
+    if node.tagName == node.parentNode.tagName
+      parent = node.parentNode
+      # Move attributes to the parent, and unwrap
       for name, value of dom(node).attributes()
-        if name == 'class' && target.hasAttribute('class')
-          value = [target.getAttribute('class'), value].join(' ')
-        target.setAttribute(name, value)
+        if name == 'class' && parent.hasAttribute('class')
+          value = [parent.getAttribute('class'), value].join(' ')
+        parent.setAttribute(name, value)
       dom(node).unwrap()
-      return target
+      return parent
     else if node.parentNode.tagName > node.tagName
       # Order tag nesting alphabetically (parent->child : A->Z)
       dom(node).moveChildren(node.parentNode)
