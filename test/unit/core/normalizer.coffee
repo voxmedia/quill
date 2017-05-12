@@ -118,7 +118,7 @@ describe('Normalizer', ->
         expected: '<img src="http://quilljs.com/images/cloud.png"><img src="http://quilljs.com/images/cloud.png">'
       'wrap orphaned text node':
         initial:  '<s><b>0</b></s><s><span>1</span></s>'
-        expected: '<s><b>0</b>1</s>'
+        expected: '<b><s>0</s></b><s>1</s>'
       'merge text nodes':
         initial:  'A <b></b> B.'
         expected:  'A  B.'
@@ -128,9 +128,15 @@ describe('Normalizer', ->
       'reorder nodes plus merge':
         initial:  '<strong><em>A</em></strong><em>B</em>'
         expected: '<em><strong>A</strong>B</em>'
-      'unwrap span':
-        initial:  '<strong><em><span class="author-1">A</span></em></strong>'
-        expected: '<em><strong><span class="author-1">A</span></strong></em>'
+      'reorder nodes with siblings':
+        initial: '<strong>A<em>B</em>C</strong>'
+        expected: '<strong>A</strong><em><strong>B</strong></em><strong>C</strong>'
+      'reoder and merge nodes':
+        initial: '<s>A<b>B</b><i>C</i></s><i>D</d>'
+        expected: '<s>A</s><b><s>B</s></b><i><s>C</s>D</i>'
+      'dont reorder void tags':
+        initial: '<strong><img /></strong>'
+        expected: '<strong><img /></strong>'
 
 
     _.each(tests, (test, name) ->
