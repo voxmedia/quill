@@ -151,9 +151,8 @@ class Normalizer
         dom(node).unwrap()
         continue
 
-      # If node is an only child, and parent is not the lineNode,
-      # normalize nesting order
-      if node.parentNode != lineNode and !node.previousSibling? and !node.nextSibling?
+      # If parent is not the lineNode, normalize nesting order
+      if node.parentNode != lineNode
         node = @optimizeNesting(node, lineNode)
         # check next sibling again in case it is similar enough to merge
         if node.nextSibling?
@@ -180,14 +179,18 @@ class Normalizer
           value = [parent.getAttribute('class'), value].join(' ')
         parent.setAttribute(name, value)
       dom(node).unwrap()
-      return parent
-    else if node.parentNode.tagName > node.tagName
+      node = parent
+
+    if node.parentNode != root and node.parentNode.tagName > node.tagName
       # Order tag nesting alphabetically (parent->child : A->Z)
-      dom(node).moveChildren(node.parentNode)
-      dom(node.parentNode).wrap(node)
-      return node
-    else
-      return node
+      dom(node).isolate(root)
+      parent = node.parentNode
+      while parent.parentNode != root and parent.tagName > node.tagName
+        parent = parent.parentNode
+      dom(node).unwrap()
+      dom(parent).wrap(node)
+
+    return node
 
   # Make sure descendants are all inline elements
   @pullBlocks: (lineNode) ->

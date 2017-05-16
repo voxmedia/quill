@@ -11,8 +11,7 @@ body
   background-color: #f5f5f5
   border-bottom: 1px solid #ccc
   padding: 5px 12px
-  .ql-active, button:hover
-    color: green
+  .ql-active
     font-weight: bold
 
 #editor-container
@@ -21,3 +20,42 @@ body
 #editor-wrapper
   border: 1px solid #aaa
   box-shadow: 0 0 2px 2px #ddd
+
+.ql-container
+  position: relative
+
+.ql-editor
+  white-space: pre-wrap
+  height: 100%
+  padding: 10px
+
+.ql-tooltip, .ql-multi-cursor, .ql-paste-manager
+  position: absolute
+  top: 0px
+  z-index: 1000
+
+.ql-multi-cursor .cursor
+  position: absolute
+
+.ql-multi-cursor .cursor-caret
+  position: absolute
+  width: 3px
+  height: 100%
+
+.ql-multi-cursor .cursor-flag
+
+.ql-multi-cursor .cursor.hidden:not(:hover) .cursor-flag
+  display: none
+
+.ql-link-tooltip
+  padding: 8px 10px
+  background: #fff
+  border: 1px solid #aaa
+
+.ql-link-tooltip:not(.editing)
+  .input, .done
+    display: none
+
+.ql-link-tooltip.editing
+  .url, .change, .remove
+    display: none

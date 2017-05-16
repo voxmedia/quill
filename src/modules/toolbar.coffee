@@ -72,6 +72,7 @@ class Toolbar
       until dom(target).hasClass("ql-#{name}") or target == @container
         target = target.parentNode
       return unless target? and target != @container
+      return if target.tagName == 'SELECT' and event.type == 'click'
 
       value =
         if target.tagName == 'SELECT'

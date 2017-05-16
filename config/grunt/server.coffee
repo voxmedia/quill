@@ -16,6 +16,7 @@ browserifyOps =
   fullPaths: true
   packageCache: {}
   standalone: 'Quill'
+  debug: true
 
 
 bundle = (watcher) ->
