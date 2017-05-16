@@ -189,9 +189,8 @@ class Normalizer
         parent = parent.parentNode
       dom(node).unwrap()
       dom(parent).wrap(node)
-      return node
-    else
-      return node
+
+    return node
 
   # Make sure descendants are all inline elements
   @pullBlocks: (lineNode) ->
