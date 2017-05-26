@@ -482,13 +482,79 @@ describe('DOM', ->
         '.replace(/\s+/g, ''))
         expect(retNode).toEqual(@container.lastChild)
       )
+    )
 
-      it('split force', ->
-        node = @container.querySelector('span')
-        retNode = dom(node).splitBefore(@container, true).get()
+    describe('splitAfter()', ->
+      beforeEach( ->
+        @container.innerHTML = '
+          <div>
+            <span>One</span>
+            <b>Two</b>
+            <div>
+              <i>Three</i>
+              <s>Four</s>
+              <u>Five</u>
+            </div>
+            <a>Six</a>
+          </div>
+        '.replace(/\s+/g, '')
+      )
+
+      it('single split', ->
+        node = @container.querySelector('b')
+        retNode = dom(node).splitAfter(@container).get()
         expect(@container).toEqualHTML('
           <div>
+            <span>One</span>
+            <b>Two</b>
           </div>
+          <div>
+            <div>
+              <i>Three</i>
+              <s>Four</s>
+              <u>Five</u>
+            </div>
+            <a>Six</a>
+          </div>
+        '.replace(/\s+/g, ''))
+        expect(retNode).toEqual(@container.firstChild)
+      )
+
+      it('split multiple', ->
+        node = @container.querySelector('s')
+        retNode = dom(node).splitAfter(@container).get()
+        expect(@container).toEqualHTML('
+          <div>
+            <span>One</span>
+            <b>Two</b>
+            <div>
+              <i>Three</i>
+              <s>Four</s>
+            </div>
+          </div>
+          <div>
+            <div>
+              <u>Five</u>
+            </div>
+            <a>Six</a>
+          </div>
+        '.replace(/\s+/g, ''))
+        expect(retNode).toEqual(@container.firstChild)
+      )
+
+      it('split none', ->
+        node = @container.querySelector('a')
+        html = @container.innerHTML
+        retNode = dom(node).splitAfter(@container).get()
+        expect(@container).toEqualHTML(html)
+        expect(retNode).toEqual(@container.lastChild)
+      )
+
+      it('split parent', ->
+        node = @container.querySelector('u')
+        html = @container.innerHTML
+        retNode = dom(node).splitAfter(@container).get()
+        expect(@container).toEqualHTML('
           <div>
             <span>One</span>
             <b>Two</b>
@@ -498,8 +564,11 @@ describe('DOM', ->
               <u>Five</u>
             </div>
           </div>
+          <div>
+            <a>Six</a>
+          </div>
         '.replace(/\s+/g, ''))
-        expect(retNode).toEqual(node.parentNode)
+        expect(retNode).toEqual(@container.firstChild)
       )
     )
 
@@ -580,18 +649,17 @@ describe('DOM', ->
     describe('isolate', ->
       tests =
         'before':
-          target: 'u'
+          target: 'b'
           html: '
             <div>
               <div>
                 <i>One</i>
                 <s>Two</s>
+                <u>Three</u>
               </div>
             </div>
             <div>
-              <div>
-                <u>Three</u>
-              </div>
+              <b>Four</b>
             </div>'
         'after':
           target: 'i'
@@ -606,6 +674,7 @@ describe('DOM', ->
                 <s>Two</s>
                 <u>Three</u>
               </div>
+              <b>Four</b>
             </div>'
         'both':
           target: 's'
@@ -624,7 +693,26 @@ describe('DOM', ->
               <div>
                 <u>Three</u>
               </div>
+              <b>Four</b>
             </div>'
+        'after parent':
+          target: 'u'
+          html: '
+            <div>
+              <div>
+                <i>One</i>
+                <s>Two</s>
+              </div>
+            </div>
+            <div>
+              <div>
+                <u>Three</u>
+              </div>
+            </div>
+            <div>
+              <b>Four</b>
+            </div>
+          '
 
       _.each(tests, (test, name) ->
         it(name, ->
@@ -635,6 +723,7 @@ describe('DOM', ->
                 <s>Two</s>
                 <u>Three</u>
               </div>
+              <b>Four</b>
             </div>
           '.replace(/\s+/g, '')
           node = @container.querySelector(test.target)

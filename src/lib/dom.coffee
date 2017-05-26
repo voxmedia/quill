@@ -90,7 +90,7 @@ class Wrapper
     return @node?.nodeType == dom.TEXT_NODE
 
   isolate: (root) ->
-    dom(@node.nextSibling).splitBefore(root) if @node.nextSibling?
+    this.splitAfter(root)
     this.splitBefore(root)
     return this
 
@@ -180,9 +180,14 @@ class Wrapper
     @node = newNode
     return this
 
-  splitBefore: (root, force = false) ->
+  splitAfter: (root) ->
     return this if @node == root or @node.parentNode == root
-    if @node.previousSibling? or force
+    dom(@node.nextSibling).splitBefore(root) if @node.nextSibling?
+    return dom(@node.parentNode).splitAfter(root)
+
+  splitBefore: (root) ->
+    return this if @node == root or @node.parentNode == root
+    if @node.previousSibling?
       parentNode = @node.parentNode
       parentClone = parentNode.cloneNode(false)
       parentNode.parentNode.insertBefore(parentClone, parentNode.nextSibling)
