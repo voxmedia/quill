@@ -168,27 +168,29 @@ class Normalizer
           nodes.push(node.firstChild)
           dom(node.previousSibling).merge(node)
 
-  # Merge the node with its parent if their tags are the same,
+  # Merge the node with its parent(s) if their tags are the same,
   # otherwise, alphabetize nesting order of tag names (prefer <a> to be outer-most)
   @optimizeNesting: (node, root) ->
-    if node.tagName == node.parentNode.tagName
-      parent = node.parentNode
-      # Move attributes to the parent, and unwrap
-      for name, value of dom(node).attributes()
-        if name == 'class' && parent.hasAttribute('class')
-          value = [parent.getAttribute('class'), value].join(' ')
-        parent.setAttribute(name, value)
-      dom(node).unwrap()
-      node = parent
+    return node if dom.VOID_TAGS[node.tagName]?
 
-    if node.parentNode != root and node.parentNode.tagName > node.tagName
-      # Order tag nesting alphabetically (parent->child : A->Z)
-      dom(node).isolate(root)
-      parent = node.parentNode
-      while parent.parentNode != root and parent.tagName > node.tagName
-        parent = parent.parentNode
-      dom(node).unwrap()
-      dom(parent).wrap(node)
+    parent = node.parentNode
+    while parent != root
+      if parent.tagName > node.tagName
+        # Order tag nesting alphabetically (parent->child : A->Z)
+        parent = dom(node).isolate(parent.parentNode).get()
+        dom(node).unwrap()
+        dom(parent).wrap(node)
+        parent = node
+      else if parent.tagName == node.tagName
+        # Move attributes to the parent, and unwrap
+        parent = dom(node).isolate(parent.parentNode).get()
+        for name, value of dom(node).attributes()
+          if name == 'class' && parent.hasAttribute('class')
+            value = [parent.getAttribute('class'), value].join(' ')
+          parent.setAttribute(name, value)
+        dom(node).unwrap()
+        node = parent
+      parent = parent.parentNode
 
     return node
 
