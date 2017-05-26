@@ -650,6 +650,7 @@ describe('DOM', ->
       tests =
         'before':
           target: 'b'
+          result: 'div:nth-child(2)'
           html: '
             <div>
               <div>
@@ -663,6 +664,7 @@ describe('DOM', ->
             </div>'
         'after':
           target: 'i'
+          result: 'div'
           html: '
             <div>
               <div>
@@ -678,6 +680,7 @@ describe('DOM', ->
             </div>'
         'both':
           target: 's'
+          result: 'div:nth-child(2)'
           html: '
             <div>
               <div>
@@ -697,6 +700,7 @@ describe('DOM', ->
             </div>'
         'after parent':
           target: 'u'
+          result: 'div:nth-child(2)'
           html: '
             <div>
               <div>
@@ -729,7 +733,7 @@ describe('DOM', ->
           node = @container.querySelector(test.target)
           retNode = dom(node).isolate(@container).get()
           expect(@container).toEqualHTML(test.html.replace(/\s+/g, ''))
-          expect(retNode).toEqual(node)
+          expect(retNode).toEqual(@container.querySelector(test.result))
         )
       )
     )

@@ -91,8 +91,7 @@ class Wrapper
 
   isolate: (root) ->
     this.splitAfter(root)
-    this.splitBefore(root)
-    return this
+    return this.splitBefore(root)
 
   length: ->
     return 0 unless @node?
