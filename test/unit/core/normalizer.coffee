@@ -132,18 +132,80 @@ describe('Normalizer', ->
         initial: '<strong>A<em>B</em>C</strong>'
         expected: '<strong>A</strong><em><strong>B</strong></em><strong>C</strong>'
       'reoder and merge nodes':
-        initial: '<s>A<b>B</b><i>C</i></s><i>D</d>'
+        initial: '<s>A<b>B</b><i>C</i></s><i>D</i>'
         expected: '<s>A</s><b><s>B</s></b><i><s>C</s>D</i>'
       'dont reorder void tags':
         initial: '<strong><img /></strong>'
         expected: '<strong><img /></strong>'
+      'split and merge same tags':
+        initial: '<span class="a"><span class="b">AB</span>C</span>'
+        expected: '<span class="a b">AB</span><span class="a">C</span>'
+      'reorder and merge':
+        initial: '<span class="a"><b><span class="c">X</span></b>YZ</span>'
+        expected: '<b><span class="a c">X</span></b><span class="a">YZ</span>'
+      'merge multiple':
+        initial: '<span><b><span><u><span class="x">X</span></u>Y</b>Z</span>'
+        expected: '<b><span class="x"><u>X</u></span>Y</b>Z'
 
 
     _.each(tests, (test, name) ->
       it(name, ->
-        # debugger if name == 'unwrap span'
         @container.innerHTML = "<div>#{test.initial}</div>"
         Quill.Normalizer.optimizeLine(@container.firstChild)
+        expect(@container.firstChild).toEqualHTML(test.expected)
+      )
+    )
+  )
+
+  describe('optimizeNesting()', ->
+    tests =
+      'merge same tag with attributes':
+        target: '#span-1234'
+        initial:  '<span rel="test" class="custom"><span id="span-1234">Test</span></span>'
+        expected: '<span rel="test" class="custom" id="span-1234">Test</span>'
+      'reorder nodes':
+        target: 'b'
+        initial:  '<i><b>A</b></i>'
+        expected: '<b><i>A</i></b>'
+      'reorder skip levels':
+        target: 'b'
+        initial: '<i><s><b>A</b></s></i>'
+        expected: '<b><i><s>A</s></i></b>'
+      'reorder only the target':
+        target: 'b'
+        initial: '<s><i><b>A</b></i></s>'
+        expected: '<b><s><i>A</i></s></b>'
+      'reorder nodes with siblings':
+        target: 'b'
+        initial: '<i>A<b>B</b>C</i>'
+        expected: '<i>A</i><b><i>B</i></b><i>C</i>'
+      'dont reorder void tags':
+        target: 'img'
+        initial: '<s><img /></s>'
+        expected: '<s><img /></s>'
+      'split and merge same tags':
+        target: '.b'
+        initial: '<span class="a"><span class="b">AB</span>C</span>'
+        expected: '<span class="a b">AB</span><span class="a">C</span>'
+      'avoid unnecessary split':
+        target: 's'
+        initial: '<b><u><s>Hello</s> World</u></b>'
+        expected: '<b><s><u>Hello</u></s><u> World</u></b>'
+      'reorder and merge':
+        target: '.c'
+        initial: '<span class="a"><b><span class="c">X</span></b></span>'
+        expected: '<span class="a c"><b>X</b></span>'
+      'merge multiple':
+        target: '.x'
+        initial: '<span><b><span><u><span class="x">X</span></u>Y</b>Z</span>'
+        expected: '<span class="x"><b><u>X</u></b></span><span><b><span>Y</span></b>Z</span>'
+
+
+    _.each(tests, (test, name) ->
+      it(name, ->
+        @container.innerHTML = "<div>#{test.initial}</div>"
+        node = @container.firstChild.querySelector(test.target)
+        Quill.Normalizer.optimizeNesting(node, @container.firstChild)
         expect(@container.firstChild).toEqualHTML(test.expected)
       )
     )
