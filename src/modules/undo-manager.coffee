@@ -10,8 +10,8 @@ class UndoManager
     userOnly: false
 
   @hotkeys:
-    UNDO: { key: 'Z', metaKey: true }
-    REDO: { key: 'Z', metaKey: true, shiftKey: true }
+    UNDO: { key: 'z', metaKey: true }
+    REDO: { key: 'Z', metaKey: true }
 
   constructor: (@quill, options = {}) ->
     @options = _.defaults(options, UndoManager.DEFAULTS)
@@ -29,7 +29,7 @@ class UndoManager
       )
       redoKey = [UndoManager.hotkeys.REDO]
       if (navigator.platform.indexOf('Win') > -1)
-        redoKey.push({ key: 'Y', metaKey: true })
+        redoKey.push({ key: 'y', metaKey: true })
       keyboard.addHotkey(redoKey, =>
         @quill.editor.checkUpdate()
         this.redo()

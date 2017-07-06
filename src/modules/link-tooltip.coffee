@@ -16,7 +16,7 @@ class LinkTooltip extends Tooltip
       <a href="javascript:;" class="done">Done</a>'
 
   @hotkeys:
-    LINK: { key: 'K', metaKey: true }
+    LINK: { key: 'k', metaKey: true }
 
   constructor: (@quill, options = {}) ->
     @options = _.defaults(options, LinkTooltip.DEFAULTS)
