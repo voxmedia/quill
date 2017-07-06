@@ -7,6 +7,7 @@ Delta  = Quill.require('delta')
 class Keyboard
   @hotkeys:
     BOLD:       { key: 'b',          metaKey: true }
+    DELETE:     ['Backspace', 'Delete']
     INDENT:     { key: 'Tab' }
     ITALIC:     { key: 'i',          metaKey: true }
     OUTDENT:    { key: 'Tab',        shiftKey: true }
@@ -107,7 +108,7 @@ class Keyboard
     )
 
   _initDeletes: ->
-    this.addHotkey(['Backspace', 'Delete'], (range, hotkey) =>
+    this.addHotkey(Keyboard.hotkeys.DELETE, (range, hotkey) =>
       if range? and @quill.getLength() > 0
         { start, end } = range
         if start != end
@@ -133,11 +134,11 @@ class Keyboard
     )
 
   _initHotkeys: ->
-    this.addHotkey('Tab', (range) =>
+    this.addHotkey(Keyboard.hotkeys.INDENT, (range) =>
       this._onTab(range, false)
       return false
     )
-    this.addHotkey({ key: 'Tab', shiftKey: true }, (range) =>
+    this.addHotkey(Keyboard.hotkeys.OUTDENT, (range) =>
       # TODO implement when we implement multiline tabs
       return false
     )
