@@ -292,12 +292,6 @@ class Wrapper
     else
       event = document.createEvent('KeyboardEvent')
       lastKeyEvent = _.clone(options)
-      if _.isNumber(options.key)
-        lastKeyEvent.which = options.key
-      else if _.isString(options.key)
-        lastKeyEvent.which = options.key.toUpperCase().charCodeAt(0)
-      else
-        lastKeyEvent.which = 0
       # FF uses initKeyEvent, Webkit uses initKeyboardEvent
       initFn = if _.isFunction(event.initKeyboardEvent) then 'initKeyboardEvent' else 'initKeyEvent'
       event[initFn](eventName, options.bubbles, options.cancelable, window, options.ctrlKey, options.altKey, options.shiftKey, options.metaKey, 0, 0)

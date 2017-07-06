@@ -32,13 +32,13 @@ class Keyboard
 
   removeHotkeys: (hotkey, callback) ->
     hotkey = if Keyboard.hotkeys[hotkey] then Keyboard.hotkeys[hotkey] else hotkey
-    key = if _.isObject(hotkey) then hotkey.key else hotkey
-    @hotkeys[key] ?= []
-    [removed, kept] = _.partition(@hotkeys[key], (handler) ->
+    hotkey = if _.isObject(hotkey) then hotkey else { key: hotkey }
+    @hotkeys[hotkey.key] ?= []
+    [removed, kept] = _.partition(@hotkeys[hotkey.key], (handler) ->
       _.isEqual(hotkey, _.omit(handler, 'callback')) and
         (!callback or callback == handler.callback)
     )
-    @hotkeys[key] = kept
+    @hotkeys[hotkey.key] = kept
     return _.map(removed, 'callback')
 
   toggleFormat: (range, format) ->
