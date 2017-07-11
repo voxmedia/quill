@@ -16,7 +16,7 @@ class LinkTooltip extends Tooltip
       <a href="javascript:;" class="done">Done</a>'
 
   @hotkeys:
-    LINK: { key: 'K', metaKey: true }
+    LINK: { key: 'k', metaKey: true }
 
   constructor: (@quill, options = {}) ->
     @options = _.defaults(options, LinkTooltip.DEFAULTS)
@@ -110,6 +110,7 @@ class LinkTooltip extends Tooltip
   _onKeyboard: ->
     range = @quill.getSelection()
     this._toggle(range, !this._findAnchor(range))
+    return false
 
   _toggle: (range, value) ->
     return unless range

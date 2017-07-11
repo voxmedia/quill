@@ -36,7 +36,7 @@ describe('Keyboard', ->
       @container.innerHTML = '<div><div>01234</div></div>'
       @quill = new Quill(@container.firstChild)
       @keyboard = @quill.getModule('keyboard')
-      @enterKey = { key: dom.KEYS.ENTER }
+      @enterKey = { key: 'Enter' }
     )
 
     it('inserts a newline', ->
@@ -124,7 +124,7 @@ describe('Keyboard', ->
       @quill.formatText(0, @quill.getLength(), { 'bold': true, 'size': size })
 
       @quill.setSelection(@quill.getLength(), @quill.getLength())
-      dom(@quill.root).trigger('keydown', { key: dom.KEYS.ENTER })
+      dom(@quill.root).trigger('keydown', { key: 'Enter' })
 
       expect(dom($('.ql-bold').get(0)).hasClass('ql-active')).toBe(true)
       expect(dom($('.ql-size').get(0)).value()).toBe(size)
@@ -134,13 +134,13 @@ describe('Keyboard', ->
       counter = 0
       fn = -> counter += 1
       keyboard = @quill.getModule('keyboard')
-      keyboard.addHotkey('S', fn)
-      dom(@quill.root).trigger('keydown', { key: 'S' })
+      keyboard.addHotkey('s', fn)
+      dom(@quill.root).trigger('keydown', { key: 's' })
       expect(counter).toBe(1)
-      result = keyboard.removeHotkeys('S', fn)
+      result = keyboard.removeHotkeys('s', fn)
       expect(result.length).toBe(1)
       expect(result[0]).toBe(fn);
-      dom(@quill.root).trigger('keydown', { key: 'S' })
+      dom(@quill.root).trigger('keydown', { key: 's' })
       expect(counter).toBe(1)
     )
 

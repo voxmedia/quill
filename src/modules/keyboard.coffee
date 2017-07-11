@@ -6,11 +6,12 @@ Delta  = Quill.require('delta')
 
 class Keyboard
   @hotkeys:
-    BOLD:       { key: 'B',          metaKey: true }
-    INDENT:     { key: dom.KEYS.TAB }
-    ITALIC:     { key: 'I',          metaKey: true }
-    OUTDENT:    { key: dom.KEYS.TAB, shiftKey: true }
-    UNDERLINE:  { key: 'U',          metaKey: true }
+    BOLD:       { key: 'b',          metaKey: true }
+    DELETE:     ['Backspace', 'Delete']
+    INDENT:     { key: 'Tab' }
+    ITALIC:     { key: 'i',          metaKey: true }
+    OUTDENT:    { key: 'Tab',        shiftKey: true }
+    UNDERLINE:  { key: 'u',          metaKey: true }
 
   constructor: (@quill, options) ->
     @hotkeys = {}
@@ -25,22 +26,19 @@ class Keyboard
     _.each(hotkeys, (hotkey) =>
       hotkey = if _.isObject(hotkey) then _.clone(hotkey) else { key: hotkey }
       hotkey.callback = callback
-      which = if _.isNumber(hotkey.key) then hotkey.key else hotkey.key.toUpperCase().charCodeAt(0)
-      @hotkeys[which] ?= []
-      @hotkeys[which].push(hotkey)
+      @hotkeys[hotkey.key] ?= []
+      @hotkeys[hotkey.key].push(hotkey)
     )
 
   removeHotkeys: (hotkey, callback) ->
-    hotkey = if _.isString(hotkey) then hotkey.toUpperCase() else hotkey
     hotkey = if Keyboard.hotkeys[hotkey] then Keyboard.hotkeys[hotkey] else hotkey
     hotkey = if _.isObject(hotkey) then hotkey else { key: hotkey }
-    which = if _.isNumber(hotkey.key) then hotkey.key else hotkey.key.charCodeAt(0)
-    @hotkeys[which] ?= []
-    [removed, kept] = _.partition(@hotkeys[which], (handler) ->
+    @hotkeys[hotkey.key] ?= []
+    [removed, kept] = _.partition(@hotkeys[hotkey.key], (handler) ->
       _.isEqual(hotkey, _.omit(handler, 'callback')) and
         (!callback or callback == handler.callback)
     )
-    @hotkeys[which] = kept
+    @hotkeys[hotkey.key] = kept
     return _.map(removed, 'callback')
 
   toggleFormat: (range, format) ->
@@ -60,8 +58,8 @@ class Keyboard
 
   _initEnter: ->
     keys = [
-      { key: dom.KEYS.ENTER }
-      { key: dom.KEYS.ENTER, shiftKey: true }
+      { key: 'Enter' }
+      { key: 'Enter', shiftKey: true }
     ]
     this.addHotkey(keys, (range, hotkey, event) =>
       return true unless range?
@@ -110,7 +108,7 @@ class Keyboard
     )
 
   _initDeletes: ->
-    this.addHotkey([dom.KEYS.DELETE, dom.KEYS.BACKSPACE], (range, hotkey) =>
+    this.addHotkey(Keyboard.hotkeys.DELETE, (range, hotkey) =>
       if range? and @quill.getLength() > 0
         { start, end } = range
         if start != end
@@ -122,7 +120,7 @@ class Keyboard
             start = start - 1
           @quill.deleteText(start, end, Quill.sources.USER)
         else
-          if hotkey.key == dom.KEYS.BACKSPACE
+          if hotkey.key == 'Backspace'
             [line, offset] = @quill.editor.doc.findLineAt(start)
             if offset == 0 and (line.formats.bullet or line.formats.list)
               format = if line.formats.bullet then 'bullet' else 'list'
@@ -157,7 +155,7 @@ class Keyboard
   _initListeners: ->
     dom(@quill.root).on('keydown', (event) =>
       prevent = false
-      _.each(@hotkeys[event.which], (hotkey) =>
+      _.each(@hotkeys[event.key], (hotkey) =>
         metaKey = if dom.isMac() then event.metaKey else event.metaKey or event.ctrlKey
         return if !!hotkey.metaKey != !!metaKey
         return if !!hotkey.shiftKey != !!event.shiftKey

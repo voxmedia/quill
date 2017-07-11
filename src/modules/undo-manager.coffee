@@ -10,8 +10,13 @@ class UndoManager
     userOnly: false
 
   @hotkeys:
-    UNDO: { key: 'Z', metaKey: true }
-    REDO: { key: 'Z', metaKey: true, shiftKey: true }
+    UNDO: { key: 'z', metaKey: true }
+    REDO: [
+      # mozilla and firefox report event.key as 'z', while chrome reports as 'Z'
+      { key: 'y', metaKey: true },
+      { key: 'z', shiftKey: true, metaKey: true },
+      { key: 'Z', shiftKey: true, metaKey: true }
+    ]
 
   constructor: (@quill, options = {}) ->
     @options = _.defaults(options, UndoManager.DEFAULTS)
@@ -27,10 +32,7 @@ class UndoManager
         this.undo()
         return false
       )
-      redoKey = [UndoManager.hotkeys.REDO]
-      if (navigator.platform.indexOf('Win') > -1)
-        redoKey.push({ key: 'Y', metaKey: true })
-      keyboard.addHotkey(redoKey, =>
+      keyboard.addHotkey(UndoManager.hotkeys.REDO, =>
         @quill.editor.checkUpdate()
         this.redo()
         return false

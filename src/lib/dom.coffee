@@ -291,12 +291,6 @@ class Wrapper
     else
       event = document.createEvent('KeyboardEvent')
       lastKeyEvent = _.clone(options)
-      if _.isNumber(options.key)
-        lastKeyEvent.which = options.key
-      else if _.isString(options.key)
-        lastKeyEvent.which = options.key.toUpperCase().charCodeAt(0)
-      else
-        lastKeyEvent.which = 0
       # FF uses initKeyEvent, Webkit uses initKeyboardEvent
       initFn = if _.isFunction(event.initKeyboardEvent) then 'initKeyboardEvent' else 'initKeyEvent'
       event[initFn](eventName, options.bubbles, options.cancelable, window, options.ctrlKey, options.altKey, options.shiftKey, options.metaKey, 0, 0)
@@ -378,17 +372,6 @@ dom = _.extend(dom,
     '24px': 5
     '32px': 6
     '48px': 7
-
-  KEYS:
-    BACKSPACE : 8
-    TAB       : 9
-    ENTER     : 13
-    ESCAPE    : 27
-    LEFT      : 37
-    UP        : 38
-    RIGHT     : 39
-    DOWN      : 40
-    DELETE    : 46
 
   BLOCK_TAGS: {
     'ADDRESS'

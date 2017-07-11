@@ -25,7 +25,7 @@ class Toolbar
     )
     @quill.on(Quill.events.TEXT_CHANGE, => this.updateActive())
     @quill.onModuleLoad('keyboard', (keyboard) =>
-      keyboard.addHotkey([dom.KEYS.BACKSPACE, dom.KEYS.DELETE], =>
+      keyboard.addHotkey(['Backspace', 'Delete'], =>
         _.defer(_.bind(this.updateActive, this))
       )
     )
