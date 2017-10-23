@@ -27,9 +27,9 @@ basicEditor.on('selection-change', (range) ->
 )
 
 basicEditor.on('text-change', (delta, source) ->
-  return if source == 'api'
+  return unless source == 'user'
   console.info 'basic', 'text', delta, source
-  advancedEditor.updateContents(delta)
+  advancedEditor.updateContents(delta, 'basic')
   sourceDelta = basicEditor.getContents()
   targetDelta = advancedEditor.getContents()
   console.assert(_.isEqual(sourceDelta, targetDelta), "Editor diversion!", sourceDelta.ops, targetDelta.ops)
@@ -40,7 +40,7 @@ advancedEditor.on('selection-change', (range) ->
 )
 
 advancedEditor.on('text-change', (delta, source) ->
-  return if source == 'api'
+  return unless source == 'user'
   console.info 'advanced', 'text', delta, source
   basicEditor.updateContents(delta)
   sourceDelta = advancedEditor.getContents()

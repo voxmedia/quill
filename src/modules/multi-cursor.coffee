@@ -49,6 +49,8 @@ class MultiCursor extends EventEmitter2
     delete @cursors[userId]
 
   setCursor: (userId, range, name, color) ->
+    if _.includes(Quill.sources, userId)
+      throw new Error("Invalid cursor userId, reserved values are 'user', 'api', 'silent'")
     unless @cursors[userId]?
       @cursors[userId] = cursor = {
         userId: userId
@@ -62,18 +64,6 @@ class MultiCursor extends EventEmitter2
     )
     return @cursors[userId]
 
-  shiftCursors: (delta) ->
-    # Find the last op with an author attribute
-    authorId = _.reduce(delta.ops, (id, op) ->
-      op.attributes?['author'] or id
-    , null)
-    _.each(@cursors, (cursor, id) =>
-      return unless cursor
-      cursor.range.transform(delta)
-      if cursor.userId == authorId
-        this.moveCursor(authorId, cursor.range)
-    )
-
   update: ->
     _.each(@cursors, (cursor, id) =>
       return unless cursor?
@@ -81,9 +71,14 @@ class MultiCursor extends EventEmitter2
       return true
     )
 
-  _applyDelta: (delta) ->
-    index = 0
-    this.shiftCursors(delta)
+  _applyDelta: (delta, source) ->
+    _.each(@cursors, (cursor, id) =>
+      return unless cursor
+      cursor.range.transform(delta)
+      if source == cursor.userId
+        # Show the flag if the delta came from this cursor
+        this.moveCursor(cursor.userId, cursor.range)
+    )
     this.update()
 
   _buildCursor: (name, color) ->
