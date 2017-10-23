@@ -15,11 +15,26 @@ class Range
 
   shift: (index, length) ->
     [@start, @end] = _.map([@start, @end], (pos) ->
-      return pos if index > pos
-      if length >= 0
-        return pos + length
+      if index > pos
+        pos
       else
-        return Math.max(index, pos + length)
+        Math.max(index, pos + length)
+    )
+
+  transform: (delta) ->
+    index = 0
+    _.each(delta.ops, (op) =>
+      if _.isString(op.insert)
+        this.shift(index, op.insert.length)
+        index += op.insert.length
+      else if _.isNumber(op.insert)
+        this.shift(index, 1)
+        index += 1
+      else if _.isNumber(op.delete)
+        this.shift(index, -1 * op.delete)
+        index -= op.delete
+      else if _.isNumber(op.retain)
+        index += op.retain
     )
 
   isCollapsed: ->

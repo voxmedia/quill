@@ -62,10 +62,14 @@ class MultiCursor extends EventEmitter2
     )
     return @cursors[userId]
 
-  shiftCursors: (index, length, authorId = null) ->
+  shiftCursors: (delta) ->
+    # Find the last op with an author attribute
+    authorId = _.reduce(delta.ops, (id, op) ->
+      op.attributes?['author'] or id
+    , null)
     _.each(@cursors, (cursor, id) =>
       return unless cursor
-      cursor.range.shift(index, length)
+      cursor.range.transform(delta)
       if cursor.userId == authorId
         this.moveCursor(authorId, cursor.range)
     )
@@ -79,18 +83,7 @@ class MultiCursor extends EventEmitter2
 
   _applyDelta: (delta) ->
     index = 0
-    _.each(delta.ops, (op) =>
-      length = 0
-      if op.insert?
-        length = op.insert.length or 1
-        this.shiftCursors(index, length, op.attributes?['author'])
-      else if op.delete?
-        this.shiftCursors(index, -1*op.delete, null)
-      else if op.retain?
-        this.shiftCursors(index, 0, null)
-        length = op.retain
-      index += length
-    )
+    this.shiftCursors(delta)
     this.update()
 
   _buildCursor: (name, color) ->
