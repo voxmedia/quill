@@ -99,6 +99,7 @@ class MultiCursor extends EventEmitter2
     return cursor
 
   _buildHighlight: (bounds, color) =>
+    # eachClientRect gives us absolute bounds (rather than relative to @quill.container)
     container = @quill.container
     containerBounds = container.getBoundingClientRect()
     span = document.createElement('span')
@@ -110,27 +111,39 @@ class MultiCursor extends EventEmitter2
     span.style.backgroundColor = color
     return span
 
-  _updateCursor: (cursor) ->
+  _getBounds: (cursor) ->
     endBounds = @quill.getBounds(cursor.range.end)
-    return this.removeCursor(cursor.userId) unless endBounds?
+    return null unless endBounds?
+    return {
+      height: endBounds.height
+      top: endBounds.top + @quill.container.scrollTop
+      left: endBounds.left + @quill.container.scrollLeft
+    }
+
+  _updateCursor: (cursor) ->
+    bounds = this._getBounds(cursor)
+    return this.removeCursor(cursor.userId) unless bounds?
 
     elem = cursor.elem
 
     # position the caret at the end
     caret = elem.querySelector('.cursor-caret')
-    caret.style.top = (endBounds.top + @quill.container.scrollTop) + 'px'
-    caret.style.left = endBounds.left + 'px'
-    caret.style.height = endBounds.height + 'px'
+    caret.style.top = bounds.top + 'px'
+    caret.style.left = bounds.left + 'px'
+    caret.style.height = bounds.height + 'px'
 
     # position the flag at the end
     flag = elem.querySelector('.cursor-flag')
-    flag.style.top = (endBounds.top + @quill.container.scrollTop - flag.offsetHeight) + 'px'
-    flag.style.left = endBounds.left + 'px'
+    flag.style.top = (bounds.top - flag.offsetHeight) + 'px'
+    flag.style.left = bounds.left + 'px'
 
     # flip flag to left side of caret if not enough space
-    if endBounds.left > flag.offsetWidth - caret.offsetWidth and flag.offsetWidth > @quill.root.offsetWidth - endBounds.left
+    if (
+      flag.offsetWidth > @quill.root.offsetWidth - bounds.left and # too close to right edge
+      bounds.left > flag.offsetWidth - caret.offsetWidth # far enough from left edge
+    )
       flag.classList.add('left')
-      flag.style.left = (endBounds.left - flag.offsetWidth + caret.offsetWidth) + 'px'
+      flag.style.left = (bounds.left - flag.offsetWidth + caret.offsetWidth) + 'px'
 
     # build the highlight boxes for each selected line
     highlights = elem.querySelector('.cursor-highlights')
