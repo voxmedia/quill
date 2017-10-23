@@ -96,6 +96,7 @@ class MultiCursor extends EventEmitter2
   _buildCursor: (name, color) ->
     cursor = document.createElement('div')
     dom(cursor).addClass('cursor')
+    dom(cursor).addClass('hidden')
     cursor.innerHTML = @options.template
     flag = cursor.querySelector('.cursor-flag')
     dom(flag).text(name)
