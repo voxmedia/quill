@@ -4,7 +4,6 @@ basicEditor = new Quill('.basic-wrapper .editor-container',
   modules:
     authorship: { authorId: 'basic' }
     toolbar: { container: '.basic-wrapper .toolbar-container' }
-  styles: false
 )
 
 advancedEditor = new Quill('.advanced-wrapper .editor-container',
@@ -14,18 +13,17 @@ advancedEditor = new Quill('.advanced-wrapper .editor-container',
     'link-tooltip': true
     'image-tooltip': true
     'multi-cursor': true
-  styles: false
 )
 
 authorship = advancedEditor.getModule('authorship')
 authorship.addAuthor('basic', 'rgba(255,153,51,0.4)')
 
 cursorManager = advancedEditor.getModule('multi-cursor')
-cursorManager.setCursor('basic', 0, 'basic', 'rgba(255,153,51,0.9)')
+cursorManager.setCursor('basic', { start: 0, end: 0 }, 'basic', 'rgba(255,153,51,0.9)')
 
 basicEditor.on('selection-change', (range) ->
   console.info 'basic', 'selection', range
-  cursorManager.moveCursor('basic', range.end) if range?
+  cursorManager.moveCursor('basic', range) if range?
 )
 
 basicEditor.on('text-change', (delta, source) ->

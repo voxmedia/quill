@@ -23,16 +23,21 @@ body
 
 .ql-container
   position: relative
+  overflow: auto
 
 .ql-editor
   white-space: pre-wrap
-  height: 100%
+  min-height: 100%
   padding: 10px
+  box-sizing: border-box
 
 .ql-tooltip, .ql-multi-cursor, .ql-paste-manager
   position: absolute
   top: 0px
-  z-index: 1000
+  // z-index: 1000
+
+.ql-multi-cursor
+  pointer-events: none
 
 .ql-multi-cursor .cursor
   position: absolute
@@ -43,9 +48,15 @@ body
   height: 100%
 
 .ql-multi-cursor .cursor-flag
+  position: absolute
+  padding: 2px
 
-.ql-multi-cursor .cursor.hidden:not(:hover) .cursor-flag
+.ql-multi-cursor .cursor.hidden .cursor-flag
   display: none
+
+.ql-multi-cursor .cursor-highlight
+  position: absolute
+  opacity: 0.3
 
 .ql-link-tooltip
   padding: 8px 10px
@@ -59,3 +70,18 @@ body
 .ql-link-tooltip.editing
   .url, .change, .remove
     display: none
+
+.ql-format-group
+  display: inline-block
+  margin-right: 15px
+  vertical-align: middle
+
+.ql-format-separator
+  box-sizing: border-box
+  background-color: #ddd
+  display: inline-block
+  height: 14px
+  margin-left: 4px
+  margin-right: 4px
+  vertical-align: middle
+  width: 1px
