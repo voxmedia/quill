@@ -19,6 +19,8 @@ class Tooltip
       if source == 'user' and @container.style.left != Tooltip.HIDE_MARGIN
         @range = null
         this.hide()
+      else if @range
+        @range.transform(delta)
     )
 
   initTextbox: (textbox, enterCallback, escapeCallback) ->

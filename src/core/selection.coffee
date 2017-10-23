@@ -9,7 +9,7 @@ class Selection
   @DEFAULTS:
     rangeOpts: { ignoreFocus: false, overrideFocus: false }
 
-  constructor: (@doc, @emitter) ->
+  constructor: (@doc, @quill) ->
     @focus = false
     @range = new Range(0, 0)
     @nullDelay = false
@@ -48,7 +48,7 @@ class Selection
 
   scrollIntoView: () ->
     return unless @range
-    editor = @emitter.editor
+    editor = @quill.editor
     startBounds = editor.getBounds(@range.start)
     endBounds = if @range.isCollapsed() then startBounds else editor.getBounds(@range.end)
     containerBounds = editor.root.parentNode.getBoundingClientRect()
@@ -92,7 +92,7 @@ class Selection
       @range = range
       @focus = focus
       # Set range before emitting to prevent infinite loop if listeners call quill.getSelection()
-      @emitter.emit(@emitter.constructor.events.SELECTION_CHANGE, toEmit, source) if emit
+      @quill.emit(@quill.constructor.events.SELECTION_CHANGE, toEmit, source) if emit
 
   _decodePosition: (node, offset) ->
     if dom(node).isElement()
