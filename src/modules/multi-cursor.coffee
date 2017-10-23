@@ -106,11 +106,12 @@ class MultiCursor extends EventEmitter2
     return cursor
 
   _buildHighlight: (bounds, color) =>
-    containerBounds = @quill.container.getBoundingClientRect()
+    container = @quill.container
+    containerBounds = container.getBoundingClientRect()
     span = document.createElement('span')
     span.classList.add('cursor-highlight')
-    span.style.left = (bounds.left - containerBounds.left) + 'px'
-    span.style.top = (bounds.top - containerBounds.top) + 'px'
+    span.style.left = (bounds.left - containerBounds.left + container.scrollLeft) + 'px'
+    span.style.top = (bounds.top - containerBounds.top + container.scrollTop) + 'px'
     span.style.width = bounds.width + 'px'
     span.style.height = bounds.height + 'px'
     span.style.backgroundColor = color
