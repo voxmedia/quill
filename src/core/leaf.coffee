@@ -41,7 +41,7 @@ class Leaf extends LinkedList.Node
         @node = textNode
     @length = @text.length
 
-  findAdjacentLeaves: (offset, formats) ->
+  findAdjacentLeaves: (offset, formats = {}) ->
     leaves = [this]
 
     # Collect previous leaves + update offset from click-point
@@ -67,7 +67,7 @@ class Leaf extends LinkedList.Node
 
   hasFormats: (formats) ->
     return Object.keys(formats).every((formatKey) ->
-      return formatKey in @formats && @formats[formatKey] == formats[formatKey]
+      return @formats[formatKey] == formats[formatKey]
     )
 
 
