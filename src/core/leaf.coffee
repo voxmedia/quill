@@ -66,8 +66,8 @@ class Leaf extends LinkedList.Node
     return [leaves, offset]
 
   hasFormats: (formats) ->
-    return Object.keys(formats).forEach((formatKey) ->
-      return formatKey in @formats && @formats[formatKey] === formats[formatKey]
+    return Object.keys(formats).every((formatKey) ->
+      return formatKey in @formats && @formats[formatKey] == formats[formatKey]
     )
 
 
