@@ -66,13 +66,12 @@ class Leaf extends LinkedList.Node
     return [leaves, offset]
 
   hasFormats: (formats) ->
-    console.log(this)
-    console.log(formats)
-    console.log(@formats)
+    leafHasFormats = true
+    for formatKey of formats
+      if not @formats.hasOwnProperty(formatKey) or @formats[formatKey] != formats[formatKey]
+        leafHasFormats = false
 
-    return Object.keys(formats).every((formatKey) ->
-      return @formats[formatKey] == formats[formatKey]
-    )
+    return leafHasFormats
 
 
 module.exports = Leaf
