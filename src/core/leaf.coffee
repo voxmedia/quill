@@ -66,6 +66,10 @@ class Leaf extends LinkedList.Node
     return [leaves, offset]
 
   hasFormats: (formats) ->
+    console.log(this)
+    console.log(formats)
+    console.log(@formats)
+
     return Object.keys(formats).every((formatKey) ->
       return @formats[formatKey] == formats[formatKey]
     )
