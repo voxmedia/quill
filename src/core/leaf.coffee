@@ -41,5 +41,34 @@ class Leaf extends LinkedList.Node
         @node = textNode
     @length = @text.length
 
+  findAdjacentLeaves: (offset, formats) ->
+    leaves = [this]
+
+    # Collect previous leaves + update offset from click-point
+    prev = @prev;
+    while prev?
+      if prev.hasFormats(formats)
+        offset += prev.length
+        leaves = [prev].concat(leaves)
+        prev = prev.prev
+      else
+        prev = null
+
+    # Collect next leaves
+    next = @next;
+    while next?
+      if next.hasFormats(formats)
+        leaves = leaves.concat([next])
+        next = next.next
+      else
+        next = null
+
+    return [leaves, offset]
+
+  hasFormats: (formats) ->
+    return Object.keys(formats).forEach((formatKey) ->
+      return formatKey in @formats && @formats[formatKey] === formats[formatKey]
+    )
+
 
 module.exports = Leaf
