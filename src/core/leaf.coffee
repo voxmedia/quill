@@ -41,5 +41,35 @@ class Leaf extends LinkedList.Node
         @node = textNode
     @length = @text.length
 
+  findMatchingSiblings: (formats = {}) ->
+    prevLeaves = []
+    nextLeaves = []
+
+    prev = @prev
+    while prev?
+      if prev.hasFormats(formats)
+        prevLeaves.push(prev)
+        prev = prev.prev
+      else
+        prev = null
+
+    next = @next
+    while next?
+      if next.hasFormats(formats)
+        nextLeaves.push(next)
+        next = next.next
+      else
+        next = null
+
+    return [prevLeaves, nextLeaves]
+
+  hasFormats: (formats) ->
+    leafHasFormats = true
+    for formatKey of formats
+      if @formats[formatKey] != formats[formatKey]
+        leafHasFormats = false
+
+    return leafHasFormats
+
 
 module.exports = Leaf

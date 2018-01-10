@@ -102,6 +102,12 @@ class LinkTooltip extends Tooltip
     [leaf, offset] = @quill.editor.doc.findLeafAt(range.start, true)
     start = range.start - offset
     end = start + leaf.length
+
+    # Update range bounds to include siblings
+    [prev, next] = leaf.findMatchingSiblings({ link: leaf.formats.link })
+    prev.forEach((leaf) -> start -= leaf.length)
+    next.forEach((leaf) -> end += leaf.length)
+
     return { start, end }
 
   _onToolbar: (range, value) ->
