@@ -41,34 +41,32 @@ class Leaf extends LinkedList.Node
         @node = textNode
     @length = @text.length
 
-  findAdjacentLeaves: (offset, formats = {}) ->
-    leaves = [this]
+  findMatchingSiblings: (formats = {}) ->
+    prevLeaves = []
+    nextLeaves = []
 
-    # Collect previous leaves + update offset from click-point
-    prev = @prev;
+    prev = @prev
     while prev?
       if prev.hasFormats(formats)
-        offset += prev.length
-        leaves = [prev].concat(leaves)
+        prevLeaves.push(prev)
         prev = prev.prev
       else
         prev = null
 
-    # Collect next leaves
-    next = @next;
+    next = @next
     while next?
       if next.hasFormats(formats)
-        leaves = leaves.concat([next])
+        nextLeaves.push(next)
         next = next.next
       else
         next = null
 
-    return [leaves, offset]
+    return [prevLeaves, nextLeaves]
 
   hasFormats: (formats) ->
     leafHasFormats = true
     for formatKey of formats
-      if not @formats.hasOwnProperty(formatKey) or @formats[formatKey] != formats[formatKey]
+      if @formats[formatKey] != formats[formatKey]
         leafHasFormats = false
 
     return leafHasFormats

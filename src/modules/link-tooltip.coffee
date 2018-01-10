@@ -100,16 +100,13 @@ class LinkTooltip extends Tooltip
 
   _expandRange: (range) ->
     [leaf, offset] = @quill.editor.doc.findLeafAt(range.start, true)
-
-    # Get all adjacent leaves from clicked leaf that share the same link format
-    leaves = [leaf]
-    if leaf?
-      [leaves, offset] = leaf.findAdjacentLeaves(offset, { link: leaf.formats.link })
-
-    # Update range bounds to include all leaves
     start = range.start - offset
-    end = start
-    leaves.forEach((leaf) -> end += leaf.length)
+    end = start + leaf.length
+
+    # Update range bounds to include siblings
+    [prev, next] = leaf.findMatchingSiblings({ link: leaf.formats.link })
+    prev.forEach((leaf) -> start -= leaf.length)
+    next.forEach((leaf) -> end += leaf.length)
 
     return { start, end }
 
