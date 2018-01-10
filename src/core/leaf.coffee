@@ -66,7 +66,7 @@ class Leaf extends LinkedList.Node
   hasFormats: (formats) ->
     leafHasFormats = true
     for formatKey of formats
-      if @formats[formatKey] != formats[formatKey]
+      if !_.isEqual(@formats[formatKey], formats[formatKey])
         leafHasFormats = false
 
     return leafHasFormats
