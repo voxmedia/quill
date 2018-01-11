@@ -395,7 +395,6 @@ dom = _.extend(dom,
     'OUTPUT'
     'P'
     'PRE'
-    'SECTION'
     'TABLE'
     'TBODY'
     'TD'
@@ -409,7 +408,8 @@ dom = _.extend(dom,
 
   EMBED_TAGS: {
     'IFRAME'
-    'IMG'
+    'IMG',
+    'SECTION'
   }
 
   LINE_TAGS: {
@@ -437,6 +437,7 @@ dom = _.extend(dom,
     'EMBED'
     'HR'
     'IFRAME'
+    'SECTION'
     'IMG'
     'INPUT'
     'KEYGEN'
