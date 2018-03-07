@@ -1,5 +1,5 @@
 Quill         = require('../quill')
-EventEmitter2 = require('eventemitter2').EventEmitter2
+EventEmitter2 = require('eventemitter2')
 _             = Quill.require('lodash')
 dom           = Quill.require('dom')
 
