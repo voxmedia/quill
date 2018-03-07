@@ -206,7 +206,7 @@ class Quill extends EventEmitter2
     @editor.doc.setHTML(html)
     @editor.checkUpdate(source)
 
-  setSelection: (index, length, source = Quill.sources.API) ->
+  setSelection: (index, length = 0, source = Quill.sources.API) ->
     if _.isNumber(index) and _.isNumber(length)
       range = new Range(index, index + length)
     else
