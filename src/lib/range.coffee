@@ -8,6 +8,8 @@ class Range
     return r1.equals(r2)
 
   constructor: (@start, @end) ->
+    @index = @start
+    @length = @end - @start
 
   equals: (range) ->
     return false unless range?
@@ -21,6 +23,8 @@ class Range
       else
         return Math.max(index, pos + length)
     )
+    @index = @start
+    @length = @end - @start
 
   isCollapsed: ->
     return @start == @end
