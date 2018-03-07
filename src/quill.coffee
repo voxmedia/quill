@@ -1,6 +1,6 @@
 _             = require('lodash')
-Delta         = require('rich-text/lib/delta')
-EventEmitter2 = require('eventemitter2').EventEmitter2
+Delta         = require('rich-text').Delta
+EventEmitter2 = require('eventemitter2')
 dom           = require('./lib/dom')
 Document      = require('./core/document')
 Editor        = require('./core/editor')
