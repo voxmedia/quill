@@ -62,11 +62,11 @@ class Selection
 
   setRange: (range, source) ->
     if range?
-      [startNode, startOffset] = this._indexToPosition(range.start)
-      if range.isCollapsed()
+      [startNode, startOffset] = this._indexToPosition(range.index || range.start)
+      if range.length == 0 or range.start == range.end
         [endNode, endOffset] = [startNode, startOffset]
       else
-        [endNode, endOffset] = this._indexToPosition(range.end)
+        [endNode, endOffset] = this._indexToPosition(range.end || range.index + range.length)
       this._setNativeRange(startNode, startOffset, endNode, endOffset)
     else
       this._setNativeRange(null)
