@@ -140,8 +140,8 @@ class Quill extends EventEmitter2
 
   getContents: (index = 0, length = this.getLength() - index) ->
     if _.isObject(index)
-      index = index.index
       length = index.length
+      index = index.index
     return @editor.delta.slice(index, index + length)
 
   getHTML: ->

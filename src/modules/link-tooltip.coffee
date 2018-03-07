@@ -1,5 +1,6 @@
 Quill   = require('../quill')
 Tooltip = require('./tooltip')
+Range = require('../lib/range')
 _       = Quill.require('lodash')
 dom     = Quill.require('dom')
 
@@ -108,7 +109,7 @@ class LinkTooltip extends Tooltip
     prev.forEach((leaf) -> start -= leaf.length)
     next.forEach((leaf) -> end += leaf.length)
 
-    return { start, end }
+    return new Range(start, end)
 
   _onToolbar: (range, value) ->
     this._toggle(range, value)

@@ -52,7 +52,7 @@ class Keyboard
 
   toggleFormat: (range, format) ->
     if range.isCollapsed()
-      delta = @quill.getContents(Math.max(0, range.start-1), range.end)
+      delta = @quill.getContents(Math.max(0, range.start-1), 1)
     else
       delta = @quill.getContents(range)
     value = delta.ops.length == 0 or !_.every(delta.ops, (op) ->

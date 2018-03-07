@@ -111,11 +111,11 @@ class Toolbar
 
   _getLeafActive: (range) ->
     if range.isCollapsed()
-      [line, offset] = @quill.editor.doc.findLineAt(range.start)
+      [line, offset] = @quill.editor.doc.findLineAt(range.index)
       if offset == 0
-        contents = @quill.getContents(range.start, range.end + 1)
+        contents = @quill.getContents(range.index, 1)
       else
-        contents = @quill.getContents(range.start - 1, range.end)
+        contents = @quill.getContents(range.index - 1, 1)
     else
       contents = @quill.getContents(range)
     formatsArr = _.map(contents.ops, 'attributes')
