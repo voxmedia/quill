@@ -21,6 +21,15 @@ class Keyboard
       @toolbar = toolbar
     )
 
+  prependHotkey: (hotkeys, callback) ->
+    hotkeys = [hotkeys] unless Array.isArray(hotkeys)
+    _.each(hotkeys, (hotkey) =>
+      hotkey = if _.isObject(hotkey) then _.clone(hotkey) else { key: hotkey }
+      hotkey.callback = callback
+      @hotkeys[hotkey.key] ?= []
+      @hotkeys[hotkey.key].unshift(hotkey)
+    )
+
   addHotkey: (hotkeys, callback) ->
     hotkeys = [hotkeys] unless Array.isArray(hotkeys)
     _.each(hotkeys, (hotkey) =>
@@ -112,12 +121,6 @@ class Keyboard
       if range? and @quill.getLength() > 0
         { start, end } = range
         if start != end
-          # if the surrounding characters are both spaces,
-          # kill the preceding space to prevent leaving double-spaces
-          before = @quill.getText(Math.max(start - 1, 0), start)
-          after = @quill.getText(end, Math.min(end + 1, @quill.getLength()))
-          if ' ' == before == after
-            start = start - 1
           @quill.deleteText(start, end, Quill.sources.USER)
         else
           if hotkey.key == 'Backspace'
