@@ -103,10 +103,10 @@ class Quill extends EventEmitter2
     style.appendChild(document.createTextNode(css))
     document.head.appendChild(style)
 
-  deleteText: (start, end, source = Quill.sources.API) ->
-    [start, end, formats, source] = this._buildParams(start, end, {}, source)
-    return unless end > start
-    delta = new Delta().retain(start).delete(end - start)
+  deleteText: (index, length, source = Quill.sources.API) ->
+    [index, length, formats, source] = this._buildParams(index, length, {}, source)
+    return unless length > 0
+    delta = new Delta().retain(index).delete(length)
     @editor.applyDelta(delta, source)
 
   emit: (eventName, args...) ->
@@ -117,28 +117,28 @@ class Quill extends EventEmitter2
   focus: ->
     @editor.focus()
 
-  formatLine: (start, end, name, value, source) ->
-    [start, end, formats, source] = this._buildParams(start, end, name, value, source)
+  formatLine: (index, length, name, value, source) ->
+    [index, length, formats, source] = this._buildParams(index, length, name, value, source)
     # use the inclusive option only when a range is selected
-    [line, offset] = @editor.doc.findLineAt(end, start != end)
-    end += (line.length - offset) if line?
-    this.formatText(start, end, formats, source)
+    [line, offset] = @editor.doc.findLineAt(index + length, length > 0)
+    length += (line.length - offset) if line?
+    this.formatText(index, length, formats, source)
 
-  formatText: (start, end, name, value, source) ->
-    [start, end, formats, source] = this._buildParams(start, end, name, value, source)
+  formatText: (index, length, name, value, source) ->
+    [index, length, formats, source] = this._buildParams(index, length, name, value, source)
     formats = _.reduce(formats, (formats, value, name) =>
       format = @editor.doc.formats[name]
       # TODO warn if no format
       formats[name] = null unless value and value != format.config.default     # false will be composed and kept in attributes
       return formats
     , formats)
-    delta = new Delta().retain(start).retain(end - start, formats)
+    delta = new Delta().retain(index).retain(length, formats)
     @editor.applyDelta(delta, source)
 
   getBounds: (index) ->
     return @editor.getBounds(index)
 
-  getContents: (index = 0, length = null) ->
+  getContents: (index = 0, length = this.getLength() - index) ->
     if _.isObject(index)
       index = index.index
       length = index.length
@@ -157,8 +157,8 @@ class Quill extends EventEmitter2
     @editor.checkUpdate()   # Make sure we access getRange with editor in consistent state
     return @editor.selection.getRange(opts)
 
-  getText: (start = 0, end = null) ->
-    return _.map(this.getContents(start, end).ops, (op) ->
+  getText: (index = 0, length = undefined) ->
+    return _.map(this.getContents(index, length).ops, (op) ->
       return if _.isString(op.insert) then op.insert else dom.EMBED_TEXT
     ).join('')
 
@@ -206,12 +206,12 @@ class Quill extends EventEmitter2
     @editor.doc.setHTML(html)
     @editor.checkUpdate(source)
 
-  setSelection: (start, end, source = Quill.sources.API) ->
-    if _.isNumber(start) and _.isNumber(end)
-      range = new Range(start, end)
+  setSelection: (index, length, source = Quill.sources.API) ->
+    if _.isNumber(index) and _.isNumber(length)
+      range = new Range(index, index + length)
     else
-      range = start
-      source = end or source
+      range = index
+      source = length or source
     @editor.selection.setRange(range, source)
 
   setText: (text, source = Quill.sources.API) ->
@@ -222,13 +222,13 @@ class Quill extends EventEmitter2
     delta = { ops: delta } if Array.isArray(delta)
     @editor.applyDelta(delta, source)
 
-  # fn(Number start, Number end, String name, String value, String source)
-  # fn(Number start, Number end, Object formats, String source)
+  # fn(Number index, Number length, String name, String value, String source)
+  # fn(Number index, Number length, Object formats, String source)
   # fn(Object range, String name, String value, String source)
   # fn(Object range, Object formats, String source)
   _buildParams: (params...) ->
     if _.isObject(params[0])
-      params.splice(0, 1, params[0].start, params[0].end)
+      params.splice(0, 1, params[0].index, params[0].length)
     if _.isString(params[2])
       formats = {}
       formats[params[2]] = params[3]

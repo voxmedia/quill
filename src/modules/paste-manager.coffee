@@ -84,7 +84,7 @@ class PasteManager
         delta.ops.unshift({ retain: range.start }) if range.start > 0
         delta.delete(range.end - range.start)
         @quill.updateContents(delta, 'user')
-      @quill.setSelection(range.start + lengthAdded, range.start + lengthAdded)
+      @quill.setSelection(range.start + lengthAdded, 0)
       # Make sure bottom of pasted content is visible
       @quill.editor.selection.scrollIntoView()
       @container.innerHTML = ""

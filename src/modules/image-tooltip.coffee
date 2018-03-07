@@ -43,7 +43,7 @@ class ImageTooltip extends Tooltip
       @textbox.value = ''
       index = @range.end
       @quill.insertEmbed(index, 'image', url, 'user')
-      @quill.setSelection(index + 1, index + 1)
+      @quill.setSelection(index + 1, 0)
     this.hide()
 
   _onToolbar: (range, value) ->

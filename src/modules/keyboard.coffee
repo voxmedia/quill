@@ -119,19 +119,19 @@ class Keyboard
   _initDeletes: ->
     this.addHotkey(Keyboard.hotkeys.DELETE, (range, hotkey) =>
       if range? and @quill.getLength() > 0
-        { start, end } = range
-        if start != end
-          @quill.deleteText(start, end, Quill.sources.USER)
+        { index, length } = range
+        if length > 0
+          @quill.deleteText(index, length, Quill.sources.USER)
         else
           if hotkey.key == 'Backspace'
-            [line, offset] = @quill.editor.doc.findLineAt(start)
+            [line, offset] = @quill.editor.doc.findLineAt(index)
             if offset == 0 and (line.formats.bullet or line.formats.list)
               format = if line.formats.bullet then 'bullet' else 'list'
-              @quill.formatLine(start, start, format, false, Quill.sources.USER)
-            else if start > 0
-              @quill.deleteText(start - 1, start, Quill.sources.USER)
-          else if start < @quill.getLength() - 1
-            @quill.deleteText(start, start + 1, Quill.sources.USER)
+              @quill.formatLine(index, 0, format, false, Quill.sources.USER)
+            else if index > 0
+              @quill.deleteText(index - 1, 1, Quill.sources.USER)
+          else if index < @quill.getLength() - 1
+            @quill.deleteText(index, 1, Quill.sources.USER)
       @quill.editor.selection.scrollIntoView()
       return false
     )
@@ -179,7 +179,7 @@ class Keyboard
                        .delete(range.end - range.start)
                        .retain(@quill.getLength() - range.end)
     @quill.updateContents(delta, Quill.sources.USER)
-    @quill.setSelection(range.start + 1, range.start + 1)
+    @quill.setSelection(range.start + 1, 0)
 
 
 Quill.registerModule('keyboard', Keyboard)

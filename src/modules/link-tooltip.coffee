@@ -63,7 +63,7 @@ class LinkTooltip extends Tooltip
         anchor.href = url if anchor?
       else
         @quill.formatText(@range, 'link', url, 'user')
-      @quill.setSelection(end, end)
+      @quill.setSelection(end, 0)
     this.setMode(url, false)
 
   removeLink: (range) ->
