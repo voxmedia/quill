@@ -155,7 +155,7 @@ class Toolbar
         activeFormats[name] = [formats[name]] if Toolbar.formats.SELECT[name]?
       )
       return activeFormats
-    , formatsArr[0] or {})
+    , _.clone(formatsArr[0] || {}))
 
 
 Quill.registerModule('toolbar', Toolbar)
