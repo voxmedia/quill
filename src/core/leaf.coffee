@@ -10,8 +10,9 @@ class Leaf extends LinkedList.Node
   @isLeafNode: (node) ->
     return dom(node).isTextNode() or !node.firstChild?
 
-  constructor: (@node, formats) ->
+  constructor: (@node, formats, embed) ->
     @formats = _.clone(formats)
+    @embed = embed
     @text = dom(@node).text()
     @length = @text.length
     dom(@node).data(Leaf.DATA_KEY, this)
@@ -47,7 +48,7 @@ class Leaf extends LinkedList.Node
 
     prev = @prev
     while prev?
-      if prev.hasFormats(formats)
+      if !prev.embed and prev.hasFormats(formats)
         prevLeaves.push(prev)
         prev = prev.prev
       else
@@ -55,7 +56,7 @@ class Leaf extends LinkedList.Node
 
     next = @next
     while next?
-      if next.hasFormats(formats)
+      if !next.embed and next.hasFormats(formats)
         nextLeaves.push(next)
         next = next.next
       else

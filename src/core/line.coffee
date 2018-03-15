@@ -20,13 +20,19 @@ class Line extends LinkedList.Node
     _.each(dom(node).childNodes(), (node) =>
       node = @doc.normalizer.normalizeNode(node)
       nodeFormats = _.clone(formats)
+      nodeEmbed = null
       # TODO: optimize
       _.each(@doc.formats, (format, name) ->
         # format.value() also checks match() but existing bug in tandem-core requires check anyways
-        nodeFormats[name] = format.value(node) if !format.isType(Format.types.LINE) and format.match(node)
+        return unless format.match(node)
+        if format.isType(Format.types.EMBED)
+          nodeEmbed = {}
+          nodeEmbed[name] = format.value(node)
+        else if !format.isType(Format.types.LINE)
+          nodeFormats[name] = format.value(node)
       )
       if Leaf.isLeafNode(node)
-        @leaves.append(new Leaf(node, nodeFormats))
+        @leaves.append(new Leaf(node, nodeFormats, nodeEmbed))
       else
         this.buildLeaves(node, nodeFormats)
     )
@@ -116,21 +122,19 @@ class Line extends LinkedList.Node
     @node.insertBefore(node, nextNode)
     this.rebuild()
 
-  insertEmbed: (offset, attributes) ->
+  insertEmbed: (offset, embed, formats = {}) ->
     [leaf, leafOffset] = this.findLeafAt(offset)
     [prevNode, nextNode] = dom(leaf.node).split(leafOffset)
-    formatName = _.find(Object.keys(attributes), (name) =>
-      return @doc.formats[name].isType(Format.types.EMBED)
-    )
-    node = @doc.formats[formatName].add({}, attributes[formatName])  # TODO fix {} hack
-    attributes = _.clone(attributes)
-    delete attributes[formatName]
-    this._insert(offset, node, attributes)
+    name = Object.keys(embed)[0]
+    value = embed[name]
+    format = @doc.formats[name]
+    node = format.add({}, value)  # TODO fix {} hack
+    this._insert(offset, node, formats)
 
   insertText: (offset, text, formats = {}) ->
     return unless text.length > 0
     [leaf, leafOffset] = this.findLeafAt(offset)
-    if _.isEqual(leaf.formats, formats)
+    if !leaf.embed and _.isEqual(leaf.formats, formats)
       leaf.insertText(leafOffset, text)
       this.resetContent()
     else
@@ -169,9 +173,8 @@ class Line extends LinkedList.Node
     @delta = new Delta()
     _.each(@leaves.toArray(), (leaf) =>
       @length += leaf.length
-      # TODO use constant for embed type
-      if dom.EMBED_TAGS[leaf.node.tagName]?
-        @delta.insert(1, leaf.formats)
+      if leaf.embed
+        @delta.insert(leaf.embed, leaf.formats)
       else
         @delta.insert(leaf.text, leaf.formats)
     )

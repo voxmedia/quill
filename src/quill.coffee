@@ -162,9 +162,16 @@ class Quill extends EventEmitter2
       return if _.isString(op.insert) then op.insert else dom.EMBED_TEXT
     ).join('')
 
-  insertEmbed: (index, type, url, source) ->
-    [index, length, formats, source] = this._buildParams(index, 0, type, url, source)
-    delta = new Delta().retain(index).insert(1, formats)
+  insertEmbed: (index, type, url, formats, source) ->
+    if _.isObject(type)
+      embed = type
+      formats = url
+      source = formats
+    else
+      embed = {}
+      embed[type] = url
+    [index, length, formats, source] = this._buildParams(index, 0, formats, source)
+    delta = new Delta().retain(index).insert(embed, formats)
     @editor.applyDelta(delta, source)
 
   insertText: (index, text, name, value, source) ->
