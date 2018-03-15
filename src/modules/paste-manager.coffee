@@ -35,14 +35,7 @@ class PasteManager
     this._copy(event)
     range = @quill.getSelection()
     return unless range?
-    { start, end } = range
-    # if the surrounding characters are both spaces,
-    # kill the preceding space to prevent leaving double-spaces
-    before = @quill.getText(Math.max(start - 1, 0), start)
-    after = @quill.getText(end, Math.min(end + 1, @quill.getLength()))
-    if ' ' == before == after
-      start = start - 1
-    @quill.deleteText(start, end, 'user')
+    @quill.deleteText(range.index, range.length, 'user')
 
   _copy: (event) ->
     range = @quill.getSelection({ overrideFocus: true })
