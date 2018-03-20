@@ -58,10 +58,7 @@ class Editor
             index += op.insert.length
             length += op.insert.length
           else if op.insert?
-            this._insertEmbed(index, op.insert)
-            _.each(op.attributes, (value, name) =>
-              this._formatAt(index, 1, name, value)
-            )
+            this._insertEmbed(index, op.insert, op.attributes)
             index += 1
             length += 1
           else if _.isNumber(op.delete)
@@ -163,10 +160,10 @@ class Editor
         line = line.next
     )
 
-  _insertEmbed: (index, embed) ->
+  _insertEmbed: (index, embed, attributes) ->
     @selection.shiftAfter(index, 1, =>
       [line, offset] = @doc.findLineAt(index)
-      line.insertEmbed(offset, embed)
+      line.insertEmbed(offset, embed, attributes)
     )
 
   _insertText: (index, text) ->
