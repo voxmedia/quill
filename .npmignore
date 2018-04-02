@@ -6,7 +6,6 @@ _*
 *.log
 bower.json
 config
-dist/quill.min.js
 docs
 examples
 test
