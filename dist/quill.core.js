@@ -1116,7 +1116,7 @@ var Quill = function () {
       emitter: this.emitter,
       whitelist: this.options.formats
     });
-    this.editor = new _editor2.default(this.scroll);
+    this.editor = new _editor2.default(this.scroll, this.options);
     this.selection = new _selection2.default(this.scroll, this.emitter);
     this.theme = new this.options.theme(this, this.options);
     this.keyboard = this.theme.addModule('keyboard');
@@ -1540,7 +1540,8 @@ Quill.DEFAULTS = {
   readOnly: false,
   scrollingContainer: null,
   strict: true,
-  theme: 'default'
+  theme: 'default',
+  normalizeDelta: true
 };
 Quill.events = _emitter4.default.events;
 Quill.sources = _emitter4.default.sources;
@@ -2242,10 +2243,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var ASCII = /^[ -~]*$/;
 
 var Editor = function () {
-  function Editor(scroll) {
+  function Editor(scroll, options) {
     _classCallCheck(this, Editor);
 
     this.scroll = scroll;
+    this.options = options;
     this.delta = this.getDelta();
   }
 
@@ -2258,7 +2260,9 @@ var Editor = function () {
       this.scroll.update();
       var scrollLength = this.scroll.length();
       this.scroll.batchStart();
-      delta = normalizeDelta(delta);
+      if (this.options.normalizeDelta) {
+        delta = normalizeDelta(delta);
+      }
       delta.reduce(function (index, op) {
         var length = op.retain || op.delete || op.insert.length || 1;
         var attributes = op.attributes || {};
