@@ -14,9 +14,8 @@ const ASCII = /^[ -~]*$/;
 
 
 class Editor {
-  constructor(scroll, options) {
+  constructor(scroll) {
     this.scroll = scroll;
-    this.options = options;
     this.delta = this.getDelta();
   }
 
@@ -25,9 +24,7 @@ class Editor {
     this.scroll.update();
     let scrollLength = this.scroll.length();
     this.scroll.batchStart();
-    if (this.options.normalizeDelta) {
-      delta = normalizeDelta(delta);
-    }
+    delta = normalizeDelta(delta);
     delta.reduce((index, op) => {
       let length = op.retain || op.delete || op.insert.length || 1;
       let attributes = op.attributes || {};
