@@ -1,7 +1,9 @@
 import Quill from '../quill.js';
 import CodeBlock from '../formats/code';
+import Author from '../formats/author';
 
 Quill.register(CodeBlock, true); // Syntax version will otherwise be registered
+Quill.register(Author);
 
 import './helpers/unit.js';
 
@@ -23,6 +25,7 @@ import './unit/formats/header';
 import './unit/formats/indent';
 import './unit/formats/list';
 import './unit/formats/bold';
+import './unit/formats/author';
 
 import './unit/modules/clipboard';
 import './unit/modules/history';
