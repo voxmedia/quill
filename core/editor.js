@@ -246,15 +246,6 @@ function normalizeDelta(delta) {
       delete attributes['image'];
       return delta.insert({ image: op.attributes.image }, attributes);
     }
-    if (op.attributes != null && (op.attributes.list === true || op.attributes.bullet === true)) {
-      op = clone(op);
-      if (op.attributes.list) {
-        op.attributes.list = 'ordered';
-      } else {
-        op.attributes.list = 'bullet';
-        delete op.attributes.bullet;
-      }
-    }
     if (typeof op.insert === 'string') {
       let text = op.insert.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
       return delta.insert(text, op.attributes);
