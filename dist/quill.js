@@ -845,9 +845,11 @@ var Block = function (_Parchment$Block) {
           this.format(name, value);
         }
       }
-      this.children.forEachAt(index, Math.min(length, this.length() - index - 1), function (child, offset, length) {
-        child.formatAt(offset, length, name, value);
-      });
+      if (_parchment2.default.query(name, _parchment2.default.Scope.INLINE)) {
+        this.children.forEachAt(index, Math.min(length, this.length() - index - 1), function (child, offset, length) {
+          child.formatAt(offset, length, name, value);
+        });
+      }
       this.cache = {};
     }
   }, {
