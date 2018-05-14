@@ -4356,7 +4356,7 @@ exports.default = Scroll;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.SHORTKEY = exports.default = undefined;
+exports.normalize = exports.SHORTKEY = exports.default = undefined;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -4420,13 +4420,12 @@ var Keyboard = function (_Module) {
   _createClass(Keyboard, null, [{
     key: 'match',
     value: function match(evt, binding) {
-      binding = normalize(binding);
       if (['altKey', 'ctrlKey', 'metaKey', 'shiftKey'].some(function (key) {
         return !!binding[key] !== evt[key] && binding[key] !== null;
       })) {
         return false;
       }
-      return binding.key === (evt.which || evt.keyCode);
+      return binding.key === evt.key || binding.key === evt.which;
     }
   }]);
 
@@ -4437,39 +4436,48 @@ var Keyboard = function (_Module) {
 
     _this.bindings = {};
     Object.keys(_this.options.bindings).forEach(function (name) {
-      if (name === 'list autofill' && quill.scroll.whitelist != null && !quill.scroll.whitelist['list']) {
+      if (name === 'list autofill' && quill.scroll.whitelist != null && !quill.scroll.whitelist.list) {
         return;
       }
       if (_this.options.bindings[name]) {
         _this.addBinding(_this.options.bindings[name]);
       }
     });
-    _this.addBinding({ key: Keyboard.keys.ENTER, shiftKey: null }, handleEnter);
-    _this.addBinding({ key: Keyboard.keys.ENTER, metaKey: null, ctrlKey: null, altKey: null }, function () {});
+    _this.addBinding({ key: 'Enter', shiftKey: null }, handleEnter);
+    _this.addBinding({ key: 'Enter', metaKey: null, ctrlKey: null, altKey: null }, function () {});
     if (/Firefox/i.test(navigator.userAgent)) {
       // Need to handle delete and backspace for Firefox in the general case #1171
-      _this.addBinding({ key: Keyboard.keys.BACKSPACE }, { collapsed: true }, handleBackspace);
-      _this.addBinding({ key: Keyboard.keys.DELETE }, { collapsed: true }, handleDelete);
+      _this.addBinding({ key: 'Backspace' }, { collapsed: true }, handleBackspace);
+      _this.addBinding({ key: 'Delete' }, { collapsed: true }, handleDelete);
     } else {
-      _this.addBinding({ key: Keyboard.keys.BACKSPACE }, { collapsed: true, prefix: /^.?$/ }, handleBackspace);
-      _this.addBinding({ key: Keyboard.keys.DELETE }, { collapsed: true, suffix: /^.?$/ }, handleDelete);
+      _this.addBinding({ key: 'Backspace' }, { collapsed: true, prefix: /^.?$/ }, handleBackspace);
+      _this.addBinding({ key: 'Delete' }, { collapsed: true, suffix: /^.?$/ }, handleDelete);
     }
-    _this.addBinding({ key: Keyboard.keys.BACKSPACE }, { collapsed: false }, handleDeleteRange);
-    _this.addBinding({ key: Keyboard.keys.DELETE }, { collapsed: false }, handleDeleteRange);
-    _this.addBinding({ key: Keyboard.keys.BACKSPACE, altKey: null, ctrlKey: null, metaKey: null, shiftKey: null }, { collapsed: true, offset: 0 }, handleBackspace);
+    _this.addBinding({ key: 'Backspace' }, { collapsed: false }, handleDeleteRange);
+    _this.addBinding({ key: 'Delete' }, { collapsed: false }, handleDeleteRange);
+    _this.addBinding({
+      key: 'Backspace',
+      altKey: null,
+      ctrlKey: null,
+      metaKey: null,
+      shiftKey: null
+    }, { collapsed: true, offset: 0 }, handleBackspace);
     _this.listen();
     return _this;
   }
 
   _createClass(Keyboard, [{
     key: 'addBinding',
-    value: function addBinding(key) {
+    value: function addBinding(keyBinding) {
+      var _this2 = this;
+
       var context = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
       var handler = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-      var binding = normalize(key);
-      if (binding == null || binding.key == null) {
-        return debug.warn('Attempted to add invalid keyboard binding', binding);
+      var binding = normalize(keyBinding);
+      if (binding == null) {
+        debug.warn('Attempted to add invalid keyboard binding', binding);
+        return;
       }
       if (typeof context === 'function') {
         context = { handler: context };
@@ -4477,36 +4485,39 @@ var Keyboard = function (_Module) {
       if (typeof handler === 'function') {
         handler = { handler: handler };
       }
-      binding = (0, _extend2.default)(binding, context, handler);
-      this.bindings[binding.key] = this.bindings[binding.key] || [];
-      this.bindings[binding.key].push(binding);
+      var keys = Array.isArray(binding.key) ? binding.key : [binding.key];
+      keys.forEach(function (key) {
+        var singleBinding = (0, _extend2.default)({}, binding, { key: key }, context, handler);
+        _this2.bindings[singleBinding.key] = _this2.bindings[singleBinding.key] || [];
+        _this2.bindings[singleBinding.key].push(singleBinding);
+      });
     }
   }, {
     key: 'listen',
     value: function listen() {
-      var _this2 = this;
+      var _this3 = this;
 
       this.quill.root.addEventListener('keydown', function (evt) {
         if (evt.defaultPrevented) return;
-        var which = evt.which || evt.keyCode;
-        var bindings = (_this2.bindings[which] || []).filter(function (binding) {
+        var bindings = (_this3.bindings[evt.key] || []).concat(_this3.bindings[evt.which] || []);
+        var matches = bindings.filter(function (binding) {
           return Keyboard.match(evt, binding);
         });
-        if (bindings.length === 0) return;
-        var range = _this2.quill.getSelection();
-        if (range == null || !_this2.quill.hasFocus()) return;
+        if (matches.length === 0) return;
+        var range = _this3.quill.getSelection();
+        if (range == null || !_this3.quill.hasFocus()) return;
 
-        var _quill$getLine = _this2.quill.getLine(range.index),
+        var _quill$getLine = _this3.quill.getLine(range.index),
             _quill$getLine2 = _slicedToArray(_quill$getLine, 2),
             line = _quill$getLine2[0],
             offset = _quill$getLine2[1];
 
-        var _quill$getLeaf = _this2.quill.getLeaf(range.index),
+        var _quill$getLeaf = _this3.quill.getLeaf(range.index),
             _quill$getLeaf2 = _slicedToArray(_quill$getLeaf, 2),
             leafStart = _quill$getLeaf2[0],
             offsetStart = _quill$getLeaf2[1];
 
-        var _ref = range.length === 0 ? [leafStart, offsetStart] : _this2.quill.getLeaf(range.index + range.length),
+        var _ref = range.length === 0 ? [leafStart, offsetStart] : _this3.quill.getLeaf(range.index + range.length),
             _ref2 = _slicedToArray(_ref, 2),
             leafEnd = _ref2[0],
             offsetEnd = _ref2[1];
@@ -4516,15 +4527,23 @@ var Keyboard = function (_Module) {
         var curContext = {
           collapsed: range.length === 0,
           empty: range.length === 0 && line.length() <= 1,
-          format: _this2.quill.getFormat(range),
+          format: _this3.quill.getFormat(range),
+          line: line,
           offset: offset,
           prefix: prefixText,
-          suffix: suffixText
+          suffix: suffixText,
+          event: evt
         };
-        var prevented = bindings.some(function (binding) {
-          if (binding.collapsed != null && binding.collapsed !== curContext.collapsed) return false;
-          if (binding.empty != null && binding.empty !== curContext.empty) return false;
-          if (binding.offset != null && binding.offset !== curContext.offset) return false;
+        var prevented = matches.some(function (binding) {
+          if (binding.collapsed != null && binding.collapsed !== curContext.collapsed) {
+            return false;
+          }
+          if (binding.empty != null && binding.empty !== curContext.empty) {
+            return false;
+          }
+          if (binding.offset != null && binding.offset !== curContext.offset) {
+            return false;
+          }
           if (Array.isArray(binding.format)) {
             // any format is present
             if (binding.format.every(function (name) {
@@ -4542,9 +4561,13 @@ var Keyboard = function (_Module) {
               return false;
             }
           }
-          if (binding.prefix != null && !binding.prefix.test(curContext.prefix)) return false;
-          if (binding.suffix != null && !binding.suffix.test(curContext.suffix)) return false;
-          return binding.handler.call(_this2, range, curContext) !== true;
+          if (binding.prefix != null && !binding.prefix.test(curContext.prefix)) {
+            return false;
+          }
+          if (binding.suffix != null && !binding.suffix.test(curContext.suffix)) {
+            return false;
+          }
+          return binding.handler.call(_this3, range, curContext, binding) !== true;
         });
         if (prevented) {
           evt.preventDefault();
@@ -4556,44 +4579,34 @@ var Keyboard = function (_Module) {
   return Keyboard;
 }(_module2.default);
 
-Keyboard.keys = {
-  BACKSPACE: 8,
-  TAB: 9,
-  ENTER: 13,
-  ESCAPE: 27,
-  LEFT: 37,
-  UP: 38,
-  RIGHT: 39,
-  DOWN: 40,
-  DELETE: 46
-};
-
 Keyboard.DEFAULTS = {
   bindings: {
-    'bold': makeFormatHandler('bold'),
-    'italic': makeFormatHandler('italic'),
-    'underline': makeFormatHandler('underline'),
-    'indent': {
+    bold: makeFormatHandler('bold'),
+    italic: makeFormatHandler('italic'),
+    underline: makeFormatHandler('underline'),
+    indent: {
       // highlight tab or tab at beginning of list, indent or blockquote
-      key: Keyboard.keys.TAB,
+      key: 'Tab',
       format: ['blockquote', 'indent', 'list'],
       handler: function handler(range, context) {
         if (context.collapsed && context.offset !== 0) return true;
         this.quill.format('indent', '+1', _quill2.default.sources.USER);
+        return false;
       }
     },
-    'outdent': {
-      key: Keyboard.keys.TAB,
+    outdent: {
+      key: 'Tab',
       shiftKey: true,
       format: ['blockquote', 'indent', 'list'],
       // highlight tab or tab at beginning of list, indent or blockquote
       handler: function handler(range, context) {
         if (context.collapsed && context.offset !== 0) return true;
         this.quill.format('indent', '-1', _quill2.default.sources.USER);
+        return false;
       }
     },
     'outdent backspace': {
-      key: Keyboard.keys.BACKSPACE,
+      key: 'Backspace',
       collapsed: true,
       shiftKey: null,
       metaKey: null,
@@ -4612,7 +4625,7 @@ Keyboard.DEFAULTS = {
     'indent code-block': makeCodeBlockHandler(true),
     'outdent code-block': makeCodeBlockHandler(false),
     'remove tab': {
-      key: Keyboard.keys.TAB,
+      key: 'Tab',
       shiftKey: true,
       collapsed: true,
       prefix: /\t$/,
@@ -4620,18 +4633,29 @@ Keyboard.DEFAULTS = {
         this.quill.deleteText(range.index - 1, 1, _quill2.default.sources.USER);
       }
     },
-    'tab': {
-      key: Keyboard.keys.TAB,
-      handler: function handler(range) {
+    tab: {
+      key: 'Tab',
+      handler: function handler(range, context) {
+        if (context.format.table) return true;
         this.quill.history.cutoff();
         var delta = new _quillDelta2.default().retain(range.index).delete(range.length).insert('\t');
         this.quill.updateContents(delta, _quill2.default.sources.USER);
         this.quill.history.cutoff();
         this.quill.setSelection(range.index + 1, _quill2.default.sources.SILENT);
+        return false;
+      }
+    },
+    'blockquote empty enter': {
+      key: 'Enter',
+      collapsed: true,
+      format: ['blockquote'],
+      empty: true,
+      handler: function handler() {
+        this.quill.format('blockquote', false, _quill2.default.sources.USER);
       }
     },
     'list empty enter': {
-      key: Keyboard.keys.ENTER,
+      key: 'Enter',
       collapsed: true,
       format: ['list'],
       empty: true,
@@ -4643,7 +4667,7 @@ Keyboard.DEFAULTS = {
       }
     },
     'checklist enter': {
-      key: Keyboard.keys.ENTER,
+      key: 'Enter',
       collapsed: true,
       format: { list: 'checked' },
       handler: function handler(range) {
@@ -4660,7 +4684,7 @@ Keyboard.DEFAULTS = {
       }
     },
     'header enter': {
-      key: Keyboard.keys.ENTER,
+      key: 'Enter',
       collapsed: true,
       format: ['header'],
       suffix: /^$/,
@@ -4692,13 +4716,15 @@ Keyboard.DEFAULTS = {
         if (offset > length) return true;
         var value = void 0;
         switch (context.prefix.trim()) {
-          case '[]':case '[ ]':
+          case '[]':
+          case '[ ]':
             value = 'unchecked';
             break;
           case '[x]':
             value = 'checked';
             break;
-          case '-':case '*':
+          case '-':
+          case '*':
             value = 'bullet';
             break;
           default:
@@ -4710,66 +4736,45 @@ Keyboard.DEFAULTS = {
         this.quill.updateContents(delta, _quill2.default.sources.USER);
         this.quill.history.cutoff();
         this.quill.setSelection(range.index - length, _quill2.default.sources.SILENT);
+        return false;
       }
     },
     'code exit': {
-      key: Keyboard.keys.ENTER,
+      key: 'Enter',
       collapsed: true,
       format: ['code-block'],
-      prefix: /\n\n$/,
-      suffix: /^\s+$/,
+      prefix: /^$/,
+      suffix: /^\s*$/,
       handler: function handler(range) {
         var _quill$getLine9 = this.quill.getLine(range.index),
             _quill$getLine10 = _slicedToArray(_quill$getLine9, 2),
             line = _quill$getLine10[0],
             offset = _quill$getLine10[1];
 
-        var delta = new _quillDelta2.default().retain(range.index + line.length() - offset - 2).retain(1, { 'code-block': null }).delete(1);
-        this.quill.updateContents(delta, _quill2.default.sources.USER);
+        var numLines = 2;
+        var cur = line;
+        while (cur != null && cur.length() <= 1 && cur.formats()['code-block']) {
+          cur = cur.prev;
+          numLines -= 1;
+          // Requisite prev lines are empty
+          if (numLines <= 0) {
+            var delta = new _quillDelta2.default().retain(range.index + line.length() - offset - 2).retain(1, { 'code-block': null }).delete(1);
+            this.quill.updateContents(delta, _quill2.default.sources.USER);
+            this.quill.setSelection(range.index - 1, _quill2.default.sources.SILENT);
+            return false;
+          }
+        }
+        return true;
       }
     },
-    'embed left': makeEmbedArrowHandler(Keyboard.keys.LEFT, false),
-    'embed left shift': makeEmbedArrowHandler(Keyboard.keys.LEFT, true),
-    'embed right': makeEmbedArrowHandler(Keyboard.keys.RIGHT, false),
-    'embed right shift': makeEmbedArrowHandler(Keyboard.keys.RIGHT, true)
+    'embed left': makeEmbedArrowHandler('ArrowLeft', false),
+    'embed left shift': makeEmbedArrowHandler('ArrowLeft', true),
+    'embed right': makeEmbedArrowHandler('ArrowRight', false),
+    'embed right shift': makeEmbedArrowHandler('ArrowRight', true),
+    'table down': makeTableArrowHandler(false),
+    'table up': makeTableArrowHandler(true)
   }
 };
-
-function makeEmbedArrowHandler(key, shiftKey) {
-  var _ref3;
-
-  var where = key === Keyboard.keys.LEFT ? 'prefix' : 'suffix';
-  return _ref3 = {
-    key: key,
-    shiftKey: shiftKey,
-    altKey: null
-  }, _defineProperty(_ref3, where, /^$/), _defineProperty(_ref3, 'handler', function handler(range) {
-    var index = range.index;
-    if (key === Keyboard.keys.RIGHT) {
-      index += range.length + 1;
-    }
-
-    var _quill$getLeaf3 = this.quill.getLeaf(index),
-        _quill$getLeaf4 = _slicedToArray(_quill$getLeaf3, 1),
-        leaf = _quill$getLeaf4[0];
-
-    if (!(leaf instanceof _parchment2.default.Embed)) return true;
-    if (key === Keyboard.keys.LEFT) {
-      if (shiftKey) {
-        this.quill.setSelection(range.index - 1, range.length + 1, _quill2.default.sources.USER);
-      } else {
-        this.quill.setSelection(range.index - 1, _quill2.default.sources.USER);
-      }
-    } else {
-      if (shiftKey) {
-        this.quill.setSelection(range.index, range.length + 1, _quill2.default.sources.USER);
-      } else {
-        this.quill.setSelection(range.index + range.length + 1, _quill2.default.sources.USER);
-      }
-    }
-    return false;
-  }), _ref3;
-}
 
 function handleBackspace(range, context) {
   if (range.index === 0 || this.quill.getLength() <= 1) return;
@@ -4803,8 +4808,8 @@ function handleDelete(range, context) {
   // Check for astral symbols
   var length = /^[\uD800-\uDBFF][\uDC00-\uDFFF]/.test(context.suffix) ? 2 : 1;
   if (range.index >= this.quill.getLength() - length) return;
-  var formats = {},
-      nextLength = 0;
+  var formats = {};
+  var nextLength = 0;
 
   var _quill$getLine15 = this.quill.getLine(range.index),
       _quill$getLine16 = _slicedToArray(_quill$getLine15, 1),
@@ -4844,17 +4849,18 @@ function handleDeleteRange(range) {
   this.quill.focus();
 }
 
+// TODO use just updateContents()
 function handleEnter(range, context) {
-  var _this3 = this;
+  var _this4 = this;
 
   if (range.length > 0) {
     this.quill.scroll.deleteAt(range.index, range.length); // So we do not trigger text-change
   }
-  var lineFormats = Object.keys(context.format).reduce(function (lineFormats, format) {
+  var lineFormats = Object.keys(context.format).reduce(function (formats, format) {
     if (_parchment2.default.query(format, _parchment2.default.Scope.BLOCK) && !Array.isArray(context.format[format])) {
-      lineFormats[format] = context.format[format];
+      formats[format] = context.format[format];
     }
-    return lineFormats;
+    return formats;
   }, {});
   this.quill.insertText(range.index, '\n', lineFormats, _quill2.default.sources.USER);
   // Earlier scroll.deleteAt might have messed up our selection,
@@ -4865,50 +4871,37 @@ function handleEnter(range, context) {
     if (lineFormats[name] != null) return;
     if (Array.isArray(context.format[name])) return;
     if (name === 'link') return;
-    _this3.quill.format(name, context.format[name], _quill2.default.sources.USER);
+    _this4.quill.format(name, context.format[name], _quill2.default.sources.USER);
   });
 }
 
 function makeCodeBlockHandler(indent) {
   return {
-    key: Keyboard.keys.TAB,
+    key: 'Tab',
     shiftKey: !indent,
     format: { 'code-block': true },
     handler: function handler(range) {
       var CodeBlock = _parchment2.default.query('code-block');
+      var lines = range.length === 0 ? this.quill.getLines(range.index, 1) : this.quill.getLines(range);
       var index = range.index,
           length = range.length;
 
-      var _quill$scroll$descend = this.quill.scroll.descendant(CodeBlock, index),
-          _quill$scroll$descend2 = _slicedToArray(_quill$scroll$descend, 2),
-          block = _quill$scroll$descend2[0],
-          offset = _quill$scroll$descend2[1];
-
-      if (block == null) return;
-      var scrollIndex = this.quill.getIndex(block);
-      var start = block.newlineIndex(offset, true) + 1;
-      var end = block.newlineIndex(scrollIndex + offset + length);
-      var lines = block.domNode.textContent.slice(start, end).split('\n');
-      offset = 0;
       lines.forEach(function (line, i) {
         if (indent) {
-          block.insertAt(start + offset, CodeBlock.TAB);
-          offset += CodeBlock.TAB.length;
+          line.insertAt(0, CodeBlock.TAB);
           if (i === 0) {
             index += CodeBlock.TAB.length;
           } else {
             length += CodeBlock.TAB.length;
           }
-        } else if (line.startsWith(CodeBlock.TAB)) {
-          block.deleteAt(start + offset, CodeBlock.TAB.length);
-          offset -= CodeBlock.TAB.length;
+        } else if (line.domNode.textContent.startsWith(CodeBlock.TAB)) {
+          line.deleteAt(0, CodeBlock.TAB.length);
           if (i === 0) {
             index -= CodeBlock.TAB.length;
           } else {
             length -= CodeBlock.TAB.length;
           }
         }
-        offset += line.length + 1;
       });
       this.quill.update(_quill2.default.sources.USER);
       this.quill.setSelection(index, length, _quill2.default.sources.SILENT);
@@ -4916,9 +4909,44 @@ function makeCodeBlockHandler(indent) {
   };
 }
 
+function makeEmbedArrowHandler(key, shiftKey) {
+  var _ref3;
+
+  var where = key === 'ArrowLeft' ? 'prefix' : 'suffix';
+  return _ref3 = {
+    key: key,
+    shiftKey: shiftKey,
+    altKey: null
+  }, _defineProperty(_ref3, where, /^$/), _defineProperty(_ref3, 'handler', function handler(range) {
+    var index = range.index;
+
+    if (key === 'ArrowRight') {
+      index += range.length + 1;
+    }
+
+    var _quill$getLeaf3 = this.quill.getLeaf(index),
+        _quill$getLeaf4 = _slicedToArray(_quill$getLeaf3, 1),
+        leaf = _quill$getLeaf4[0];
+
+    if (!(leaf instanceof _parchment2.default.Embed)) return true;
+    if (key === 'ArrowLeft') {
+      if (shiftKey) {
+        this.quill.setSelection(range.index - 1, range.length + 1, _quill2.default.sources.USER);
+      } else {
+        this.quill.setSelection(range.index - 1, _quill2.default.sources.USER);
+      }
+    } else if (shiftKey) {
+      this.quill.setSelection(range.index, range.length + 1, _quill2.default.sources.USER);
+    } else {
+      this.quill.setSelection(range.index + range.length + 1, _quill2.default.sources.USER);
+    }
+    return false;
+  }), _ref3;
+}
+
 function makeFormatHandler(format) {
   return {
-    key: format[0].toUpperCase(),
+    key: format[0],
     shortKey: true,
     handler: function handler(range, context) {
       this.quill.format(format, !context.format[format], _quill2.default.sources.USER);
@@ -4926,21 +4954,49 @@ function makeFormatHandler(format) {
   };
 }
 
+function makeTableArrowHandler(up) {
+  return {
+    key: up ? 'ArrowUp' : 'ArrowDown',
+    collapsed: true,
+    format: ['table'],
+    handler: function handler(range, context) {
+      // TODO move to table module
+      var key = up ? 'prev' : 'next';
+      var cell = context.line;
+      var targetRow = cell.parent[key];
+      if (targetRow != null) {
+        if (targetRow.statics.blotName === 'table-row') {
+          var targetCell = targetRow.children.head;
+          var cur = cell;
+          while (cur.prev != null) {
+            cur = cur.prev;
+            targetCell = targetCell.next;
+          }
+          var index = targetCell.offset(this.quill.scroll) + Math.min(context.offset, targetCell.length() - 1);
+          this.quill.setSelection(index, 0, _quill2.default.sources.USER);
+        }
+      } else {
+        var targetLine = cell.table()[key];
+        if (targetLine != null) {
+          if (up) {
+            this.quill.setSelection(targetLine.offset(this.quill.scroll) + targetLine.length() - 1, 0, _quill2.default.sources.USER);
+          } else {
+            this.quill.setSelection(targetLine.offset(this.quill.scroll), 0, _quill2.default.sources.USER);
+          }
+        }
+      }
+      return false;
+    }
+  };
+}
+
 function normalize(binding) {
   if (typeof binding === 'string' || typeof binding === 'number') {
-    return normalize({ key: binding });
-  }
-  if ((typeof binding === 'undefined' ? 'undefined' : _typeof(binding)) === 'object') {
+    binding = { key: binding };
+  } else if ((typeof binding === 'undefined' ? 'undefined' : _typeof(binding)) === 'object') {
     binding = (0, _clone2.default)(binding, false);
-  }
-  if (typeof binding.key === 'string') {
-    if (Keyboard.keys[binding.key.toUpperCase()] != null) {
-      binding.key = Keyboard.keys[binding.key.toUpperCase()];
-    } else if (binding.key.length === 1) {
-      binding.key = binding.key.toUpperCase().charCodeAt(0);
-    } else {
-      return null;
-    }
+  } else {
+    return null;
   }
   if (binding.shortKey) {
     binding[SHORTKEY] = binding.shortKey;
@@ -4951,6 +5007,7 @@ function normalize(binding) {
 
 exports.default = Keyboard;
 exports.SHORTKEY = SHORTKEY;
+exports.normalize = normalize;
 
 /***/ }),
 /* 24 */
