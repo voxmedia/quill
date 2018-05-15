@@ -6163,10 +6163,10 @@ var History = function (_Module) {
         _this.transform(delta);
       }
     });
-    _this.quill.keyboard.addBinding({ key: 'Z', shortKey: true }, _this.undo.bind(_this));
-    _this.quill.keyboard.addBinding({ key: 'Z', shortKey: true, shiftKey: true }, _this.redo.bind(_this));
+    _this.quill.keyboard.addBinding({ key: 'z', shortKey: true }, _this.undo.bind(_this));
+    _this.quill.keyboard.addBinding({ key: 'z', shortKey: true, shiftKey: true }, _this.redo.bind(_this));
     if (/Win/i.test(navigator.platform)) {
-      _this.quill.keyboard.addBinding({ key: 'Y', shortKey: true }, _this.redo.bind(_this));
+      _this.quill.keyboard.addBinding({ key: 'y', shortKey: true }, _this.redo.bind(_this));
     }
     return _this;
   }

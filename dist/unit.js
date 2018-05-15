@@ -6540,10 +6540,10 @@ var History = function (_Module) {
         _this.transform(delta);
       }
     });
-    _this.quill.keyboard.addBinding({ key: 'Z', shortKey: true }, _this.undo.bind(_this));
-    _this.quill.keyboard.addBinding({ key: 'Z', shortKey: true, shiftKey: true }, _this.redo.bind(_this));
+    _this.quill.keyboard.addBinding({ key: 'z', shortKey: true }, _this.undo.bind(_this));
+    _this.quill.keyboard.addBinding({ key: 'z', shortKey: true, shiftKey: true }, _this.redo.bind(_this));
     if (/Win/i.test(navigator.platform)) {
-      _this.quill.keyboard.addBinding({ key: 'Y', shortKey: true }, _this.redo.bind(_this));
+      _this.quill.keyboard.addBinding({ key: 'y', shortKey: true }, _this.redo.bind(_this));
     }
     return _this;
   }
@@ -9906,7 +9906,7 @@ var SnowTheme = function (_BaseTheme) {
       this.buildPickers([].slice.call(toolbar.container.querySelectorAll('select')), _icons2.default);
       this.tooltip = new SnowTooltip(this.quill, this.options.bounds);
       if (toolbar.container.querySelector('.ql-link')) {
-        this.quill.keyboard.addBinding({ key: 'K', shortKey: true }, function (range, context) {
+        this.quill.keyboard.addBinding({ key: 'k', shortKey: true }, function (range, context) {
           toolbar.handlers['link'].call(toolbar, !context.format.link);
         });
       }
