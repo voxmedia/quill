@@ -8970,7 +8970,14 @@ var Clipboard = function (_Module) {
       var range = this.quill.getSelection();
       var delta = new _quillDelta2.default().retain(range.index);
       var scrollTop = this.quill.scrollingContainer.scrollTop;
-      this.container.focus();
+
+      if (/Firefox/i.test(navigator.userAgent) && e.clipboardData && e.clipboardData.getData('text/html')) {
+        e.preventDefault();
+        this.container.innerHTML = e.clipboardData.getData('text/html');
+      } else {
+        this.container.focus();
+      }
+
       this.quill.selection.update(_quill2.default.sources.SILENT);
       setTimeout(function () {
         delta = delta.concat(_this2.convert()).delete(range.length);
@@ -10222,16 +10229,16 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var IdentAttributor = function (_Parchment$Attributor) {
-  _inherits(IdentAttributor, _Parchment$Attributor);
+var IndentAttributor = function (_Parchment$Attributor) {
+  _inherits(IndentAttributor, _Parchment$Attributor);
 
-  function IdentAttributor() {
-    _classCallCheck(this, IdentAttributor);
+  function IndentAttributor() {
+    _classCallCheck(this, IndentAttributor);
 
-    return _possibleConstructorReturn(this, (IdentAttributor.__proto__ || Object.getPrototypeOf(IdentAttributor)).apply(this, arguments));
+    return _possibleConstructorReturn(this, (IndentAttributor.__proto__ || Object.getPrototypeOf(IndentAttributor)).apply(this, arguments));
   }
 
-  _createClass(IdentAttributor, [{
+  _createClass(IndentAttributor, [{
     key: 'add',
     value: function add(node, value) {
       if (value === '+1' || value === '-1') {
@@ -10242,25 +10249,25 @@ var IdentAttributor = function (_Parchment$Attributor) {
         this.remove(node);
         return true;
       } else {
-        return _get(IdentAttributor.prototype.__proto__ || Object.getPrototypeOf(IdentAttributor.prototype), 'add', this).call(this, node, value);
+        return _get(IndentAttributor.prototype.__proto__ || Object.getPrototypeOf(IndentAttributor.prototype), 'add', this).call(this, node, value);
       }
     }
   }, {
     key: 'canAdd',
     value: function canAdd(node, value) {
-      return _get(IdentAttributor.prototype.__proto__ || Object.getPrototypeOf(IdentAttributor.prototype), 'canAdd', this).call(this, node, value) || _get(IdentAttributor.prototype.__proto__ || Object.getPrototypeOf(IdentAttributor.prototype), 'canAdd', this).call(this, node, parseInt(value));
+      return _get(IndentAttributor.prototype.__proto__ || Object.getPrototypeOf(IndentAttributor.prototype), 'canAdd', this).call(this, node, value) || _get(IndentAttributor.prototype.__proto__ || Object.getPrototypeOf(IndentAttributor.prototype), 'canAdd', this).call(this, node, parseInt(value));
     }
   }, {
     key: 'value',
     value: function value(node) {
-      return parseInt(_get(IdentAttributor.prototype.__proto__ || Object.getPrototypeOf(IdentAttributor.prototype), 'value', this).call(this, node)) || undefined; // Don't return NaN
+      return parseInt(_get(IndentAttributor.prototype.__proto__ || Object.getPrototypeOf(IndentAttributor.prototype), 'value', this).call(this, node)) || undefined; // Don't return NaN
     }
   }]);
 
-  return IdentAttributor;
+  return IndentAttributor;
 }(_parchment2.default.Attributor.Class);
 
-var IndentClass = new IdentAttributor('indent', 'ql-indent', {
+var IndentClass = new IndentAttributor('indent', 'ql-indent', {
   scope: _parchment2.default.Scope.BLOCK,
   whitelist: [1, 2, 3, 4, 5, 6, 7, 8]
 });
