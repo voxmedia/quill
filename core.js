@@ -1,4 +1,3 @@
-import Parchment from 'parchment';
 import Quill from './core/quill';
 
 import Block, { BlockEmbed } from './blots/block';
@@ -13,24 +12,23 @@ import TextBlot from './blots/text';
 import Clipboard from './modules/clipboard';
 import History from './modules/history';
 import Keyboard from './modules/keyboard';
+import Uploader from './modules/uploader';
 
 Quill.register({
-  'blots/block'        : Block,
-  'blots/block/embed'  : BlockEmbed,
-  'blots/break'        : Break,
-  'blots/container'    : Container,
-  'blots/cursor'       : Cursor,
-  'blots/embed'        : Embed,
-  'blots/inline'       : Inline,
-  'blots/scroll'       : Scroll,
-  'blots/text'         : TextBlot,
+  'blots/block': Block,
+  'blots/block/embed': BlockEmbed,
+  'blots/break': Break,
+  'blots/container': Container,
+  'blots/cursor': Cursor,
+  'blots/embed': Embed,
+  'blots/inline': Inline,
+  'blots/scroll': Scroll,
+  'blots/text': TextBlot,
 
-  'modules/clipboard'  : Clipboard,
-  'modules/history'    : History,
-  'modules/keyboard'   : Keyboard
+  'modules/clipboard': Clipboard,
+  'modules/history': History,
+  'modules/keyboard': Keyboard,
+  'modules/uploader': Uploader,
 });
-
-Parchment.register(Block, Break, Cursor, Inline, Scroll, TextBlot);
-
 
 export default Quill;

@@ -1,112 +1,161 @@
-import Keyboard, { SHORTKEY } from '../../../modules/keyboard';
-
+import Keyboard, { SHORTKEY, normalize } from '../../../modules/keyboard';
 
 describe('Keyboard', function() {
   describe('match', function() {
     it('no modifiers', function() {
-      let binding = {
-        key: 'a'
-      };
-      expect(Keyboard.match({
-        keyCode: 'A'.charCodeAt(0),
-        shiftKey: false,
-        metaKey: false,
-        ctrlKey: false,
-        altKey: false
-      }, binding)).toBe(true);
-      expect(Keyboard.match({
-        keyCode: 'A'.charCodeAt(0),
-        shiftKey: true,
-        metaKey: false,
-        ctrlKey: false,
-        altKey: false
-      }, binding)).toBe(false);
+      const binding = normalize({
+        key: 'a',
+      });
+      expect(
+        Keyboard.match(
+          {
+            key: 'a',
+            shiftKey: false,
+            metaKey: false,
+            ctrlKey: false,
+            altKey: false,
+          },
+          binding,
+        ),
+      ).toBe(true);
+      expect(
+        Keyboard.match(
+          {
+            key: 'A',
+            shiftKey: false,
+            metaKey: false,
+            ctrlKey: false,
+            altKey: true,
+          },
+          binding,
+        ),
+      ).toBe(false);
     });
 
     it('simple modifier', function() {
-      let binding = {
+      const binding = normalize({
         key: 'a',
-        shiftKey: true
-      };
-      expect(Keyboard.match({
-        keyCode: 'A'.charCodeAt(0),
-        shiftKey: false,
-        metaKey: false,
-        ctrlKey: false,
-        altKey: false
-      }, binding)).toBe(false);
-      expect(Keyboard.match({
-        keyCode: 'A'.charCodeAt(0),
-        shiftKey: true,
-        metaKey: false,
-        ctrlKey: false,
-        altKey: false
-      }, binding)).toBe(true);
+        altKey: true,
+      });
+      expect(
+        Keyboard.match(
+          {
+            key: 'a',
+            shiftKey: false,
+            metaKey: false,
+            ctrlKey: false,
+            altKey: false,
+          },
+          binding,
+        ),
+      ).toBe(false);
+      expect(
+        Keyboard.match(
+          {
+            key: 'a',
+            shiftKey: false,
+            metaKey: false,
+            ctrlKey: false,
+            altKey: true,
+          },
+          binding,
+        ),
+      ).toBe(true);
     });
 
     it('optional modifier', function() {
-      let binding = {
+      const binding = normalize({
         key: 'a',
-        shiftKey: null
-      };
-      expect(Keyboard.match({
-        keyCode: 'A'.charCodeAt(0),
-        shiftKey: false,
-        metaKey: false,
-        ctrlKey: false,
-        altKey: false
-      }, binding)).toBe(true);
-      expect(Keyboard.match({
-        keyCode: 'A'.charCodeAt(0),
-        shiftKey: true,
-        metaKey: false,
-        ctrlKey: false,
-        altKey: false
-      }, binding)).toBe(true);
+        altKey: null,
+      });
+      expect(
+        Keyboard.match(
+          {
+            key: 'a',
+            shiftKey: false,
+            metaKey: false,
+            ctrlKey: false,
+            altKey: false,
+          },
+          binding,
+        ),
+      ).toBe(true);
+      expect(
+        Keyboard.match(
+          {
+            key: 'a',
+            shiftKey: false,
+            metaKey: false,
+            ctrlKey: false,
+            altKey: true,
+          },
+          binding,
+        ),
+      ).toBe(true);
     });
 
     it('shortkey modifier', function() {
-      let binding = {
+      const binding = normalize({
         key: 'a',
-        shortKey: true
-      };
-      expect(Keyboard.match({
-        keyCode: 'A'.charCodeAt(0),
-        shiftKey: false,
-        metaKey: false,
-        ctrlKey: false,
-        altKey: false
-      }, binding)).toBe(false);
-      expect(Keyboard.match({
-        keyCode: 'A'.charCodeAt(0),
-        shiftKey: false,
-        metaKey: false,
-        ctrlKey: false,
-        altKey: false,
-        [SHORTKEY]: true
-      }, binding)).toBe(true);
+        shortKey: true,
+      });
+      expect(
+        Keyboard.match(
+          {
+            key: 'a',
+            shiftKey: false,
+            metaKey: false,
+            ctrlKey: false,
+            altKey: false,
+          },
+          binding,
+        ),
+      ).toBe(false);
+      expect(
+        Keyboard.match(
+          {
+            key: 'a',
+            shiftKey: false,
+            metaKey: false,
+            ctrlKey: false,
+            altKey: false,
+            [SHORTKEY]: true,
+          },
+          binding,
+        ),
+      ).toBe(true);
     });
 
     it('native shortkey modifier', function() {
-      let binding = {
+      const binding = normalize({
         key: 'a',
-        [SHORTKEY]: true
-      };
-      expect(Keyboard.match({
-        keyCode: 'A'.charCodeAt(0),
-        shiftKey: false,
-        metaKey: false,
-        ctrlKey: false,
-        altKey: false
-      }, binding)).toBe(false);
-      expect(Keyboard.match({
-        keyCode: 'A'.charCodeAt(0),
-        shiftKey: false,
-        metaKey: false,
-        ctrlKey: false,
-        altKey: false,
-        [SHORTKEY]: true
-      }, binding)).toBe(true);
+        [SHORTKEY]: true,
+      });
+      expect(
+        Keyboard.match(
+          {
+            key: 'a',
+            shiftKey: false,
+            metaKey: false,
+            ctrlKey: false,
+            altKey: false,
+          },
+          binding,
+        ),
+      ).toBe(false);
+      expect(
+        Keyboard.match(
+          {
+            key: 'a',
+            shiftKey: false,
+            metaKey: false,
+            ctrlKey: false,
+            altKey: false,
+            [SHORTKEY]: true,
+          },
+          binding,
+        ),
+      ).toBe(true);
     });
   });
 });

@@ -3,7 +3,7 @@ import equal from 'deep-equal';
 import extend from 'extend';
 import Delta from 'quill-delta';
 import DeltaOp from 'quill-delta/lib/op';
-import Parchment from 'parchment';
+import { EmbedBlot, Scope, TextBlot } from 'parchment';
 import Quill from '../core/quill';
 import logger from '../core/logger';
 import Module from '../core/module';
@@ -28,13 +28,6 @@ class Keyboard extends Module {
     super(quill, options);
     this.bindings = {};
     Object.keys(this.options.bindings).forEach(name => {
-      if (
-        name === 'list autofill' &&
-        quill.scroll.whitelist != null &&
-        !quill.scroll.whitelist.list
-      ) {
-        return;
-      }
       if (this.options.bindings[name]) {
         this.addBinding(this.options.bindings[name]);
       }
@@ -121,13 +114,11 @@ class Keyboard extends Module {
           ? [leafStart, offsetStart]
           : this.quill.getLeaf(range.index + range.length);
       const prefixText =
-        leafStart instanceof Parchment.Text
+        leafStart instanceof TextBlot
           ? leafStart.value().slice(0, offsetStart)
           : '';
       const suffixText =
-        leafEnd instanceof Parchment.Text
-          ? leafEnd.value().slice(offsetEnd)
-          : '';
+        leafEnd instanceof TextBlot ? leafEnd.value().slice(offsetEnd) : '';
       const curContext = {
         collapsed: range.length === 0,
         empty: range.length === 0 && line.length() <= 1,
@@ -309,12 +300,75 @@ Keyboard.DEFAULTS = {
         this.quill.scrollIntoView();
       },
     },
+    'table backspace': {
+      key: 'Backspace',
+      format: ['table'],
+      collapsed: true,
+      offset: 0,
+      handler() {},
+    },
+    'table delete': {
+      key: 'Delete',
+      format: ['table'],
+      collapsed: true,
+      suffix: /^$/,
+      handler() {},
+    },
+    'table enter': {
+      key: 'Enter',
+      shiftKey: null,
+      format: ['table'],
+      handler(range) {
+        const module = this.quill.getModule('table');
+        if (module) {
+          const [table, row, cell, offset] = module.getTable(range);
+          const shift = tableSide(table, row, cell, offset);
+          if (shift == null) return;
+          let index = table.offset();
+          if (shift < 0) {
+            const delta = new Delta().retain(index).insert('\n');
+            this.quill.updateContents(delta, Quill.sources.USER);
+            this.quill.setSelection(
+              range.index + 1,
+              range.length,
+              Quill.sources.SILENT,
+            );
+          } else if (shift > 0) {
+            index += table.length();
+            const delta = new Delta().retain(index).insert('\n');
+            this.quill.updateContents(delta, Quill.sources.USER);
+            this.quill.setSelection(index, Quill.sources.USER);
+          }
+        }
+      },
+    },
+    'table tab': {
+      key: 'Tab',
+      shiftKey: null,
+      format: ['table'],
+      handler(range, context) {
+        const { event, line: cell } = context;
+        const offset = cell.offset(this.quill.scroll);
+        if (event.shiftKey) {
+          this.quill.setSelection(offset - 1, Quill.sources.USER);
+        } else {
+          this.quill.setSelection(offset + cell.length(), Quill.sources.USER);
+        }
+      },
+    },
     'list autofill': {
       key: ' ',
       collapsed: true,
-      format: { list: false },
+      format: {
+        list: false,
+        'code-block': false,
+        blockquote: false,
+        header: false,
+        table: false,
+      },
       prefix: /^\s*?(\d+\.|-|\*|\[ ?\]|\[x\])$/,
       handler(range, context) {
+        if (this.quill.scroll.query('list') == null) return true;
         const { length } = context.prefix;
         const [line, offset] = this.quill.getLine(range.index);
         if (offset > length) return true;
@@ -393,10 +447,12 @@ function handleBackspace(range, context) {
   let formats = {};
   if (context.offset === 0) {
     const [prev] = this.quill.getLine(range.index - 1);
-    if (prev != null && prev.length() > 1) {
-      const curFormats = line.formats();
-      const prevFormats = this.quill.getFormat(range.index - 1, 1);
-      formats = DeltaOp.attributes.diff(curFormats, prevFormats) || {};
+    if (prev != null) {
+      if (prev.length() > 1 || prev.statics.blotName === 'table') {
+        const curFormats = line.formats();
+        const prevFormats = this.quill.getFormat(range.index - 1, 1);
+        formats = DeltaOp.attributes.diff(curFormats, prevFormats) || {};
+      }
     }
   }
   // Check for astral symbols
@@ -463,7 +519,7 @@ function handleEnter(range, context) {
   }
   const lineFormats = Object.keys(context.format).reduce((formats, format) => {
     if (
-      Parchment.query(format, Parchment.Scope.BLOCK) &&
+      this.quill.scroll.query(format, Scope.BLOCK) &&
       !Array.isArray(context.format[format])
     ) {
       formats[format] = context.format[format];
@@ -489,7 +545,7 @@ function makeCodeBlockHandler(indent) {
     shiftKey: !indent,
     format: { 'code-block': true },
     handler(range) {
-      const CodeBlock = Parchment.query('code-block');
+      const CodeBlock = this.quill.scroll.query('code-block');
       const lines =
         range.length === 0
           ? this.quill.getLines(range.index, 1)
@@ -531,7 +587,7 @@ function makeEmbedArrowHandler(key, shiftKey) {
         index += range.length + 1;
       }
       const [leaf] = this.quill.getLeaf(index);
-      if (!(leaf instanceof Parchment.Embed)) return true;
+      if (!(leaf instanceof EmbedBlot)) return true;
       if (key === 'ArrowLeft') {
         if (shiftKey) {
           this.quill.setSelection(
@@ -628,6 +684,20 @@ function normalize(binding) {
     delete binding.shortKey;
   }
   return binding;
+}
+
+function tableSide(table, row, cell, offset) {
+  if (row.prev == null && row.next == null) {
+    if (cell.prev == null && cell.next == null) {
+      return offset === 0 ? -1 : 1;
+    }
+    return cell.prev == null ? -1 : 1;
+  } else if (row.prev == null) {
+    return -1;
+  } else if (row.next == null) {
+    return 1;
+  }
+  return null;
 }
 
 export { Keyboard as default, SHORTKEY, normalize };

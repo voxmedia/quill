@@ -2,6 +2,9 @@
 layout: docs
 title: Formats
 permalink: /docs/formats/
+redirect_from:
+  - /docs/modules/formula/
+  - /docs/modules/formulas/
 ---
 
 Quill supports a number of formats, both in UI controls and API calls.
@@ -38,6 +41,6 @@ By default all formats are enabled and allowed to exist within a Quill editor an
 
 #### Embeds
 
-  - Formula - `formula`
+  - Formula - `formula` (requires [KaTex]((https://khan.github.io/KaTeX/)))
   - Image - `image`
   - Video - `video`

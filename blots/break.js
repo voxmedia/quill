@@ -1,15 +1,12 @@
-import Parchment from 'parchment';
+import { EmbedBlot } from 'parchment';
 
-
-class Break extends Parchment.Embed {
+class Break extends EmbedBlot {
   static value() {
     return undefined;
   }
 
-  insertInto(parent, ref) {
-    if (parent.children.length === 0) {
-      super.insertInto(parent, ref);
-    } else {
+  optimize() {
+    if (this.prev || this.next) {
       this.remove();
     }
   }
@@ -24,6 +21,5 @@ class Break extends Parchment.Embed {
 }
 Break.blotName = 'break';
 Break.tagName = 'BR';
-
 
 export default Break;

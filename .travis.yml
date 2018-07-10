@@ -1,5 +1,5 @@
 language: node_js
-node_js: '7'
+node_js: '8.9'
 script:
   - npm run build
   - travis_retry npm run travis
@@ -11,8 +11,9 @@ cache:
 addons:
   sauce_connect:
     username: "quill"
-  jwt:
-    secure: "AAqywYhvkaoJyqLvtcm+urFZsL4Z6q+0WIbN9oFwGaS02bP2trJkRQmI0+TwK6Spsvn0t1idAORuLM6I5ABdJ6+pe3AMTIIGL06dyQQj5r1cRKPCrOpySjZe4L18XYb6PvcyibI0ZLo8szptGeBYDXqOzMlNLy2a+JR+USqsQoU="
+    # There is no way to securely allow community PRs to be built and tested
+    # by Travis and SauceLabs. Please do not abuse.
+    access_key: "ced60aed-80ad-436b-9ba8-690ed1205180"
 env:
   matrix:
     - BROWSER=mac-chrome-latest
@@ -21,8 +22,5 @@ env:
     - BROWSER=windows-chrome-latest
     - BROWSER=windows-firefox-latest
     - BROWSER=windows-edge-latest
-    - BROWSER=windows-ie-latest
-    - BROWSER=linux-chrome-latest
-    - BROWSER=linux-firefox-latest
     - BROWSER=ios-latest
     - BROWSER=android-latest

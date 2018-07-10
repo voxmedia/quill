@@ -1,6 +1,6 @@
 {
   "name": "quill",
-  "version": "1.3.6",
+  "version": "2.0.0-dev.2",
   "description": "Your powerful, rich text editor",
   "author": "Jason Chen <jhchen7@gmail.com>",
   "homepage": "http://quilljs.com",
@@ -34,41 +34,47 @@
   "dependencies": {
     "clone": "^2.1.1",
     "deep-equal": "^1.0.1",
-    "eventemitter3": "^2.0.3",
+    "eventemitter3": "^3.1.0",
     "extend": "^3.0.1",
-    "parchment": "git://github.com/voxmedia/parchment#1d652b05361c1adb382c78cc3f991362d99a828e",
+    "parchment": "quilljs/parchment#487850f7eb030a6c4e750ba809e58b09444e0bdb",
     "quill-delta": "^3.6.2"
   },
   "devDependencies": {
-    "babel-core": "^6.26.0",
+    "babel-core": "^6.26.3",
     "babel-loader": "^7.1.2",
-    "babel-plugin-istanbul": "^4.1.5",
-    "babel-plugin-transform-es2015-modules-commonjs": "^6.24.1",
-    "babel-preset-es2015": "^6.24.1",
-    "css-loader": "~0.28.7",
-    "eslint": "^4.9.0",
-    "eslint-loader": "^1.9.0",
-    "extract-text-webpack-plugin": "^3.0.1",
-    "html-loader": "~0.5.1",
-    "http-proxy": "^1.16.2",
-    "jasmine-core": "^2.8.0",
-    "karma": "^1.7.1",
+    "babel-plugin-istanbul": "^4.1.6",
+    "babel-preset-env": "^1.7.0",
+    "css-loader": "~0.28.9",
+    "eslint": "^4.17.0",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-config-prettier": "^2.9.0",
+    "eslint-import-resolver-webpack": "~0.10.0",
+    "eslint-plugin-import": "^2.12.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-prettier": "^2.6.0",
+    "eslint-plugin-react": "^7.8.2",
+    "highlight.js": "^9.12.0",
+    "html-loader": "~0.5.5",
+    "http-proxy": "^1.17.0",
+    "jasmine": "^3.1.0",
+    "jasmine-core": "^3.1.0",
+    "karma": "^2.0.2",
     "karma-chrome-launcher": "^2.2.0",
-    "karma-coverage": "^1.1.1",
-    "karma-jasmine": "^1.1.0",
+    "karma-coverage": "^1.1.2",
+    "karma-jasmine": "^1.1.2",
     "karma-sauce-launcher": "^1.2.0",
-    "lodash": "^4.17.4",
-    "style-loader": "~0.19.0",
+    "lodash": "^4.17.10",
+    "mini-css-extract-plugin": "~0.4.0",
+    "prettier": "^1.13.4",
+    "puppeteer": "^1.5.0",
+    "style-loader": "~0.21.0",
     "stylus": "~0.54.5",
     "stylus-loader": "^3.0.1",
-    "ts-loader": "^3.0.3",
-    "typescript": "^2.5.3",
-    "wdio-jasmine-framework": "~0.3.2",
-    "wdio-spec-reporter": "~0.1.2",
-    "webdriver-manager": "^12.0.6",
-    "webdriverio": "^4.8.0",
-    "webpack": "^3.8.1",
-    "webpack-dev-server": "^2.9.2"
+    "ts-loader": "^4.3.1",
+    "typescript": "^2.9.1",
+    "webpack": "^4.10.2",
+    "webpack-cli": "^3.0.1",
+    "webpack-dev-server": "^3.1.4"
   },
   "license": "BSD-3-Clause",
   "repository": {
@@ -78,18 +84,78 @@
   "bugs": {
     "url": "https://github.com/quilljs/quill/issues"
   },
+  "eslintConfig": {
+    "extends": [
+      "airbnb",
+      "prettier"
+    ],
+    "env": {
+      "browser": true,
+      "commonjs": true,
+      "es6": true
+    },
+    "plugins": [
+      "prettier"
+    ],
+    "settings": {
+      "import/resolver": {
+        "webpack": {
+          "config": "_develop/webpack.config.js"
+        }
+      }
+    },
+    "rules": {
+      "arrow-body-style": [
+        "off"
+      ],
+      "class-methods-use-this": [
+        "off"
+      ],
+      "import/no-extraneous-dependencies": [
+        "error",
+        {
+          "devDependencies": [
+            "_develop/*.js",
+            "test/**/*.js"
+          ]
+        }
+      ],
+      "no-param-reassign": [
+        "off"
+      ],
+      "no-use-before-define": [
+        "error",
+        {
+          "functions": false
+        }
+      ],
+      "import/named": [
+        "error"
+      ],
+      "prettier/prettier": "error"
+    }
+  },
+  "eslintIgnore": [
+    "dist/",
+    "docs/",
+    "node_modules/"
+  ],
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "all"
+  },
   "scripts": {
-    "build": "webpack --config _develop/webpack.config.js; rm dist/quill.core dist/quill.bubble dist/quill.snow;",
+    "build": "npm run lint && npm run build:webpack",
+    "build:webpack": "webpack --config _develop/webpack.config.js; rm dist/quill.core dist/quill.bubble dist/quill.snow",
     "build:release": "./_develop/scripts/release.sh",
-    "start": "npm run build; bundle exec foreman start -f _develop/procfile",
+    "lint": "eslint blots core formats modules themes ui test",
+    "start": "npm run build:webpack; bundle exec foreman start -f _develop/procfile",
     "test": "npm run test:unit",
     "test:all": "npm run test:unit; npm run test:functional",
-    "test:functional": "./_develop/scripts/webdriver.sh",
+    "test:functional": "./_develop/scripts/puppeteer.sh",
     "test:unit": "npm run build; karma start _develop/karma.config.js",
     "test:coverage": "webpack --env.coverage --config _develop/webpack.config.js; karma start _develop/karma.config.js --reporters coverage",
-    "travis": "karma start _develop/karma.config.js --reporters dots,saucelabs",
-    "webdriver:start": "webdriver-manager start",
-    "webdriver:update": "webdriver-manager update"
+    "travis": "npm run lint && karma start _develop/karma.config.js --reporters dots,saucelabs"
   },
   "keywords": [
     "editor",
