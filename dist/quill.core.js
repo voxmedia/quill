@@ -1,5 +1,5 @@
 /*!
- * Quill Editor v1.3.6
+ * Quill Editor v1.3.7
  * https://quilljs.com/
  * Copyright (c) 2014, Jason Chen
  * Copyright (c) 2013, salesforce.com
@@ -76,7 +76,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 110);
+/******/ 	return __webpack_require__(__webpack_require__.s = 111);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -89,11 +89,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var container_1 = __webpack_require__(17);
 var format_1 = __webpack_require__(18);
 var leaf_1 = __webpack_require__(19);
-var scroll_1 = __webpack_require__(45);
-var inline_1 = __webpack_require__(46);
-var block_1 = __webpack_require__(47);
-var embed_1 = __webpack_require__(48);
-var text_1 = __webpack_require__(49);
+var scroll_1 = __webpack_require__(46);
+var inline_1 = __webpack_require__(47);
+var block_1 = __webpack_require__(48);
+var embed_1 = __webpack_require__(49);
+var text_1 = __webpack_require__(50);
 var attributor_1 = __webpack_require__(12);
 var class_1 = __webpack_require__(32);
 var style_1 = __webpack_require__(33);
@@ -127,9 +127,9 @@ exports.default = Parchment;
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var diff = __webpack_require__(51);
+var diff = __webpack_require__(52);
 var equal = __webpack_require__(11);
-var extend = __webpack_require__(3);
+var extend = __webpack_require__(34);
 var op = __webpack_require__(20);
 
 
@@ -611,98 +611,6 @@ exports.register = register;
 
 /***/ }),
 /* 3 */
-/***/ (function(module, exports) {
-
-'use strict';
-
-var hasOwn = Object.prototype.hasOwnProperty;
-var toStr = Object.prototype.toString;
-
-var isArray = function isArray(arr) {
-	if (typeof Array.isArray === 'function') {
-		return Array.isArray(arr);
-	}
-
-	return toStr.call(arr) === '[object Array]';
-};
-
-var isPlainObject = function isPlainObject(obj) {
-	if (!obj || toStr.call(obj) !== '[object Object]') {
-		return false;
-	}
-
-	var hasOwnConstructor = hasOwn.call(obj, 'constructor');
-	var hasIsPrototypeOf = obj.constructor && obj.constructor.prototype && hasOwn.call(obj.constructor.prototype, 'isPrototypeOf');
-	// Not own constructor property must be Object
-	if (obj.constructor && !hasOwnConstructor && !hasIsPrototypeOf) {
-		return false;
-	}
-
-	// Own properties are enumerated firstly, so to speed up,
-	// if last one is own, then all properties are own.
-	var key;
-	for (key in obj) { /**/ }
-
-	return typeof key === 'undefined' || hasOwn.call(obj, key);
-};
-
-module.exports = function extend() {
-	var options, name, src, copy, copyIsArray, clone;
-	var target = arguments[0];
-	var i = 1;
-	var length = arguments.length;
-	var deep = false;
-
-	// Handle a deep copy situation
-	if (typeof target === 'boolean') {
-		deep = target;
-		target = arguments[1] || {};
-		// skip the boolean and the target
-		i = 2;
-	}
-	if (target == null || (typeof target !== 'object' && typeof target !== 'function')) {
-		target = {};
-	}
-
-	for (; i < length; ++i) {
-		options = arguments[i];
-		// Only deal with non-null/undefined values
-		if (options != null) {
-			// Extend the base object
-			for (name in options) {
-				src = target[name];
-				copy = options[name];
-
-				// Prevent never-ending loop
-				if (target !== copy) {
-					// Recurse if we're merging plain objects or arrays
-					if (deep && copy && (isPlainObject(copy) || (copyIsArray = isArray(copy)))) {
-						if (copyIsArray) {
-							copyIsArray = false;
-							clone = src && isArray(src) ? src : [];
-						} else {
-							clone = src && isPlainObject(src) ? src : {};
-						}
-
-						// Never move original objects, clone them
-						target[name] = extend(deep, clone, copy);
-
-					// Don't bring in undefined values
-					} else if (typeof copy !== 'undefined') {
-						target[name] = copy;
-					}
-				}
-			}
-		}
-	}
-
-	// Return the modified object
-	return target;
-};
-
-
-/***/ }),
-/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -717,7 +625,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-var _extend = __webpack_require__(3);
+var _extend = __webpack_require__(5);
 
 var _extend2 = _interopRequireDefault(_extend);
 
@@ -963,7 +871,7 @@ exports.BlockEmbed = BlockEmbed;
 exports.default = Block;
 
 /***/ }),
-/* 5 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -980,7 +888,7 @@ var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = [
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-__webpack_require__(50);
+__webpack_require__(51);
 
 var _quillDelta = __webpack_require__(1);
 
@@ -1006,7 +914,7 @@ var _selection = __webpack_require__(15);
 
 var _selection2 = _interopRequireDefault(_selection);
 
-var _extend = __webpack_require__(3);
+var _extend = __webpack_require__(5);
 
 var _extend2 = _interopRequireDefault(_extend);
 
@@ -1014,7 +922,7 @@ var _logger = __webpack_require__(10);
 
 var _logger2 = _interopRequireDefault(_logger);
 
-var _theme = __webpack_require__(34);
+var _theme = __webpack_require__(35);
 
 var _theme2 = _interopRequireDefault(_theme);
 
@@ -1536,7 +1444,7 @@ Quill.DEFAULTS = {
 Quill.events = _emitter4.default.events;
 Quill.sources = _emitter4.default.sources;
 // eslint-disable-next-line no-undef
-Quill.version =  false ? 'dev' : "1.3.6";
+Quill.version =  false ? 'dev' : "1.3.7";
 
 Quill.imports = {
   'delta': _quillDelta2.default,
@@ -1698,6 +1606,129 @@ exports.overload = overload;
 exports.default = Quill;
 
 /***/ }),
+/* 5 */
+/***/ (function(module, exports) {
+
+'use strict';
+
+var hasOwn = Object.prototype.hasOwnProperty;
+var toStr = Object.prototype.toString;
+var defineProperty = Object.defineProperty;
+var gOPD = Object.getOwnPropertyDescriptor;
+
+var isArray = function isArray(arr) {
+	if (typeof Array.isArray === 'function') {
+		return Array.isArray(arr);
+	}
+
+	return toStr.call(arr) === '[object Array]';
+};
+
+var isPlainObject = function isPlainObject(obj) {
+	if (!obj || toStr.call(obj) !== '[object Object]') {
+		return false;
+	}
+
+	var hasOwnConstructor = hasOwn.call(obj, 'constructor');
+	var hasIsPrototypeOf = obj.constructor && obj.constructor.prototype && hasOwn.call(obj.constructor.prototype, 'isPrototypeOf');
+	// Not own constructor property must be Object
+	if (obj.constructor && !hasOwnConstructor && !hasIsPrototypeOf) {
+		return false;
+	}
+
+	// Own properties are enumerated firstly, so to speed up,
+	// if last one is own, then all properties are own.
+	var key;
+	for (key in obj) { /**/ }
+
+	return typeof key === 'undefined' || hasOwn.call(obj, key);
+};
+
+// If name is '__proto__', and Object.defineProperty is available, define __proto__ as an own property on target
+var setProperty = function setProperty(target, options) {
+	if (defineProperty && options.name === '__proto__') {
+		defineProperty(target, options.name, {
+			enumerable: true,
+			configurable: true,
+			value: options.newValue,
+			writable: true
+		});
+	} else {
+		target[options.name] = options.newValue;
+	}
+};
+
+// Return undefined instead of __proto__ if '__proto__' is not an own property
+var getProperty = function getProperty(obj, name) {
+	if (name === '__proto__') {
+		if (!hasOwn.call(obj, name)) {
+			return void 0;
+		} else if (gOPD) {
+			// In early versions of node, obj['__proto__'] is buggy when obj has
+			// __proto__ as an own property. Object.getOwnPropertyDescriptor() works.
+			return gOPD(obj, name).value;
+		}
+	}
+
+	return obj[name];
+};
+
+module.exports = function extend() {
+	var options, name, src, copy, copyIsArray, clone;
+	var target = arguments[0];
+	var i = 1;
+	var length = arguments.length;
+	var deep = false;
+
+	// Handle a deep copy situation
+	if (typeof target === 'boolean') {
+		deep = target;
+		target = arguments[1] || {};
+		// skip the boolean and the target
+		i = 2;
+	}
+	if (target == null || (typeof target !== 'object' && typeof target !== 'function')) {
+		target = {};
+	}
+
+	for (; i < length; ++i) {
+		options = arguments[i];
+		// Only deal with non-null/undefined values
+		if (options != null) {
+			// Extend the base object
+			for (name in options) {
+				src = getProperty(target, name);
+				copy = getProperty(options, name);
+
+				// Prevent never-ending loop
+				if (target !== copy) {
+					// Recurse if we're merging plain objects or arrays
+					if (deep && copy && (isPlainObject(copy) || (copyIsArray = isArray(copy)))) {
+						if (copyIsArray) {
+							copyIsArray = false;
+							clone = src && isArray(src) ? src : [];
+						} else {
+							clone = src && isPlainObject(src) ? src : {};
+						}
+
+						// Never move original objects, clone them
+						setProperty(target, { name: name, newValue: extend(deep, clone, copy) });
+
+					// Don't bring in undefined values
+					} else if (typeof copy !== 'undefined') {
+						setProperty(target, { name: name, newValue: copy });
+					}
+				}
+			}
+		}
+	}
+
+	// Return the modified object
+	return target;
+};
+
+
+/***/ }),
 /* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1839,7 +1870,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-var _eventemitter = __webpack_require__(54);
+var _eventemitter = __webpack_require__(55);
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -2009,8 +2040,8 @@ exports.default = namespace;
 /***/ (function(module, exports, __webpack_require__) {
 
 var pSlice = Array.prototype.slice;
-var objectKeys = __webpack_require__(52);
-var isArguments = __webpack_require__(53);
+var objectKeys = __webpack_require__(53);
+var isArguments = __webpack_require__(54);
 
 var deepEqual = module.exports = function (actual, expected, opts) {
   if (!opts) opts = {};
@@ -2204,7 +2235,7 @@ var _cursor = __webpack_require__(24);
 
 var _cursor2 = _interopRequireDefault(_cursor);
 
-var _block = __webpack_require__(4);
+var _block = __webpack_require__(3);
 
 var _block2 = _interopRequireDefault(_block);
 
@@ -2220,7 +2251,7 @@ var _deepEqual = __webpack_require__(11);
 
 var _deepEqual2 = _interopRequireDefault(_deepEqual);
 
-var _extend = __webpack_require__(3);
+var _extend = __webpack_require__(5);
 
 var _extend2 = _interopRequireDefault(_extend);
 
@@ -2552,7 +2583,7 @@ var _parchment = __webpack_require__(0);
 
 var _parchment2 = _interopRequireDefault(_parchment);
 
-var _block = __webpack_require__(4);
+var _block = __webpack_require__(3);
 
 var _block2 = _interopRequireDefault(_block);
 
@@ -3304,7 +3335,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var linked_list_1 = __webpack_require__(44);
+var linked_list_1 = __webpack_require__(45);
 var shadow_1 = __webpack_require__(30);
 var Registry = __webpack_require__(2);
 var ContainerBlot = /** @class */ (function (_super) {
@@ -3690,7 +3721,7 @@ exports.default = LeafBlot;
 /***/ (function(module, exports, __webpack_require__) {
 
 var equal = __webpack_require__(11);
-var extend = __webpack_require__(3);
+var extend = __webpack_require__(34);
 
 
 var lib = {
@@ -4118,7 +4149,7 @@ var _emitter = __webpack_require__(8);
 
 var _emitter2 = _interopRequireDefault(_emitter);
 
-var _block = __webpack_require__(4);
+var _block = __webpack_require__(3);
 
 var _block2 = _interopRequireDefault(_block);
 
@@ -4372,7 +4403,7 @@ var _deepEqual = __webpack_require__(11);
 
 var _deepEqual2 = _interopRequireDefault(_deepEqual);
 
-var _extend = __webpack_require__(3);
+var _extend = __webpack_require__(5);
 
 var _extend2 = _interopRequireDefault(_extend);
 
@@ -4388,7 +4419,7 @@ var _parchment = __webpack_require__(0);
 
 var _parchment2 = _interopRequireDefault(_parchment);
 
-var _quill = __webpack_require__(5);
+var _quill = __webpack_require__(4);
 
 var _quill2 = _interopRequireDefault(_quill);
 
@@ -5207,7 +5238,7 @@ var _parchment = __webpack_require__(0);
 
 var _parchment2 = _interopRequireDefault(_parchment);
 
-var _block = __webpack_require__(4);
+var _block = __webpack_require__(3);
 
 var _block2 = _interopRequireDefault(_block);
 
@@ -5315,11 +5346,11 @@ var _parchment = __webpack_require__(0);
 
 var _parchment2 = _interopRequireDefault(_parchment);
 
-var _quill = __webpack_require__(5);
+var _quill = __webpack_require__(4);
 
 var _quill2 = _interopRequireDefault(_quill);
 
-var _block = __webpack_require__(4);
+var _block = __webpack_require__(3);
 
 var _block2 = _interopRequireDefault(_block);
 
@@ -5335,7 +5366,7 @@ var _cursor = __webpack_require__(24);
 
 var _cursor2 = _interopRequireDefault(_cursor);
 
-var _embed = __webpack_require__(35);
+var _embed = __webpack_require__(36);
 
 var _embed2 = _interopRequireDefault(_embed);
 
@@ -5351,11 +5382,11 @@ var _text = __webpack_require__(7);
 
 var _text2 = _interopRequireDefault(_text);
 
-var _clipboard = __webpack_require__(55);
+var _clipboard = __webpack_require__(56);
 
 var _clipboard2 = _interopRequireDefault(_clipboard);
 
-var _history = __webpack_require__(42);
+var _history = __webpack_require__(43);
 
 var _history2 = _interopRequireDefault(_history);
 
@@ -5753,6 +5784,129 @@ exports.default = StyleAttributor;
 
 /***/ }),
 /* 34 */
+/***/ (function(module, exports) {
+
+'use strict';
+
+var hasOwn = Object.prototype.hasOwnProperty;
+var toStr = Object.prototype.toString;
+var defineProperty = Object.defineProperty;
+var gOPD = Object.getOwnPropertyDescriptor;
+
+var isArray = function isArray(arr) {
+	if (typeof Array.isArray === 'function') {
+		return Array.isArray(arr);
+	}
+
+	return toStr.call(arr) === '[object Array]';
+};
+
+var isPlainObject = function isPlainObject(obj) {
+	if (!obj || toStr.call(obj) !== '[object Object]') {
+		return false;
+	}
+
+	var hasOwnConstructor = hasOwn.call(obj, 'constructor');
+	var hasIsPrototypeOf = obj.constructor && obj.constructor.prototype && hasOwn.call(obj.constructor.prototype, 'isPrototypeOf');
+	// Not own constructor property must be Object
+	if (obj.constructor && !hasOwnConstructor && !hasIsPrototypeOf) {
+		return false;
+	}
+
+	// Own properties are enumerated firstly, so to speed up,
+	// if last one is own, then all properties are own.
+	var key;
+	for (key in obj) { /**/ }
+
+	return typeof key === 'undefined' || hasOwn.call(obj, key);
+};
+
+// If name is '__proto__', and Object.defineProperty is available, define __proto__ as an own property on target
+var setProperty = function setProperty(target, options) {
+	if (defineProperty && options.name === '__proto__') {
+		defineProperty(target, options.name, {
+			enumerable: true,
+			configurable: true,
+			value: options.newValue,
+			writable: true
+		});
+	} else {
+		target[options.name] = options.newValue;
+	}
+};
+
+// Return undefined instead of __proto__ if '__proto__' is not an own property
+var getProperty = function getProperty(obj, name) {
+	if (name === '__proto__') {
+		if (!hasOwn.call(obj, name)) {
+			return void 0;
+		} else if (gOPD) {
+			// In early versions of node, obj['__proto__'] is buggy when obj has
+			// __proto__ as an own property. Object.getOwnPropertyDescriptor() works.
+			return gOPD(obj, name).value;
+		}
+	}
+
+	return obj[name];
+};
+
+module.exports = function extend() {
+	var options, name, src, copy, copyIsArray, clone;
+	var target = arguments[0];
+	var i = 1;
+	var length = arguments.length;
+	var deep = false;
+
+	// Handle a deep copy situation
+	if (typeof target === 'boolean') {
+		deep = target;
+		target = arguments[1] || {};
+		// skip the boolean and the target
+		i = 2;
+	}
+	if (target == null || (typeof target !== 'object' && typeof target !== 'function')) {
+		target = {};
+	}
+
+	for (; i < length; ++i) {
+		options = arguments[i];
+		// Only deal with non-null/undefined values
+		if (options != null) {
+			// Extend the base object
+			for (name in options) {
+				src = getProperty(target, name);
+				copy = getProperty(options, name);
+
+				// Prevent never-ending loop
+				if (target !== copy) {
+					// Recurse if we're merging plain objects or arrays
+					if (deep && copy && (isPlainObject(copy) || (copyIsArray = isArray(copy)))) {
+						if (copyIsArray) {
+							copyIsArray = false;
+							clone = src && isArray(src) ? src : [];
+						} else {
+							clone = src && isPlainObject(src) ? src : {};
+						}
+
+						// Never move original objects, clone them
+						setProperty(target, { name: name, newValue: extend(deep, clone, copy) });
+
+					// Don't bring in undefined values
+					} else if (typeof copy !== 'undefined') {
+						setProperty(target, { name: name, newValue: copy });
+					}
+				}
+			}
+		}
+	}
+
+	// Return the modified object
+	return target;
+};
+
+
+/***/ }),
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5808,7 +5962,7 @@ Theme.themes = {
 exports.default = Theme;
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5929,7 +6083,7 @@ var Embed = function (_Parchment$Embed) {
 exports.default = Embed;
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5960,7 +6114,7 @@ exports.AlignClass = AlignClass;
 exports.AlignStyle = AlignStyle;
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5990,7 +6144,7 @@ exports.BackgroundClass = BackgroundClass;
 exports.BackgroundStyle = BackgroundStyle;
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6021,7 +6175,7 @@ exports.DirectionClass = DirectionClass;
 exports.DirectionStyle = DirectionStyle;
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6080,7 +6234,7 @@ exports.FontStyle = FontStyle;
 exports.FontClass = FontClass;
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6110,8 +6264,8 @@ exports.SizeClass = SizeClass;
 exports.SizeStyle = SizeStyle;
 
 /***/ }),
-/* 41 */,
-/* 42 */
+/* 42 */,
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6128,7 +6282,7 @@ var _parchment = __webpack_require__(0);
 
 var _parchment2 = _interopRequireDefault(_parchment);
 
-var _quill = __webpack_require__(5);
+var _quill = __webpack_require__(4);
 
 var _quill2 = _interopRequireDefault(_quill);
 
@@ -6279,8 +6433,8 @@ exports.default = History;
 exports.getLastChangeIndex = getLastChangeIndex;
 
 /***/ }),
-/* 43 */,
-/* 44 */
+/* 44 */,
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6421,7 +6575,7 @@ exports.default = LinkedList;
 
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6605,7 +6759,7 @@ exports.default = ScrollBlot;
 
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6690,7 +6844,7 @@ exports.default = InlineBlot;
 
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6764,7 +6918,7 @@ exports.default = BlockBlot;
 
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6812,7 +6966,7 @@ exports.default = EmbedBlot;
 
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6915,7 +7069,7 @@ exports.default = TextBlot;
 
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6986,7 +7140,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, exports) {
 
 /**
@@ -7730,7 +7884,7 @@ function merge_tuples (diffs, start, length) {
 
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, exports) {
 
 exports = module.exports = typeof Object.keys === 'function'
@@ -7745,7 +7899,7 @@ function shim (obj) {
 
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, exports) {
 
 var supportsArgumentsClass = (function(){
@@ -7771,7 +7925,7 @@ function unsupported(object){
 
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, exports) {
 
 'use strict';
@@ -8088,7 +8242,7 @@ if ('undefined' !== typeof module) {
 
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8105,7 +8259,7 @@ var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = [
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _extend2 = __webpack_require__(3);
+var _extend2 = __webpack_require__(5);
 
 var _extend3 = _interopRequireDefault(_extend2);
 
@@ -8117,7 +8271,7 @@ var _parchment = __webpack_require__(0);
 
 var _parchment2 = _interopRequireDefault(_parchment);
 
-var _quill = __webpack_require__(5);
+var _quill = __webpack_require__(4);
 
 var _quill2 = _interopRequireDefault(_quill);
 
@@ -8129,9 +8283,9 @@ var _module = __webpack_require__(9);
 
 var _module2 = _interopRequireDefault(_module);
 
-var _align = __webpack_require__(36);
+var _align = __webpack_require__(37);
 
-var _background = __webpack_require__(37);
+var _background = __webpack_require__(38);
 
 var _code = __webpack_require__(14);
 
@@ -8139,11 +8293,11 @@ var _code2 = _interopRequireDefault(_code);
 
 var _color = __webpack_require__(26);
 
-var _direction = __webpack_require__(38);
+var _direction = __webpack_require__(39);
 
-var _font = __webpack_require__(39);
+var _font = __webpack_require__(40);
 
-var _size = __webpack_require__(40);
+var _size = __webpack_require__(41);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -8519,7 +8673,6 @@ exports.matchSpacing = matchSpacing;
 exports.matchText = matchText;
 
 /***/ }),
-/* 56 */,
 /* 57 */,
 /* 58 */,
 /* 59 */,
@@ -8573,7 +8726,8 @@ exports.matchText = matchText;
 /* 107 */,
 /* 108 */,
 /* 109 */,
-/* 110 */
+/* 110 */,
+/* 111 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__(29);
