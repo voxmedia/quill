@@ -14,6 +14,7 @@ const SHORTKEY = /Mac/i.test(navigator.platform) ? 'metaKey' : 'ctrlKey';
 
 class Keyboard extends Module {
   static match(evt, binding) {
+    binding = normalize(binding);
     if (
       ['altKey', 'ctrlKey', 'metaKey', 'shiftKey'].some(key => {
         return !!binding[key] !== evt[key] && binding[key] !== null;
@@ -21,7 +22,10 @@ class Keyboard extends Module {
     ) {
       return false;
     }
-    return binding.key === evt.key || binding.key === evt.which;
+    return (
+      binding.key === evt.key ||
+      binding.keyCode === (evt.which || evt.keyCode)
+    );
   }
 
   constructor(quill, options) {
@@ -184,6 +188,18 @@ class Keyboard extends Module {
     });
   }
 }
+
+Keyboard.keys = {
+  BACKSPACE: 8,
+  TAB: 9,
+  ENTER: 13,
+  ESCAPE: 27,
+  LEFT: 37,
+  UP: 38,
+  RIGHT: 39,
+  DOWN: 40,
+  DELETE: 46
+};
 
 Keyboard.DEFAULTS = {
   bindings: {
@@ -616,10 +632,19 @@ function makeTableArrowHandler(up) {
 }
 
 function normalize(binding) {
-  if (typeof binding === 'string' || typeof binding === 'number') {
-    binding = { key: binding };
+  if (typeof binding === 'string') {
+    return normalize({ key: binding });
+  } else if (typeof binding === 'number') {
+    return normalize({ keyCode: binding });
   } else if (typeof binding === 'object') {
     binding = clone(binding, false);
+    if (typeof binding.key === 'string') {
+      if (Keyboard.keys[binding.key.toUpperCase()] != null) {
+        binding.keyCode = Keyboard.keys[binding.key.toUpperCase()];
+      } else if (binding.key.length === 1) {
+        binding.keyCode = binding.key.toUpperCase().charCodeAt(0);
+      }
+    }
   } else {
     return null;
   }
@@ -630,4 +655,4 @@ function normalize(binding) {
   return binding;
 }
 
-export { Keyboard as default, SHORTKEY, normalize };
+export { Keyboard as default, SHORTKEY };
