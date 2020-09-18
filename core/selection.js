@@ -1,6 +1,6 @@
-import { ContainerBlot, LeafBlot, Scope } from 'parchment';
-import clone from 'clone';
-import equal from 'deep-equal';
+import { LeafBlot, Scope } from 'parchment';
+import cloneDeep from 'lodash.clonedeep';
+import isEqual from 'lodash.isequal';
 import Emitter from './emitter';
 import logger from './logger';
 
@@ -24,10 +24,11 @@ class Selection {
     // savedRange is last non-null range
     this.savedRange = new Range(0, 0);
     this.lastRange = this.savedRange;
+    this.lastNative = null;
     this.handleComposition();
     this.handleDragging();
     this.emitter.listenDOM('selectionchange', document, () => {
-      if (!this.mouseDown) {
+      if (!this.mouseDown && !this.composing) {
         setTimeout(this.update.bind(this, Emitter.sources.USER), 1);
       }
     });
@@ -68,8 +69,10 @@ class Selection {
   handleComposition() {
     this.root.addEventListener('compositionstart', () => {
       this.composing = true;
+      this.scroll.batchStart();
     });
     this.root.addEventListener('compositionend', () => {
+      this.scroll.batchEnd();
       this.composing = false;
       if (this.cursor.parent) {
         const range = this.cursor.restore();
@@ -207,10 +210,11 @@ class Selection {
       const index = blot.offset(this.scroll);
       if (offset === 0) {
         return index;
-      } else if (blot instanceof ContainerBlot) {
-        return index + blot.length();
       }
-      return index + blot.index(node, offset);
+      if (blot instanceof LeafBlot) {
+        return index + blot.index(node, offset);
+      }
+      return index + blot.length();
     });
     const end = Math.min(Math.max(...indexes), this.scroll.length() - 1);
     const start = Math.min(end, ...indexes);
@@ -369,22 +373,31 @@ class Selection {
     const oldRange = this.lastRange;
     const [lastRange, nativeRange] = this.getRange();
     this.lastRange = lastRange;
+    this.lastNative = nativeRange;
     if (this.lastRange != null) {
       this.savedRange = this.lastRange;
     }
-    if (!equal(oldRange, this.lastRange)) {
+    if (!isEqual(oldRange, this.lastRange)) {
       if (
         !this.composing &&
         nativeRange != null &&
         nativeRange.native.collapsed &&
         nativeRange.start.node !== this.cursor.textNode
       ) {
-        this.cursor.restore();
+        const range = this.cursor.restore();
+        if (range) {
+          this.setNativeRange(
+            range.startNode,
+            range.startOffset,
+            range.endNode,
+            range.endOffset,
+          );
+        }
       }
       const args = [
         Emitter.events.SELECTION_CHANGE,
-        clone(this.lastRange),
-        clone(oldRange),
+        cloneDeep(this.lastRange),
+        cloneDeep(oldRange),
         source,
       ];
       this.emitter.emit(Emitter.events.EDITOR_CHANGE, ...args);

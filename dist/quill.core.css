@@ -1,5 +1,5 @@
 /*!
- * Quill Editor v2.0.0-dev.2
+ * Quill Editor v2.0.0-dev.4
  * https://quilljs.com/
  * Copyright (c) 2014, Jason Chen
  * Copyright (c) 2013, salesforce.com
@@ -15,9 +15,9 @@
 .ql-container.ql-disabled .ql-tooltip {
   visibility: hidden;
 }
-.ql-container.ql-disabled .ql-editor li[data-list="checked"]:before,
-.ql-container.ql-disabled .ql-editor li[data-list="unchecked"]:before {
-  pointer-events: none;
+.ql-container:not(.ql-disabled) li[data-list=checked] > .ql-ui,
+.ql-container:not(.ql-disabled) li[data-list=unchecked] > .ql-ui {
+  cursor: pointer;
 }
 .ql-clipboard {
   left: -100000px;
@@ -32,7 +32,7 @@
 }
 .ql-editor {
   box-sizing: border-box;
-  counter-reset: list-0;
+  counter-reset: list-0 list-1 list-2 list-3 list-4 list-5 list-6 list-7 list-8 list-9;
   line-height: 1.42;
   height: 100%;
   outline: none;
@@ -82,8 +82,9 @@
 .ql-editor li {
   list-style-type: none;
   padding-left: 1.5em;
+  position: relative;
 }
-.ql-editor li:before {
+.ql-editor li > .ql-ui:before {
   display: inline-block;
   margin-left: -1.5em;
   margin-right: 0.3em;
@@ -91,112 +92,167 @@
   white-space: nowrap;
   width: 1.2em;
 }
-.ql-editor li[data-list=checked],
-.ql-editor li[data-list=unchecked] {
-  pointer-events: none;
-}
-.ql-editor li[data-list=checked] *,
-.ql-editor li[data-list=unchecked] * {
-  pointer-events: all;
-}
-.ql-editor li[data-list=checked]:before,
-.ql-editor li[data-list=unchecked]:before {
+.ql-editor li[data-list=checked] > .ql-ui,
+.ql-editor li[data-list=unchecked] > .ql-ui {
   color: #777;
-  cursor: pointer;
-  pointer-events: all;
 }
-.ql-editor li[data-list=bullet]:before {
+.ql-editor li[data-list=bullet] > .ql-ui:before {
   content: '\2022';
 }
-.ql-editor li[data-list=checked]:before {
+.ql-editor li[data-list=checked] > .ql-ui:before {
   content: '\2611';
 }
-.ql-editor li[data-list=unchecked]:before {
+.ql-editor li[data-list=unchecked] > .ql-ui:before {
   content: '\2610';
 }
 .ql-editor li[data-list=ordered] {
-  counter-reset: list-1 list-2 list-3 list-4 list-5 list-6 list-7 list-8 list-9;
   counter-increment: list-0;
 }
-.ql-editor li[data-list=ordered]:before {
+@supports (counter-set: none) {
+  .ql-editor li[data-list=ordered] {
+    counter-set: list-1 list-2 list-3 list-4 list-5 list-6 list-7 list-8 list-9;
+  }
+}
+@supports not (counter-set: none) {
+  .ql-editor li[data-list=ordered] {
+    counter-reset: list-1 list-2 list-3 list-4 list-5 list-6 list-7 list-8 list-9;
+  }
+}
+.ql-editor li[data-list=ordered] > .ql-ui:before {
   content: counter(list-0, decimal) '. ';
 }
 .ql-editor li[data-list=ordered].ql-indent-1 {
   counter-increment: list-1;
 }
-.ql-editor li[data-list=ordered].ql-indent-1:before {
+.ql-editor li[data-list=ordered].ql-indent-1 > .ql-ui:before {
   content: counter(list-1, lower-alpha) '. ';
 }
-.ql-editor li[data-list=ordered].ql-indent-1 {
-  counter-reset: list-2 list-3 list-4 list-5 list-6 list-7 list-8 list-9;
+@supports (counter-set: none) {
+  .ql-editor li[data-list=ordered].ql-indent-1 {
+    counter-set: list-2 list-3 list-4 list-5 list-6 list-7 list-8 list-9;
+  }
+}
+@supports not (counter-set: none) {
+  .ql-editor li[data-list=ordered].ql-indent-1 {
+    counter-reset: list-2 list-3 list-4 list-5 list-6 list-7 list-8 list-9;
+  }
 }
 .ql-editor li[data-list=ordered].ql-indent-2 {
   counter-increment: list-2;
 }
-.ql-editor li[data-list=ordered].ql-indent-2:before {
+.ql-editor li[data-list=ordered].ql-indent-2 > .ql-ui:before {
   content: counter(list-2, lower-roman) '. ';
 }
-.ql-editor li[data-list=ordered].ql-indent-2 {
-  counter-reset: list-3 list-4 list-5 list-6 list-7 list-8 list-9;
+@supports (counter-set: none) {
+  .ql-editor li[data-list=ordered].ql-indent-2 {
+    counter-set: list-3 list-4 list-5 list-6 list-7 list-8 list-9;
+  }
+}
+@supports not (counter-set: none) {
+  .ql-editor li[data-list=ordered].ql-indent-2 {
+    counter-reset: list-3 list-4 list-5 list-6 list-7 list-8 list-9;
+  }
 }
 .ql-editor li[data-list=ordered].ql-indent-3 {
   counter-increment: list-3;
 }
-.ql-editor li[data-list=ordered].ql-indent-3:before {
+.ql-editor li[data-list=ordered].ql-indent-3 > .ql-ui:before {
   content: counter(list-3, decimal) '. ';
 }
-.ql-editor li[data-list=ordered].ql-indent-3 {
-  counter-reset: list-4 list-5 list-6 list-7 list-8 list-9;
+@supports (counter-set: none) {
+  .ql-editor li[data-list=ordered].ql-indent-3 {
+    counter-set: list-4 list-5 list-6 list-7 list-8 list-9;
+  }
+}
+@supports not (counter-set: none) {
+  .ql-editor li[data-list=ordered].ql-indent-3 {
+    counter-reset: list-4 list-5 list-6 list-7 list-8 list-9;
+  }
 }
 .ql-editor li[data-list=ordered].ql-indent-4 {
   counter-increment: list-4;
 }
-.ql-editor li[data-list=ordered].ql-indent-4:before {
+.ql-editor li[data-list=ordered].ql-indent-4 > .ql-ui:before {
   content: counter(list-4, lower-alpha) '. ';
 }
-.ql-editor li[data-list=ordered].ql-indent-4 {
-  counter-reset: list-5 list-6 list-7 list-8 list-9;
+@supports (counter-set: none) {
+  .ql-editor li[data-list=ordered].ql-indent-4 {
+    counter-set: list-5 list-6 list-7 list-8 list-9;
+  }
+}
+@supports not (counter-set: none) {
+  .ql-editor li[data-list=ordered].ql-indent-4 {
+    counter-reset: list-5 list-6 list-7 list-8 list-9;
+  }
 }
 .ql-editor li[data-list=ordered].ql-indent-5 {
   counter-increment: list-5;
 }
-.ql-editor li[data-list=ordered].ql-indent-5:before {
+.ql-editor li[data-list=ordered].ql-indent-5 > .ql-ui:before {
   content: counter(list-5, lower-roman) '. ';
 }
-.ql-editor li[data-list=ordered].ql-indent-5 {
-  counter-reset: list-6 list-7 list-8 list-9;
+@supports (counter-set: none) {
+  .ql-editor li[data-list=ordered].ql-indent-5 {
+    counter-set: list-6 list-7 list-8 list-9;
+  }
+}
+@supports not (counter-set: none) {
+  .ql-editor li[data-list=ordered].ql-indent-5 {
+    counter-reset: list-6 list-7 list-8 list-9;
+  }
 }
 .ql-editor li[data-list=ordered].ql-indent-6 {
   counter-increment: list-6;
 }
-.ql-editor li[data-list=ordered].ql-indent-6:before {
+.ql-editor li[data-list=ordered].ql-indent-6 > .ql-ui:before {
   content: counter(list-6, decimal) '. ';
 }
-.ql-editor li[data-list=ordered].ql-indent-6 {
-  counter-reset: list-7 list-8 list-9;
+@supports (counter-set: none) {
+  .ql-editor li[data-list=ordered].ql-indent-6 {
+    counter-set: list-7 list-8 list-9;
+  }
+}
+@supports not (counter-set: none) {
+  .ql-editor li[data-list=ordered].ql-indent-6 {
+    counter-reset: list-7 list-8 list-9;
+  }
 }
 .ql-editor li[data-list=ordered].ql-indent-7 {
   counter-increment: list-7;
 }
-.ql-editor li[data-list=ordered].ql-indent-7:before {
+.ql-editor li[data-list=ordered].ql-indent-7 > .ql-ui:before {
   content: counter(list-7, lower-alpha) '. ';
 }
-.ql-editor li[data-list=ordered].ql-indent-7 {
-  counter-reset: list-8 list-9;
+@supports (counter-set: none) {
+  .ql-editor li[data-list=ordered].ql-indent-7 {
+    counter-set: list-8 list-9;
+  }
+}
+@supports not (counter-set: none) {
+  .ql-editor li[data-list=ordered].ql-indent-7 {
+    counter-reset: list-8 list-9;
+  }
 }
 .ql-editor li[data-list=ordered].ql-indent-8 {
   counter-increment: list-8;
 }
-.ql-editor li[data-list=ordered].ql-indent-8:before {
+.ql-editor li[data-list=ordered].ql-indent-8 > .ql-ui:before {
   content: counter(list-8, lower-roman) '. ';
 }
-.ql-editor li[data-list=ordered].ql-indent-8 {
-  counter-reset: list-9;
+@supports (counter-set: none) {
+  .ql-editor li[data-list=ordered].ql-indent-8 {
+    counter-set: list-9;
+  }
+}
+@supports not (counter-set: none) {
+  .ql-editor li[data-list=ordered].ql-indent-8 {
+    counter-reset: list-9;
+  }
 }
 .ql-editor li[data-list=ordered].ql-indent-9 {
   counter-increment: list-9;
 }
-.ql-editor li[data-list=ordered].ql-indent-9:before {
+.ql-editor li[data-list=ordered].ql-indent-9 > .ql-ui:before {
   content: counter(list-9, decimal) '. ';
 }
 .ql-editor .ql-indent-1:not(.ql-direction-rtl) {
@@ -310,7 +366,7 @@
 .ql-editor li.ql-direction-rtl {
   padding-right: 1.5em;
 }
-.ql-editor li.ql-direction-rtl:before {
+.ql-editor li.ql-direction-rtl > .ql-ui:before {
   margin-left: 0.3em;
   margin-right: -1.5em;
   text-align: left;
@@ -404,6 +460,9 @@
 }
 .ql-editor .ql-align-right {
   text-align: right;
+}
+.ql-editor .ql-ui {
+  position: absolute;
 }
 .ql-editor.ql-blank::before {
   color: rgba(0,0,0,0.6);
