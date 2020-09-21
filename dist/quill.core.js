@@ -4387,7 +4387,7 @@ exports.default = Scroll;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.normalize = exports.SHORTKEY = exports.default = undefined;
+exports.SHORTKEY = exports.default = undefined;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -4451,12 +4451,13 @@ var Keyboard = function (_Module) {
   _createClass(Keyboard, null, [{
     key: 'match',
     value: function match(evt, binding) {
+      binding = normalize(binding);
       if (['altKey', 'ctrlKey', 'metaKey', 'shiftKey'].some(function (key) {
         return !!binding[key] !== evt[key] && binding[key] !== null;
       })) {
         return false;
       }
-      return binding.key === evt.key || binding.key === evt.which;
+      return binding.key === evt.key || binding.keyCode === (evt.which || evt.keyCode);
     }
   }]);
 
@@ -4609,6 +4610,18 @@ var Keyboard = function (_Module) {
 
   return Keyboard;
 }(_module2.default);
+
+Keyboard.keys = {
+  BACKSPACE: 8,
+  TAB: 9,
+  ENTER: 13,
+  ESCAPE: 27,
+  LEFT: 37,
+  UP: 38,
+  RIGHT: 39,
+  DOWN: 40,
+  DELETE: 46
+};
 
 Keyboard.DEFAULTS = {
   bindings: {
@@ -5022,10 +5035,19 @@ function makeTableArrowHandler(up) {
 }
 
 function normalize(binding) {
-  if (typeof binding === 'string' || typeof binding === 'number') {
-    binding = { key: binding };
+  if (typeof binding === 'string') {
+    return normalize({ key: binding });
+  } else if (typeof binding === 'number') {
+    return normalize({ keyCode: binding });
   } else if ((typeof binding === 'undefined' ? 'undefined' : _typeof(binding)) === 'object') {
     binding = (0, _clone2.default)(binding, false);
+    if (typeof binding.key === 'string') {
+      if (Keyboard.keys[binding.key.toUpperCase()] != null) {
+        binding.keyCode = Keyboard.keys[binding.key.toUpperCase()];
+      } else if (binding.key.length === 1) {
+        binding.keyCode = binding.key.toUpperCase().charCodeAt(0);
+      }
+    }
   } else {
     return null;
   }
@@ -5038,7 +5060,6 @@ function normalize(binding) {
 
 exports.default = Keyboard;
 exports.SHORTKEY = SHORTKEY;
-exports.normalize = normalize;
 
 /***/ }),
 /* 24 */
@@ -5790,8 +5811,6 @@ exports.default = StyleAttributor;
 
 var hasOwn = Object.prototype.hasOwnProperty;
 var toStr = Object.prototype.toString;
-var defineProperty = Object.defineProperty;
-var gOPD = Object.getOwnPropertyDescriptor;
 
 var isArray = function isArray(arr) {
 	if (typeof Array.isArray === 'function') {
@@ -5821,35 +5840,6 @@ var isPlainObject = function isPlainObject(obj) {
 	return typeof key === 'undefined' || hasOwn.call(obj, key);
 };
 
-// If name is '__proto__', and Object.defineProperty is available, define __proto__ as an own property on target
-var setProperty = function setProperty(target, options) {
-	if (defineProperty && options.name === '__proto__') {
-		defineProperty(target, options.name, {
-			enumerable: true,
-			configurable: true,
-			value: options.newValue,
-			writable: true
-		});
-	} else {
-		target[options.name] = options.newValue;
-	}
-};
-
-// Return undefined instead of __proto__ if '__proto__' is not an own property
-var getProperty = function getProperty(obj, name) {
-	if (name === '__proto__') {
-		if (!hasOwn.call(obj, name)) {
-			return void 0;
-		} else if (gOPD) {
-			// In early versions of node, obj['__proto__'] is buggy when obj has
-			// __proto__ as an own property. Object.getOwnPropertyDescriptor() works.
-			return gOPD(obj, name).value;
-		}
-	}
-
-	return obj[name];
-};
-
 module.exports = function extend() {
 	var options, name, src, copy, copyIsArray, clone;
 	var target = arguments[0];
@@ -5874,8 +5864,8 @@ module.exports = function extend() {
 		if (options != null) {
 			// Extend the base object
 			for (name in options) {
-				src = getProperty(target, name);
-				copy = getProperty(options, name);
+				src = target[name];
+				copy = options[name];
 
 				// Prevent never-ending loop
 				if (target !== copy) {
@@ -5889,11 +5879,11 @@ module.exports = function extend() {
 						}
 
 						// Never move original objects, clone them
-						setProperty(target, { name: name, newValue: extend(deep, clone, copy) });
+						target[name] = extend(deep, clone, copy);
 
 					// Don't bring in undefined values
 					} else if (typeof copy !== 'undefined') {
-						setProperty(target, { name: name, newValue: copy });
+						target[name] = copy;
 					}
 				}
 			}
